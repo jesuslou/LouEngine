@@ -4,14 +4,14 @@
 
 
 #include <SFML/Graphics/View.hpp>
-//#include <entityx/entityx.h>
+#include <entityx/entityx.h>
 
-//namespace ex = entityx;
-//
-//class Application : public ex::EntityX
-//{
-//public:
-//};
+namespace ex = entityx;
+
+class Application : public ex::EntityX
+{
+public:
+};
 
 //-------------------------
 CApplicationBase::CApplicationBase( ) 
