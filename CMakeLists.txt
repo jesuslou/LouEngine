@@ -11,6 +11,13 @@ add_definitions(-DENTITYX_BUILD_SHARED=0)
 add_definitions(-DENTITYX_BUILD_TESTING=0)
 add_dependency_subdirectory("entityx" "${dependencies_folder}")
 
+set(gtest_ide_group "GoogleTest")
+add_dependency_subdirectory("googletest" "${dependencies_folder}")
+set_target_properties ("gmock" PROPERTIES FOLDER "${gtest_ide_group}")
+set_target_properties ("gmock_main" PROPERTIES FOLDER "${gtest_ide_group}")
+set_target_properties ("gtest" PROPERTIES FOLDER "${gtest_ide_group}")
+set_target_properties ("gtest_main" PROPERTIES FOLDER "${gtest_ide_group}")
+
 set(dependencies 
 		"sfml-window"
 		"sfml-system"
@@ -18,5 +25,9 @@ set(dependencies
 		"sfml-graphics"
 		"sfml-audio"
 		"entityx"
+		"gmock"
+		"gmock_main"
+		"gtest"
+		"gtest_main"
 	)
 generate_static_library(name "LouEngine" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}")
