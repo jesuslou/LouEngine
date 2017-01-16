@@ -1,10 +1,6 @@
 #ifndef _INC_SDL_APPLICATION_H_
 #define _INC_SDL_APPLICATION_H_
 
-#include "game_params/vars.h"
-
-struct SDL_Window;
-struct SDL_Surface;
 
 class CApplicationBase {
 public:
@@ -21,8 +17,6 @@ protected:
   virtual void registerGameStates( ) { }
   virtual void destroyProject( ) { }
   
-  CBindedVars m_game_vars;
-
   float m_elapsed;
 
   bool m_quit;
