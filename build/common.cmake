@@ -24,47 +24,6 @@ function(add_file_to_source_group file)
 	source_group ("${rel_file_path}" FILES ${file})
 endfunction(add_file_to_source_group)
 
-function (generate_static_library)
-	cmake_parse_arguments(lib "" "name;dependencies_folder" "dependencies" ${ARGN})
-	
-	file(GLOB_RECURSE HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
-	file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
-
-	add_source_groups("${HEADERS}")
-	add_source_groups("${SOURCES}")
-
-	add_library("${lib_name}" STATIC ${HEADERS} ${SOURCES})
-	target_include_directories ("${lib_name}" PUBLIC "./include")
-	set_target_properties("${lib_name}" PROPERTIES LINKER_LANGUAGE CXX)
-	
-	add_target_dependencies("${lib_name}" "${lib_dependencies}" "${lib_dependencies_folder}")
-	
-endfunction(generate_static_library)
-
-function (generate_game)
-	cmake_parse_arguments(game "" "name;dependencies_folder" "dependencies" ${ARGN})
-
-	# .lib with all game source, to use as well in unit tests
-	set(lib_name "${game_name}_LIB")
-	generate_static_library(name "${lib_name}" dependencies "${game_dependencies}" dependencies_folder "${game_dependencies_folder}")
-	
-	# game itself
-	project("${game_name}")
-
-	include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
-
-	set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
-	add_source_groups("${SOURCES}")
-
-	add_executable ("${game_name}" "${SOURCES}")
-	set_target_properties("${game_name}" PROPERTIES LINKER_LANGUAGE CXX)
-	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "${game_name}")
-	add_definitions(-DSFML_STATIC)
-	
-	add_target_dependencies("${game_name}" "${lib_name}" "${game_dependencies_folder}")
-	
-endfunction(generate_game)
-
 function(add_target_dependencies target_name dependencies dependencies_folder)
 	if(dependencies)
 		foreach(dependency ${dependencies})
@@ -82,6 +41,45 @@ function(check_add_dependency_include_folder dependency_name search_tag include_
 	endif()
 endfunction(check_add_dependency_include_folder)
 
-function(add_dependency_subdirectory dependency_name output_dir)
-	add_subdirectory("${output_dir}/${dependency_name}" "${CMAKE_CURRENT_BINARY_DIR}/${dependency_name}")
-endfunction(add_dependency_subdirectory)
+function(add_platform_files header_files source_files)
+	if(WIN32)
+		file(GLOB_RECURSE extra_headers "${CMAKE_CURRENT_SOURCE_DIR}/source/win32/*.h")
+		file(GLOB_RECURSE extra_sources "${CMAKE_CURRENT_SOURCE_DIR}/source/win32/*.cpp")
+	endif()
+	if(extra_headers)
+		set(header_files  "${header_files};${extra_headers}" CACHE INTERNAL "header_files")
+	endif()
+	if(extra_sources)
+		set(source_files  "${source_files};${extra_sources}" CACHE INTERNAL "source_files")
+	endif()
+endfunction(add_platform_files)
+
+function(add_msvc_precompiled_header precompiled_header precompiled_source project_sources)
+	if(EXISTS ${precompiled_header} AND EXISTS ${precompiled_source})
+		get_filename_component (precompiled_header_filename ${precompiled_header} NAME)
+		log("Generating precompiler header ${precompiled_header_filename} for MSCV")
+		foreach(src_file ${project_sources})
+			set_source_files_properties(
+				${src_file}
+				PROPERTIES
+				COMPILE_FLAGS "/Yu\"${precompiled_header_filename}\""
+			)
+		endforeach()
+
+		set_source_files_properties (${precompiled_source}
+				PROPERTIES HEADER_FILE_ONLY
+				false
+		)
+		set_source_files_properties(
+			${precompiled_source}
+			PROPERTIES
+			COMPILE_FLAGS "/Yc\"${precompiled_header_filename}\""
+		)
+	endif()
+endfunction(add_msvc_precompiled_header)
+
+function(add_precompiled_header lib_pch source_files)
+	if (MSVC)
+		add_msvc_precompiled_header("${CMAKE_CURRENT_SOURCE_DIR}/include/${lib_pch}.h" "${CMAKE_CURRENT_SOURCE_DIR}/source/win32/${lib_pch}.cpp" "${source_files}")
+	endif()
+endfunction()

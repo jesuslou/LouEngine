@@ -1,3 +1,4 @@
+#include <LouEnginePrecompile.h>
 #include <CApplication.h>
 
 #include <stdio.h>

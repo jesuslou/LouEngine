@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 
-include (${CMAKE_CURRENT_SOURCE_DIR}/build/common.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/build/LouEngine.cmake)
 
 set(dependencies_folder "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/")
 
@@ -30,4 +30,4 @@ set(dependencies
 		"gtest"
 		"gtest_main"
 	)
-generate_static_library(name "LouEngine" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}")
+generate_static_library(name "LouEngine" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}" pch "LouEnginePrecompile")
