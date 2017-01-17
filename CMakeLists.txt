@@ -4,11 +4,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/build/cmake/LouEngine.cmake)
 
 set(dependencies_folder "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/")
 
-add_definitions(-DBUILD_SHARED_LIBS=0)
 add_dependency_subdirectory("SFML" "${dependencies_folder}")
-
-add_definitions(-DENTITYX_BUILD_SHARED=0)
-add_definitions(-DENTITYX_BUILD_TESTING=0)
 add_dependency_subdirectory("entityx" "${dependencies_folder}")
 
 set(gtest_ide_group "GoogleTest")
