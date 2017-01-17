@@ -1,9 +1,9 @@
 [submodule "dependencies/SFML"]
-	path = packages/thirdparty/SFML
+	path = dependencies/SFML
 	url = https://github.com/SFML/SFML.git
 [submodule "dependencies/entityx"]
-	path = packages/thirdparty/entityx
+	path = dependencies/entityx
 	url = https://github.com/alecthomas/entityx.git
 [submodule "dependencies\\googletest"]
-	path = packages/thirdparty/googletest
+	path = dependencies/googletest
 	url = https://github.com/google/googletest.git
