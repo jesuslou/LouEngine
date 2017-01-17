@@ -1,5 +1,6 @@
 #include <LouEnginePrecompile.h>
-#include <CApplication.h>
+
+#include <core/application/CApplication.h>
 
 CApplication::CApplication( ) 
 { 
