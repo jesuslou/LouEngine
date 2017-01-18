@@ -4,6 +4,6 @@
 [submodule "dependencies/entityx"]
 	path = dependencies/entityx
 	url = https://github.com/alecthomas/entityx.git
-[submodule "dependencies\\googletest"]
+[submodule "dependencies/googletest"]
 	path = dependencies/googletest
 	url = https://github.com/google/googletest.git
