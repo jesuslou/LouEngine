@@ -16,11 +16,6 @@ set_target_properties ("gtest_main" PROPERTIES FOLDER "${gtest_ide_group}")
 
 set(dependencies 
 	# Third Party
-	"sfml-window"
-	"sfml-system"
-	"sfml-network"
-	"sfml-graphics"
-	"sfml-audio"
 	"entityx"
 	"gmock"
 	"gmock_main"
@@ -28,3 +23,12 @@ set(dependencies
 	"gtest_main"
 	)
 generate_static_library(name "LouEngine" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}" pch "LouEnginePrecompile")
+
+set(sfml_dependencies 
+	"sfml-window"
+	"sfml-system"
+	"sfml-network"
+	"sfml-graphics"
+	"sfml-audio"
+	)
+link_sfml_libraries("LouEngine" "${sfml_dependencies}" "${dependencies_folder}/SFML")

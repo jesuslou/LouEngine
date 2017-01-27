@@ -141,7 +141,7 @@ def create_project(project_name, deploy_path, remote, push, git_enabled, generat
         generate_win_file.write('\tmkdir "projects/{}"\n'.format(folder_name))
         generate_win_file.write(')\n\n')
         generate_win_file.write('cd projects/{}\n'.format(folder_name))
-        generate_win_file.write('cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DBUILD_SHARED_LIBS=0 -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0\n'.format(project_name))
+        generate_win_file.write('cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DBUILD_SHARED_LIBS=0 -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 -DGTEST_FORCE_SHARED_CRT=1\n'.format(project_name))
         generate_win_file.write('start {}.sln\n'.format(project_name))
         generate_win_file.write('cd ../..\n')
         generate_win_file.write('pause\n')

@@ -23,7 +23,6 @@ function (generate_static_library)
 	set_target_properties("${lib_name}" PROPERTIES LINKER_LANGUAGE CXX)
 	
 	add_target_dependencies("${lib_name}" "${lib_dependencies}" "${lib_dependencies_folder}")
-	
 endfunction(generate_static_library)
 
 function (generate_game)
