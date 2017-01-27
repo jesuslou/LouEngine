@@ -19,7 +19,7 @@ function (generate_static_library)
 	endif()
 	
 	add_library("${lib_name}" STATIC ${header_files} ${source_files})
-	target_include_directories ("${lib_name}" PUBLIC "./include")
+	target_include_directories ("${lib_name}" PUBLIC "include")
 	set_target_properties("${lib_name}" PROPERTIES LINKER_LANGUAGE CXX)
 	
 	add_target_dependencies("${lib_name}" "${lib_dependencies}" "${lib_dependencies_folder}")
@@ -50,6 +50,6 @@ function (generate_game)
 	
 endfunction(generate_game)
 
-function(add_dependency_subdirectory dependency_name output_dir)
-	add_subdirectory("${output_dir}/${dependency_name}" "${CMAKE_BINARY_DIR}/${dependency_name}")
+function(add_dependency_subdirectory dependency_name dependency_dir)
+	add_subdirectory("${dependency_dir}/${dependency_name}" "${CMAKE_BINARY_DIR}/${dependency_name}")
 endfunction(add_dependency_subdirectory)
