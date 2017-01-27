@@ -4,11 +4,11 @@
 
 #include <unordered_map>
 
-class CSystems
+class CGameSystems
 {
 public:
 	template<typename T>
-	static bool SetSystem(T* system, bool forceOverride = false)
+	bool SetSystem(T* system, bool forceOverride = false)
 	{
 		if (GetSystem<T>())
 		{
@@ -27,7 +27,7 @@ public:
 	}
 
 	template<typename T>
-	static T* GetSystem()
+	T* GetSystem()
 	{
 		auto systemIt = m_systems.find(CTypeHasher::Hash<T>());
 		if (systemIt != m_systems.end())
@@ -38,7 +38,7 @@ public:
 	}
 
 	template<typename T>
-	static void DestroySystem()
+	void DestroySystem()
 	{
 		T* system = GetSystem<T>();
 		if (system)
@@ -53,10 +53,20 @@ public:
 	}
 
 protected:
-	CSystems() = delete;
-	~CSystems() = delete;
-
-	static std::unordered_map<long long, void*>	m_systems;
+	std::unordered_map<long long, void*>	m_systems;
 };
 
-std::unordered_map<long long, void*> CSystems::m_systems;
+class CSystems
+{
+public:
+	static void SetGameSystems(CGameSystems* gameSystems) { s_gameSystems = gameSystems; }
+
+	template<class T>
+	static void SetSystem(T* system, bool forceOverride = false) { s_gameSystems->SetSystem<T>(system, forceOverride); }
+	template<class T>
+	static T* GetSystem() { return s_gameSystems->GetSystem<T>(); }
+	template<class T>
+	static void DestroySystem() { return s_gameSystems->DestroySystem<T>(); }
+private:
+	static CGameSystems* s_gameSystems;
+};

@@ -51,5 +51,5 @@ function (generate_game)
 endfunction(generate_game)
 
 function(add_dependency_subdirectory dependency_name output_dir)
-	add_subdirectory("${output_dir}/${dependency_name}" "${CMAKE_CURRENT_BINARY_DIR}/${dependency_name}")
+	add_subdirectory("${output_dir}/${dependency_name}" "${CMAKE_BINARY_DIR}/${dependency_name}")
 endfunction(add_dependency_subdirectory)

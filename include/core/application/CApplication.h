@@ -1,5 +1,8 @@
 #pragma once
 
+class CGameSystems;
+class IRenderer;
+
 class CApplication
 {
 public:
@@ -15,4 +18,7 @@ protected:
 	virtual bool InitProject() = 0;
 	virtual void UpdateProject() = 0;
 	virtual void DestroyProject() = 0;
+
+	CGameSystems* m_gameSystems;
+	IRenderer* m_renderer;
 };
