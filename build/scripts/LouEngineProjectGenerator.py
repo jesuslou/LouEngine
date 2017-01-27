@@ -99,7 +99,7 @@ def create_project(project_name, deploy_path, remote, push, git_enabled, generat
         main_cpp_file.write('{} application;\n\n'.format(application_class_name))
         main_cpp_file.write('int main(int argc, char** argv)\n')
         main_cpp_file.write('{\n')
-        main_cpp_file.write('\tapplication.Init("{}", 640, 480);\n'.format(application_class_name))
+        main_cpp_file.write('\tapplication.Init("{}", 640, 480);\n'.format(project_name))
         main_cpp_file.write('\tapplication.Update();\n')
         main_cpp_file.write('\tapplication.Destroy();\n')
         main_cpp_file.write('}\n')
