@@ -7,6 +7,16 @@
 class CGameSystems
 {
 public:
+
+	~CGameSystems()
+	{
+		for (auto& system : m_systems)
+		{
+			delete system.second;
+		}
+		m_systems.clear();
+	}
+
 	template<typename T>
 	bool SetSystem(T* system, bool forceOverride = false)
 	{
@@ -53,7 +63,7 @@ public:
 	}
 
 protected:
-	std::unordered_map<long long, void*>	m_systems;
+	std::unordered_map<long long, void*> m_systems;
 };
 
 class CSystems

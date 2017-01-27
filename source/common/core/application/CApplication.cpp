@@ -6,36 +6,61 @@
 
 #include <SFML/Window.hpp>
 
-CApplication::CApplication( ) 
-{ 
+CApplication::CApplication()
+	: m_gameSystems(nullptr)
+	, m_renderer(nullptr)
+{
 }
 
-bool CApplication::Init(const char *appTitle, unsigned xRes, unsigned yRes) {
-	printf("Project '%s' initialized\n", appTitle);
+CApplication::~CApplication()
+{
+	if (m_gameSystems)
+	{
+		delete m_gameSystems;
+		m_gameSystems = nullptr;
+	}
 
+	if (m_mainWindow)
+	{
+		delete m_mainWindow;
+		m_mainWindow = nullptr;
+	}
+}
+
+bool CApplication::Init(const char *appTitle, unsigned xRes, unsigned yRes) 
+{
 	m_gameSystems = new CGameSystems();
 	CSystems::SetGameSystems(m_gameSystems);
 
 	m_renderer = new CRenderer();
-	if (!m_renderer->Init(appTitle, xRes, yRes))
+	if (!m_renderer->Init())
 	{
 		delete m_renderer;
 		return false;
 	}
 	CSystems::SetSystem<IRenderer>(m_renderer);
 
-  return InitProject( );
+	m_mainWindow = new sf::Window(sf::VideoMode(xRes, yRes), appTitle);
+
+	return InitProject(*m_gameSystems);
 }
 
-void CApplication::Update( ) {
-	printf("Updating...\n");
-	UpdateProject();
-	getchar();
+void CApplication::Update() 
+{
+	while (m_mainWindow->isOpen())
+	{
+		sf::Event event;
+		while (m_mainWindow->pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				m_mainWindow->close();
+		}
+		UpdateProject();
+	}
 }
 
-void CApplication::Destroy( ) {
-	printf("Destroying...\n");
+void CApplication::Destroy() 
+{
 	DestroyProject( );
-	delete m_gameSystems;
-	getchar();
+	CSystems::DestroySystem<IRenderer>();
 }

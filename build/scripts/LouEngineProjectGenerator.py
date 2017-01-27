@@ -112,7 +112,7 @@ def create_project(project_name, deploy_path, remote, push, git_enabled, generat
         app_h_file.write('public:\n')
         app_h_file.write('\t{}();\n\n'.format(application_class_name))
         app_h_file.write('protected:\n')
-        app_h_file.write('\tbool InitProject() override;\n')
+        app_h_file.write('\tbool InitProject(CGameSystems& gameSystems) override;\n')
         app_h_file.write('\tvoid UpdateProject() override;\n')
         app_h_file.write('\tvoid DestroyProject() override;\n')
         app_h_file.write('};\n')
@@ -120,7 +120,7 @@ def create_project(project_name, deploy_path, remote, push, git_enabled, generat
     with open(path_to_os("{}/source/common/application/{}.cpp".format(game_path, application_class_name)), "w") as app_cpp_file:
         app_cpp_file.write('#include <application/{}.h>\n\n'.format(application_class_name))
         app_cpp_file.write('{}::{}()\n{{\n\t\n}}\n\n'.format(application_class_name, application_class_name))
-        app_cpp_file.write('bool {}::InitProject()\n{{\n\treturn true;\n}}\n\n'.format(application_class_name))
+        app_cpp_file.write('bool {}::InitProject(CGameSystems& gameSystems)\n{{\n\treturn true;\n}}\n\n'.format(application_class_name))
         app_cpp_file.write('void {}::UpdateProject()\n{{\n\t\n}}\n\n'.format(application_class_name))
         app_cpp_file.write('void {}::DestroyProject()\n{{\n\t\n}}\n'.format(application_class_name))
 

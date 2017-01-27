@@ -8,6 +8,6 @@ public:
 	CRenderer();
 	virtual ~CRenderer();
 
-	bool Init(const char *appTitle, int xRes, int yRes) override;
+	bool Init() override;
 	void Render() override;
 };
