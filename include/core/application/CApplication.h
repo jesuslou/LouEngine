@@ -1,5 +1,7 @@
 #pragma once
 
+#include <core/application/SApplicationWindowParameters.h>
+
 class CGameSystems;
 class IRenderer;
 
@@ -13,7 +15,7 @@ class CApplication
 public:
 	CApplication();
 
-	bool Init(const char *appTitle, unsigned xRes, unsigned yRes);
+	bool Init(const SApplicationWindowParameters& applicationWindowParameters = SApplicationWindowParameters());
 	void Update();
 	void Destroy();
 

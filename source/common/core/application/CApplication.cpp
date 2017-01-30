@@ -4,6 +4,7 @@
 #include <core/systems/CSystems.h>
 #include <graphics/core/CRenderer.h>
 
+#include <SFML/Config.hpp>
 #include <SFML/Window.hpp>
 
 CApplication::CApplication()
@@ -27,7 +28,7 @@ CApplication::~CApplication()
 	}
 }
 
-bool CApplication::Init(const char *appTitle, unsigned xRes, unsigned yRes) 
+bool CApplication::Init(const SApplicationWindowParameters& applicationWindowParameters/* = SApplicationWindowParameters()*/)
 {
 	m_gameSystems = new CGameSystems();
 	CSystems::SetGameSystems(m_gameSystems);
@@ -40,7 +41,24 @@ bool CApplication::Init(const char *appTitle, unsigned xRes, unsigned yRes)
 	}
 	CSystems::SetSystem<IRenderer>(m_renderer);
 
-	m_mainWindow = new sf::Window(sf::VideoMode(xRes, yRes), appTitle);
+	sf::Uint32 windowStyle = applicationWindowParameters.m_hasTitleBar ? sf::Style::Titlebar : sf::Style::None;
+	windowStyle |= applicationWindowParameters.m_hasCloseButton ? sf::Style::Close : sf::Style::None;
+	windowStyle |= applicationWindowParameters.m_hasResizeButton ? sf::Style::Resize : sf::Style::None;
+	windowStyle |= applicationWindowParameters.m_isFullScreen ? sf::Style::Fullscreen : sf::Style::None;
+
+	m_mainWindow = new sf::Window(sf::VideoMode(applicationWindowParameters.m_xRes, applicationWindowParameters.m_yRes)
+								  , applicationWindowParameters.m_windowTitle
+								  , windowStyle
+								  );
+
+	if (applicationWindowParameters.m_hasVerticalSync)
+	{
+		m_mainWindow->setVerticalSyncEnabled(true);
+	}
+	else
+	{
+		m_mainWindow->setFramerateLimit(applicationWindowParameters.m_frameRateLimit);
+	}
 
 	return InitProject(*m_gameSystems);
 }
