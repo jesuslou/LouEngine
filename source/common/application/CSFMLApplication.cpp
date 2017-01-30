@@ -6,7 +6,8 @@
 #include <graphics/CRenderer.h>
 
 #include <SFML/Config.hpp>
-#include <SFML/Window.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Event.hpp>
 
 CSFMLApplication::CSFMLApplication()
 	: m_gameSystems(nullptr)
@@ -56,7 +57,7 @@ bool CSFMLApplication::Init(const SSFMLApplicationWindowParameters& applicationW
 	windowStyle |= applicationWindowParameters.m_hasResizeButton ? sf::Style::Resize : sf::Style::None;
 	windowStyle |= applicationWindowParameters.m_isFullScreen ? sf::Style::Fullscreen : sf::Style::None;
 
-	m_mainWindow = new sf::Window(sf::VideoMode(applicationWindowParameters.m_xRes, applicationWindowParameters.m_yRes)
+	m_mainWindow = new sf::RenderWindow(sf::VideoMode(applicationWindowParameters.m_xRes, applicationWindowParameters.m_yRes)
 								  , applicationWindowParameters.m_windowTitle
 								  , windowStyle
 								  );
@@ -105,6 +106,10 @@ void CSFMLApplication::Update()
 		m_keyboard->Update(elapsed);
 
 		UpdateProject();
+
+		m_mainWindow->clear();
+		// Draw
+		m_mainWindow->display();
 	}
 }
 

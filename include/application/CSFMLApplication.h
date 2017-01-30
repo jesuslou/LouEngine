@@ -12,7 +12,7 @@ namespace Input
 
 namespace sf
 {
-	class Window;
+	class RenderWindow;
 }
 
 class CSFMLApplication
@@ -34,6 +34,6 @@ protected:
 	CGameSystems* m_gameSystems;
 	IRenderer* m_renderer;
 
-	sf::Window* m_mainWindow;
+	sf::RenderWindow* m_mainWindow;
 	Input::IKeyboard* m_keyboard;
 };
