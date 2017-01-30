@@ -1,5 +1,5 @@
 #include <LouEnginePrecompile.h>
 
-#include <core/systems/CSystems.h>
+#include <systems/CSystems.h>
 
 CGameSystems* CSystems::s_gameSystems = nullptr;

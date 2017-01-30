@@ -1,26 +1,31 @@
 #pragma once
 
-#include <core/application/SApplicationWindowParameters.h>
+#include <application/SSFMLApplicationWindowParameters.h>
 
 class CGameSystems;
 class IRenderer;
+
+namespace Input
+{
+	class IKeyboard;
+}
 
 namespace sf
 {
 	class Window;
 }
 
-class CApplication
+class CSFMLApplication
 {
 public:
-	CApplication();
+	CSFMLApplication();
 
-	bool Init(const SApplicationWindowParameters& applicationWindowParameters = SApplicationWindowParameters());
+	bool Init(const SSFMLApplicationWindowParameters& applicationWindowParameters = SSFMLApplicationWindowParameters());
 	void Update();
 	void Destroy();
 
 protected:
-	virtual ~CApplication();
+	virtual ~CSFMLApplication();
 
 	virtual bool InitProject(CGameSystems& gameSystems) = 0;
 	virtual void UpdateProject() = 0;
@@ -30,4 +35,5 @@ protected:
 	IRenderer* m_renderer;
 
 	sf::Window* m_mainWindow;
+	Input::IKeyboard* m_keyboard;
 };

@@ -7,5 +7,6 @@ public:
 	virtual ~IRenderer() {}
 
 	virtual bool Init() = 0;
+	virtual void Destroy() = 0;
 	virtual void Render() = 0;
 };

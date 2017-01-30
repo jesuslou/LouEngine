@@ -1,13 +1,14 @@
 #pragma once
 
-#include <graphics/core/IRenderer.h>
+#include <graphics/IRenderer.h>
 
 class CRenderer : public IRenderer
 {
 public:
 	CRenderer();
-	virtual ~CRenderer();
+	~CRenderer();
 
 	bool Init() override;
+	void Destroy() override;
 	void Render() override;
 };

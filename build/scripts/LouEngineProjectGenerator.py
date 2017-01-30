@@ -97,7 +97,7 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 		main_cpp_file.write('{} application;\n\n'.format(application_class_name))
 		main_cpp_file.write('int main(int argc, char** argv)\n')
 		main_cpp_file.write('{\n')
-		main_cpp_file.write('\tSApplicationWindowParameters applicationWindowParameters(800, 600, "{}");\n'.format(project_name))
+		main_cpp_file.write('\tSSFMLApplicationWindowParameters applicationWindowParameters(800, 600, "{}");\n'.format(project_name))
 		main_cpp_file.write('\tapplication.Init(applicationWindowParameters);\n')
 		main_cpp_file.write('\tapplication.Update();\n')
 		main_cpp_file.write('\tapplication.Destroy();\n')
