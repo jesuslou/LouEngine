@@ -19,8 +19,3 @@
 
 	url = https://github.com/g-truc/glm.git
 
-[submodule "dependencies/SDL/SDL_image"]
-
-	path = dependencies/SDL/SDL_image
-
-	url = https://github.com/g-truc/glm.git
