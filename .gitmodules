@@ -15,7 +15,7 @@
 
 [submodule "dependencies/glm"]
 
-	path = dependencies/glm
+	path = dependencies/SDL/glm
 
 	url = https://github.com/g-truc/glm.git
 
