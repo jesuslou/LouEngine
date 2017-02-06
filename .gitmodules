@@ -10,3 +10,9 @@
 [submodule "dependencies/SDL2"]
 	path = dependencies/SDL2
 	url = https://github.com/davidsiaw/SDL2.git
+[submodule "dependencies/glm"]
+	path = dependencies/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "dependencies/SDL/SDL_image"]
+	path = dependencies/SDL/SDL_image
+	url = https://github.com/g-truc/glm.git
