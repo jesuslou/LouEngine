@@ -8,7 +8,7 @@
 	path = dependencies/googletest
 	url = https://github.com/google/googletest.git
 [submodule "dependencies/SDL2"]
-	path = dependencies/SDL2
+	path = dependencies/SDL/SDL2
 	url = https://github.com/davidsiaw/SDL2.git
 [submodule "dependencies/glm"]
 	path = dependencies/glm
