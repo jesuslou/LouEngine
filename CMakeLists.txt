@@ -12,16 +12,7 @@ if(USE_SFML)
 	log("Using SFML libraries")
 	add_dependency_subdirectory("SFML" "${dependencies_folder}")
 elseif(USE_SDL2)
-	log("Using SDL2 libraries")
-	set(sdl_dependencies_folder "${dependencies_folder}/SDL/")
-	set(sdl2_ide_group "SDL")
-	add_dependency_subdirectory("SDL2" "${sdl_dependencies_folder}")
-	#set_target_properties ("SDL2" PROPERTIES FOLDER "${sdl2_ide_group}") #only exists with SDL_SHARED=1
-	set_target_properties ("SDL2main" PROPERTIES FOLDER "${sdl2_ide_group}")
-	set_target_properties ("SDL2-static" PROPERTIES FOLDER "${sdl2_ide_group}")
-	add_dependency_subdirectory("glm" "${sdl_dependencies_folder}")
-	set_target_properties ("glm_static" PROPERTIES FOLDER "${sdl2_ide_group}")
-	add_dependency_subdirectory("SDL_image" "${sdl_dependencies_folder}")
+	add_dependency_subdirectory("SDL" "${dependencies_folder}")
 endif()
 
 add_dependency_subdirectory("entityx" "${dependencies_folder}")
@@ -46,18 +37,19 @@ generate_static_library(name "${project_name}" dependencies "${dependencies}" de
 warnings_as_errors("${project_name}")
 
 if(USE_SFML)
-set(sfml_dependencies 
-	"sfml-window"
-	"sfml-system"
-	"sfml-network"
-	"sfml-graphics"
-	"sfml-audio"
-	)
+	set(sfml_dependencies 
+		"sfml-window"
+		"sfml-system"
+		"sfml-network"
+		"sfml-graphics"
+		"sfml-audio"
+		)
 	link_sfml_libraries("${project_name}" "${sfml_dependencies}" "${dependencies_folder}/SFML")
 elseif(USE_SDL2)
 	set(sdl_dependencies 
 	"SDL2-static"
 	"glm_static"
+	"SDL_image"
 	)
 	link_sdl2_libraries("${project_name}" "${sdl_dependencies}" "${dependencies_folder}/SDL")
 endif()
