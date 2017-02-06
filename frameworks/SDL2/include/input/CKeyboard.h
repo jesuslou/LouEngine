@@ -8,20 +8,20 @@
 
 namespace Input
 {
-	class CSFMLKeyboard : public IKeyboard
+	class CKeyboard : public IKeyboard
 	{
 	public:
-		CSFMLKeyboard();
+		CKeyboard();
 
 		bool Init() override;
 		void Destroy() override;
 
 		void Update(float dt) override;
 
-		bool IsPressed(int key) override;
-		bool BecomesPressed(int key) override;
-		bool IsReleased(int key) override;
-		bool BecomesReleased(int key) override;
+		bool IsPressed(LKey key) override;
+		bool BecomesPressed(LKey key) override;
+		bool IsReleased(LKey key) override;
+		bool BecomesReleased(LKey key) override;
 
 	private:
 		std::array<bool, sf::Keyboard::KeyCount> m_currentState;

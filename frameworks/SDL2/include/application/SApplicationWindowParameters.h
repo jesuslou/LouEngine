@@ -2,9 +2,9 @@
 
 #include <string>
 
-struct SSFMLApplicationWindowParameters
+struct SApplicationWindowParameters
 {
-	SSFMLApplicationWindowParameters(int xRes = 800
+	SApplicationWindowParameters(int xRes = 800
 								 , int yRes = 600
 								 , const std::string& windowTitle = "Empty Project"
 								 , bool hasTitleBar = true

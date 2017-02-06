@@ -1,25 +1,25 @@
 #include <LouEnginePrecompile.h>
 
-#include <input/CSFMLKeyboard.h>
+#include <input/CKeyboard.h>
 
 namespace Input
 {
-	CSFMLKeyboard::CSFMLKeyboard()
+	CKeyboard::CKeyboard()
 		: m_currentState()
 		, m_previousState()
 	{
 	}
 
-	bool CSFMLKeyboard::Init()
+	bool CKeyboard::Init()
 	{
 		return true;
 	}
 
-	void CSFMLKeyboard::Destroy()
+	void CKeyboard::Destroy()
 	{
 	}
 
-	void CSFMLKeyboard::Update(float /*dt*/)
+	void CKeyboard::Update(float /*dt*/)
 	{
 		for (int i = 0; i < sf::Keyboard::KeyCount; ++i)
 		{
@@ -28,22 +28,22 @@ namespace Input
 		}
 	}
 
-	bool CSFMLKeyboard::IsPressed(int key)
+	bool CKeyboard::IsPressed(LKey key)
 	{
 		return m_currentState[key];
 	}
 
-	bool CSFMLKeyboard::BecomesPressed(int key)
+	bool CKeyboard::BecomesPressed(LKey key)
 	{
 		return m_currentState[key] && !m_previousState[key];
 	}
 
-	bool CSFMLKeyboard::IsReleased(int key)
+	bool CKeyboard::IsReleased(LKey key)
 	{
 		return !m_currentState[key];
 	}
 
-	bool CSFMLKeyboard::BecomesReleased(int key)
+	bool CKeyboard::BecomesReleased(LKey key)
 	{
 		return !m_currentState[key] && m_previousState[key];
 	}

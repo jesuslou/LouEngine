@@ -13,9 +13,9 @@ namespace Input
 
 		virtual void Update(float dt) = 0;
 
-		virtual bool IsPressed(int key) = 0;
-		virtual bool BecomesPressed(int key) = 0;
-		virtual bool IsReleased(int key) = 0;
-		virtual bool BecomesReleased(int key) = 0;
+		virtual bool IsPressed(LKey key) = 0;
+		virtual bool BecomesPressed(LKey key) = 0;
+		virtual bool IsReleased(LKey key) = 0;
+		virtual bool BecomesReleased(LKey key) = 0;
 	};
 }

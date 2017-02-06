@@ -1,29 +1,21 @@
 #include <LouEnginePrecompile.h>
 
-#include <application/CSFMLApplication.h>
-#include <systems/CSystems.h>
-#include <input/CSFMLKeyboard.h>
+#include <application/CApplication.h>
+#include <application/SApplicationWindowParameters.h>
+#include <input/CKeyboard.h>
 #include <graphics/CRenderer.h>
+#include <systems/CSystems.h>
 
 #include <SFML/Config.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 
-CSFMLApplication::CSFMLApplication()
-	: m_gameSystems(nullptr)
-	, m_renderer(nullptr)
-	, m_keyboard(nullptr)
+CApplication::CApplication()
 {
 }
 
-CSFMLApplication::~CSFMLApplication()
+CApplication::~CApplication()
 {
-	if (m_gameSystems)
-	{
-		delete m_gameSystems;
-		m_gameSystems = nullptr;
-	}
-
 	if (m_mainWindow)
 	{
 		delete m_mainWindow;
@@ -31,11 +23,8 @@ CSFMLApplication::~CSFMLApplication()
 	}
 }
 
-bool CSFMLApplication::Init(const SSFMLApplicationWindowParameters& applicationWindowParameters/* = SSFMLApplicationWindowParameters()*/)
+bool CApplication::Init(const SApplicationWindowParameters& applicationWindowParameters)
 {
-	m_gameSystems = new CGameSystems();
-	CSystems::SetGameSystems(m_gameSystems);
-
 	m_renderer = new CRenderer();
 	if (!m_renderer->Init())
 	{
@@ -44,7 +33,7 @@ bool CSFMLApplication::Init(const SSFMLApplicationWindowParameters& applicationW
 	}
 	CSystems::SetSystem<IRenderer>(m_renderer);
 
-	m_keyboard = new Input::CSFMLKeyboard();
+	m_keyboard = new Input::CKeyboard();
 	if (!m_keyboard->Init())
 	{
 		delete m_keyboard;
@@ -71,10 +60,10 @@ bool CSFMLApplication::Init(const SSFMLApplicationWindowParameters& applicationW
 		m_mainWindow->setFramerateLimit(applicationWindowParameters.m_frameRateLimit);
 	}
 
-	return InitProject(*m_gameSystems);
+	return InitProject(m_gameSystems);
 }
 
-void CSFMLApplication::Update() 
+void CApplication::Update() 
 {
 	sf::Clock clock;
 	while (m_mainWindow->isOpen())
@@ -113,7 +102,7 @@ void CSFMLApplication::Update()
 	}
 }
 
-void CSFMLApplication::Destroy() 
+void CApplication::Destroy() 
 {
 	DestroyProject( );
 	m_renderer->Destroy();
