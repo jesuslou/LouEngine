@@ -59,10 +59,31 @@ def create_folder_if_not_exists(path):
 	if not os.path.exists(path):
 		os.makedirs(path)
 
+def create_windows_framework_specific_generate_script(framework, project_name, deploy_path):
+	framework = framework.lower();
+	with open(path_to_os("{}/generate_{}_win.bat".format(deploy_path, framework)), "w") as generate_win_file:
+		folder_name = "{}-{}-win32".format(project_name, framework)
+		generate_win_file.write('@echo off\n\n')
+		generate_win_file.write('IF NOT EXIST "projects/{}" (\n'.format(folder_name))
+		generate_win_file.write('\tmkdir "projects/{}"\n'.format(folder_name))
+		generate_win_file.write(')\n\n')
+		generate_win_file.write('cd projects/{}\n'.format(folder_name))
+		framework_flags = ""
+		if(framework == "sfml"):
+			framework_flags = "-DBUILD_SHARED_LIBS=0 -DUSE_SFML=1"
+		elif(framework == "sdl"):
+			framework_flags = "-DGLM_STATIC_LIBRARY_ENABLE=1 -DSDL_STATIC=1 -DSDL_SHARED=0 -DUSE_SDL=1"
+		generate_win_file.write(
+			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 {}\n'.format(
+				project_name, framework_flags))
+		generate_win_file.write('cd ../..\n')
+		generate_win_file.write('pause\n')
+
 def create_project(project_name, deploy_path, remote, push, generate, remove_folder):
 	deploy_path = "{}/{}".format(deploy_path, project_name)
-	print(deploy_path)
+
 	if remove_folder:
+		print("Removing folder under {}".format(deploy_path))
 		remove_folder_recursively(deploy_path)
 
 	create_folder_if_not_exists(path_to_os(deploy_path))
@@ -70,17 +91,23 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 
 	game_path = "{}/{}".format(deploy_path, project_name.lower())
 	create_folder_if_not_exists(path_to_os(game_path))
+
+	repo_already_checked_out = os.listdir(path_to_os(game_path)) != []
+
 	create_folder_if_not_exists(path_to_os("{}/include/application".format(game_path)))
 	create_folder_if_not_exists(path_to_os("{}/source/common/application".format(game_path)))
 
-	if subprocess.call('git init', cwd=r"{}".format(deploy_path)) != 0:
+	if repo_already_checked_out == False and subprocess.call('git init', cwd=r"{}".format(deploy_path)) != 0:
 		message_and_die('Cannot create a git repository in {}'.format(deploy_path))
 
 	if remote != "none":
-		if subprocess.call('git remote add origin {}'.format(remote), cwd=r"{}".format(deploy_path)) != 0:
-			message_and_die('Cannot set {} as remote for git repository in {}'.format(remote, deploy_path))
+		if repo_already_checked_out:
+			if subprocess.call('git remote set-url origin {}'.format(remote), cwd=r"{}".format(deploy_path)) != 0:
+				message_and_die('Cannot change repository remote to {} in {}'.format(remote, deploy_path))
+		elif subprocess.call('git remote add origin {}'.format(remote), cwd=r"{}".format(deploy_path)) != 0:
+				message_and_die('Cannot set {} as remote for git repository in {}'.format(remote, deploy_path))
 
-	if subprocess.call('git submodule add https://github.com/jesuslou/LouEngine.git dependencies/LouEngine', cwd=r"{}".format(deploy_path)) != 0:
+	if repo_already_checked_out == False and subprocess.call('git submodule add https://github.com/jesuslou/LouEngine.git dependencies/LouEngine', cwd=r"{}".format(deploy_path)) != 0:
 		message_and_die('Cannot add submodule LouEngine!')
 
 	if subprocess.call('git submodule update --init --recursive --force', cwd=r"{}".format(deploy_path)) != 0:
@@ -93,11 +120,12 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 	application_class_name = "C{}Application".format(project_name)
 
 	with open(path_to_os("{}/{}/main.cpp".format(deploy_path, project_name)), "w") as main_cpp_file:
-		main_cpp_file.write('#include <application\{}.h>\n\n'.format(application_class_name))
-		main_cpp_file.write('{} application;\n\n'.format(application_class_name))
+		main_cpp_file.write('#include <application\{}.h>\n'.format(application_class_name))
+		main_cpp_file.write('#include <application\SApplicationWindowParameters.h>\n\n'.format(application_class_name))
+		main_cpp_file.write('{} application; // This class is your starting point\n\n'.format(application_class_name))
 		main_cpp_file.write('int main(int argc, char** argv)\n')
 		main_cpp_file.write('{\n')
-		main_cpp_file.write('\tSSFMLApplicationWindowParameters applicationWindowParameters(800, 600, "{}");\n'.format(project_name))
+		main_cpp_file.write('\tSApplicationWindowParameters applicationWindowParameters(800, 600, "{}");\n'.format(project_name))
 		main_cpp_file.write('\tapplication.Init(applicationWindowParameters);\n')
 		main_cpp_file.write('\tapplication.Update();\n')
 		main_cpp_file.write('\tapplication.Destroy();\n')
@@ -105,7 +133,7 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 
 	with open(path_to_os("{}/include/application/{}.h".format(game_path, application_class_name)), "w") as app_h_file:
 		app_h_file.write('#pragma once\n\n')
-		app_h_file.write('#include <core/application/CApplication.h>\n\n')
+		app_h_file.write('#include <application/CApplication.h>\n\n')
 		app_h_file.write('class {} : public CApplication\n'.format(application_class_name))
 		app_h_file.write('{\n')
 		app_h_file.write('public:\n')
@@ -133,16 +161,8 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 		cmake_file.write(')\n\n')
 		cmake_file.write('generate_game(name "{}" dependencies "${{dependencies}}" dependencies_folder "${{dependencies_folder}}")\n'.format(project_name))
 
-	with open(path_to_os("{}/generate_win.bat".format(deploy_path)), "w") as generate_win_file:
-		folder_name = "{}-win32".format(project_name)
-		generate_win_file.write('@echo off\n\n')
-		generate_win_file.write('IF NOT EXIST "projects/{}" (\n'.format(folder_name))
-		generate_win_file.write('\tmkdir "projects/{}"\n'.format(folder_name))
-		generate_win_file.write(')\n\n')
-		generate_win_file.write('cd projects/{}\n'.format(folder_name))
-		generate_win_file.write('cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DBUILD_SHARED_LIBS=0 -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0\n'.format(project_name))
-		generate_win_file.write('cd ../..\n')
-		generate_win_file.write('pause\n')
+	create_windows_framework_specific_generate_script("sfml", project_name, deploy_path)
+	create_windows_framework_specific_generate_script("sdl", project_name, deploy_path)
 
 	if push:
 		if subprocess.call('git add .', cwd=r"{}".format(deploy_path)) != 0:
@@ -154,7 +174,7 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 
 	if generate and os.path.isdir(path_to_os("{}/dependencies/LouEngine/dependencies/SFML".format(deploy_path))):
 		print("Deploy finished. Starting project generation...")
-		os.system("cd {} && generate_win.bat".format(deploy_path))
+		os.system("cd {} && generate_sfml_win.bat".format(deploy_path))
 
 if __name__ == '__main__':
 	check_git_in_path()

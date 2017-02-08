@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.6)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../build/cmake/LouEngine.cmake)
 
-log("Using SDL2 libraries")
-
 set(sdl_dependencies_folder "${CMAKE_CURRENT_SOURCE_DIR}")
 set(sdl_ide_group "SDL")
 
