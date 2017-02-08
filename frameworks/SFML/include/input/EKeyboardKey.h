@@ -6,6 +6,8 @@ namespace Input
 {
 	enum EKeyboardKey
 	{
+		KK_INVALID = sf::Keyboard::Unknown,
+
 		KK_A = sf::Keyboard::A,
 		KK_B = sf::Keyboard::B,
 		KK_C = sf::Keyboard::C,

@@ -3,12 +3,14 @@
 #include <application/CApplication.h>
 #include <application/SApplicationWindowParameters.h>
 #include <input/CKeyboard.h>
+#include <input/CMouse.h>
 #include <graphics/CRenderer.h>
 #include <systems/CSystems.h>
 
 #include <SDL.h>
 
 CApplication::CApplication()
+	: m_window(nullptr)
 {
 }
 
@@ -41,6 +43,14 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 	}
 	CSystems::SetSystem<Input::IKeyboard>(m_keyboard);
 
+	m_mouse = new Input::CMouse();
+	if (!m_mouse->Init())
+	{
+		delete m_mouse;
+		return false;
+	}
+	CSystems::SetSystem<Input::IMouse>(m_mouse);
+
 	if (InitSDL(applicationWindowParameters))
 	{
 		return InitProject(m_gameSystems);
@@ -51,7 +61,7 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 void CApplication::Update() 
 {
 	//Event handler
-	SDL_Event e;
+	SDL_Event event;
 
 	//Set text color as black
 	SDL_Color textColor = { 0, 0, 0, 255 };
@@ -65,16 +75,20 @@ void CApplication::Update()
 		//CInputManager::get().update();
 
 		//Handle events on queue
-		while (SDL_PollEvent(&e) != 0)
+		while (SDL_PollEvent(&event) != 0)
 		{
 			//User requests quit
-			if (e.type == SDL_QUIT)
+			if (event.type == SDL_QUIT)
 			{
 				break;
 			}
 
-			//CInputManager::get().updateMouse(e);
+			Input::CMouse* mouse = static_cast<Input::CMouse*>(m_mouse);
+			mouse->updateSDLMouse(event);
 		}
+		
+		CVector2i mousePos = m_mouse->GetMouseGlobalPosition();
+		printf("mousePos: %d - %d\n", mousePos.x, mousePos.y);
 
 		m_keyboard->Update(0.016f);
 

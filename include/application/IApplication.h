@@ -7,6 +7,7 @@ class IRenderer;
 namespace Input
 {
 	class IKeyboard;
+	class IMouse;
 }
 
 class IApplication
@@ -15,6 +16,7 @@ public:
 	IApplication() 
 		: m_renderer(nullptr)
 		, m_keyboard(nullptr)
+		, m_mouse(nullptr)
 	{
 		CSystems::SetGameSystems(&m_gameSystems);
 	}
@@ -33,4 +35,5 @@ protected:
 
 	IRenderer* m_renderer;
 	Input::IKeyboard* m_keyboard;
+	Input::IMouse* m_mouse;
 };

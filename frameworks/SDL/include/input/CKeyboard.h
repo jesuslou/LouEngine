@@ -22,7 +22,7 @@ namespace Input
 		bool BecomesReleased(EKeyboardKey key) override;
 
 	private:
-		const Uint8* mCurentKeyStates;
-		const Uint8* mOldKeyStates;
+		const Uint8* m_curentKeyStates;
+		const Uint8* m_oldKeyStates;
 	};
 }

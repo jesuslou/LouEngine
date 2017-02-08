@@ -6,6 +6,8 @@ namespace Input
 {
 	enum EKeyboardKey
 	{
+		KK_INVALID = SDL_SCANCODE_UNKNOWN,
+
 		KK_A = SDL_SCANCODE_A,
 		KK_B = SDL_SCANCODE_B,
 		KK_C = SDL_SCANCODE_C,
@@ -66,6 +68,6 @@ namespace Input
 		KK_RIGHT = SDL_SCANCODE_RIGHT,
 		KK_LEFT = SDL_SCANCODE_LEFT,
 		KK_DOWN = SDL_SCANCODE_DOWN,
-		KK_UP = SDL_SCANCODE_UP,
+		KK_UP = SDL_SCANCODE_UP
 	};
 }
