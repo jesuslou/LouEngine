@@ -18,12 +18,10 @@ set_target_properties ("glm_static" PROPERTIES FOLDER "${sdl_ide_group}")
 #SDL_image
 set(lib_name "SDL_image")
 
-set(dependencies 
-	"SDL2-static"
-	)
-
 file(GLOB_RECURSE header_files "${CMAKE_CURRENT_SOURCE_DIR}/SDL_image/*.h")
 file(GLOB_RECURSE source_files "${CMAKE_CURRENT_SOURCE_DIR}/SDL_image/*.c")
+
+list(REMOVE_ITEM source_files "${CMAKE_CURRENT_SOURCE_DIR}/SDL_image/showimage.c")
 
 add_source_groups("${header_files}")
 add_source_groups("${source_files}")
@@ -31,7 +29,10 @@ add_source_groups("${source_files}")
 add_library("${lib_name}" STATIC ${header_files} ${source_files})
 target_include_directories ("${lib_name}" PUBLIC "SDL_image")
 	
-add_target_dependencies("${lib_name}" "${dependencies}" "${sdl_dependencies_folder}")
+set(dependencies 
+	"SDL2-static"
+	)
+link_sdl_libraries("${lib_name}" "${dependencies}" "${sdl_dependencies_folder}")
 
 set_target_properties("${lib_name}" PROPERTIES LINKER_LANGUAGE C)
 set_target_properties ("SDL_image" PROPERTIES FOLDER "${sdl_ide_group}")

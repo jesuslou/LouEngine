@@ -133,4 +133,5 @@ bool CApplication::InitSDL(const SApplicationWindowParameters& applicationWindow
 			//}
 		}
 	}
+	return true;
 }

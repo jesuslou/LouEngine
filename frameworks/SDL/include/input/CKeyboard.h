@@ -2,8 +2,6 @@
 
 #include <input/IKeyboard.h>
 
-#include <SFML/Window/Keyboard.hpp>
-
 #include <array>
 
 namespace Input
@@ -24,7 +22,7 @@ namespace Input
 		bool BecomesReleased(LKey key) override;
 
 	private:
-		std::array<bool, sf::Keyboard::KeyCount> m_currentState;
-		std::array<bool, sf::Keyboard::KeyCount> m_previousState;
+		const Uint8* mCurentKeyStates;
+		const Uint8* mOldKeyStates;
 	};
 }

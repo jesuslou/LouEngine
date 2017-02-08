@@ -72,7 +72,7 @@ def create_windows_framework_specific_generate_script(framework, project_name, d
 		if(framework == "sfml"):
 			framework_flags = "-DBUILD_SHARED_LIBS=0 -DUSE_SFML=1"
 		elif(framework == "sdl"):
-			framework_flags = "-DGLM_STATIC_LIBRARY_ENABLE=1 -DSDL_STATIC=1 -DSDL_SHARED=0 -DUSE_SDL=1"
+			framework_flags = "-DGLM_STATIC_LIBRARY_ENABLE=1 -DSDL_STATIC=1 -DSDL_SHARED=0 -DSDL_JOYSTICK=0 -DSDL_HAPTIC=0 -DUSE_SDL=1"
 		generate_win_file.write(
 			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 {}\n'.format(
 				project_name, framework_flags))
@@ -110,7 +110,7 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 	if repo_already_checked_out == False and subprocess.call('git submodule add https://github.com/jesuslou/LouEngine.git dependencies/LouEngine', cwd=r"{}".format(deploy_path)) != 0:
 		message_and_die('Cannot add submodule LouEngine!')
 
-	if subprocess.call('git submodule update --init --recursive --force', cwd=r"{}".format(deploy_path)) != 0:
+	if repo_already_checked_out == False and subprocess.call('git submodule update --init --recursive --force', cwd=r"{}".format(deploy_path)) != 0:
 		message_and_die('Cannot update submodules!')
 
 

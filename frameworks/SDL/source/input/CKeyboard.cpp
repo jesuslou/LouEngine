@@ -2,11 +2,13 @@
 
 #include <input/CKeyboard.h>
 
+#include <SDL_keyboard.h>
+
 namespace Input
 {
 	CKeyboard::CKeyboard()
-		: m_currentState()
-		, m_previousState()
+		: mCurentKeyStates(nullptr)
+		, mOldKeyStates(nullptr)
 	{
 	}
 
@@ -21,30 +23,40 @@ namespace Input
 
 	void CKeyboard::Update(float /*dt*/)
 	{
-		for (int i = 0; i < sf::Keyboard::KeyCount; ++i)
+		int n = 0;
+		if (!mOldKeyStates)
 		{
-			m_previousState[i] = m_currentState[i];
-			m_currentState[i] = sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(i));
+			const Uint8* tmpKeyStates = SDL_GetKeyboardState(&n);
+			mCurentKeyStates = new Uint8[n];
+			mOldKeyStates = new Uint8[n];
+			memcpy((void*)mCurentKeyStates, tmpKeyStates, sizeof(Uint8) * n);
+			memset((void*)mOldKeyStates, 0x0, sizeof(Uint8) * n);
+		}
+		else
+		{
+			const Uint8* tmpKeyStates = SDL_GetKeyboardState(&n);
+			memcpy((void*)mOldKeyStates, mCurentKeyStates, sizeof(Uint8) * n);
+			memcpy((void*)mCurentKeyStates, tmpKeyStates, sizeof(Uint8) * n);
 		}
 	}
 
 	bool CKeyboard::IsPressed(LKey key)
 	{
-		return m_currentState[key];
+		return mCurentKeyStates[key] != 0;
 	}
 
 	bool CKeyboard::BecomesPressed(LKey key)
 	{
-		return m_currentState[key] && !m_previousState[key];
+		return mOldKeyStates[key] == 0 && mCurentKeyStates[key] != 0;
 	}
 
 	bool CKeyboard::IsReleased(LKey key)
 	{
-		return !m_currentState[key];
+		return mCurentKeyStates[key] == 0;
 	}
 
 	bool CKeyboard::BecomesReleased(LKey key)
 	{
-		return !m_currentState[key] && m_previousState[key];
+		return mOldKeyStates[key] != 0 && !mCurentKeyStates[key] == 0;
 	}
 }
