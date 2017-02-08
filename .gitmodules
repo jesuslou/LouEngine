@@ -16,3 +16,6 @@
 [submodule "dependencies/SDL/SDL_image"]
 	path = dependencies/SDL/SDL_image
 	url = https://github.com/aduros/SDL_image.git
+[submodule "dependencies/SDL/SDL2"]
+	path = dependencies/SDL/SDL2
+	url = https://github.com/spurious/SDL-mirror.git
