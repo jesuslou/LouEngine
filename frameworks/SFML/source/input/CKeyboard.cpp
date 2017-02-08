@@ -28,22 +28,22 @@ namespace Input
 		}
 	}
 
-	bool CKeyboard::IsPressed(LKey key)
+	bool CKeyboard::IsPressed(EKeyboardKey key)
 	{
 		return m_currentState[key];
 	}
 
-	bool CKeyboard::BecomesPressed(LKey key)
+	bool CKeyboard::BecomesPressed(EKeyboardKey key)
 	{
 		return m_currentState[key] && !m_previousState[key];
 	}
 
-	bool CKeyboard::IsReleased(LKey key)
+	bool CKeyboard::IsReleased(EKeyboardKey key)
 	{
 		return !m_currentState[key];
 	}
 
-	bool CKeyboard::BecomesReleased(LKey key)
+	bool CKeyboard::BecomesReleased(EKeyboardKey key)
 	{
 		return !m_currentState[key] && m_previousState[key];
 	}

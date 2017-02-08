@@ -16,10 +16,10 @@ namespace Input
 
 		void Update(float dt) override;
 
-		bool IsPressed(LKey key) override;
-		bool BecomesPressed(LKey key) override;
-		bool IsReleased(LKey key) override;
-		bool BecomesReleased(LKey key) override;
+		bool IsPressed(EKeyboardKey key) override;
+		bool BecomesPressed(EKeyboardKey key) override;
+		bool IsReleased(EKeyboardKey key) override;
+		bool BecomesReleased(EKeyboardKey key) override;
 
 	private:
 		const Uint8* mCurentKeyStates;
