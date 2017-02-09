@@ -21,21 +21,11 @@ namespace Input
 
 	void CMouse::Update(float /*dt*/)
 	{
-		for (size_t i = 0; i < MB_N_MOUSE_BUTTONS; ++i)
+		Uint32 currentMouseState = SDL_GetMouseState(&m_mousePosition.x, &m_mousePosition.y);
+		for (int i = 0; i < MB_N_MOUSE_BUTTONS; ++i)
 		{
 			m_oldMouseState[i] = m_currentMouseState[i];
-		}
-	}
-
-	void CMouse::updateSDLMouse(SDL_Event & event)
-	{
-		if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
-		{
-			m_currentMouseState[event.button.button] = (event.type == SDL_MOUSEBUTTONDOWN);
-		}
-		else if (event.type == SDL_MOUSEMOTION)
-		{
-			m_mousePosition = CVector2i(event.motion.x, event.motion.y);
+			m_currentMouseState[i] = IsMouseButtonPressed(currentMouseState, static_cast<EMouseButton>(i));
 		}
 	}
 
@@ -68,9 +58,11 @@ namespace Input
 
 	CVector2i CMouse::GetMouseScreenPosition()
 	{
-		CVector2i mousePosition;
-		SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
-		return mousePosition;
+		return m_mousePosition;
 	}
 
+	bool CMouse::IsMouseButtonPressed(Uint32 buttonState, EMouseButton button)
+	{
+		return (buttonState & SDL_BUTTON(button) ? true : false);
+	}
 }

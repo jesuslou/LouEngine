@@ -17,7 +17,6 @@ namespace Input
 		void Destroy() override;
 
 		void Update(float dt) override;
-		void updateSDLMouse(SDL_Event & event);
 
 		bool IsPressed(EMouseButton button) override;
 		bool BecomesPressed(EMouseButton button) override;
@@ -28,6 +27,8 @@ namespace Input
 		CVector2i GetMouseScreenPosition() override;
 
 	private:
+		bool IsMouseButtonPressed(Uint32 buttonState, EMouseButton button);
+
 		bool m_currentMouseState[MB_N_MOUSE_BUTTONS];
 		bool m_oldMouseState[MB_N_MOUSE_BUTTONS];
 

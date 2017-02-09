@@ -60,19 +60,16 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 
 void CApplication::Update() 
 {
-	//Event handler
 	SDL_Event event;
+	Uint64 timeNow = SDL_GetPerformanceCounter();
+	Uint64 timeLast = timeNow;
+	float deltaTime = 0.f;
 
-	//Set text color as black
-	SDL_Color textColor = { 0, 0, 0, 255 };
-
-	//While application is running
 	while (true)
 	{
-		//CMicroTimer timer;
-		//timer.start();
-
-		//CInputManager::get().update();
+		Uint64 diff = timeNow - timeLast;
+		deltaTime = static_cast<float>(timeNow - timeLast) * 1000.f / static_cast<float>(SDL_GetPerformanceFrequency()) / 1000.f;
+		timeLast = timeNow;
 
 		//Handle events on queue
 		while (SDL_PollEvent(&event) != 0)
@@ -82,19 +79,13 @@ void CApplication::Update()
 			{
 				break;
 			}
-
-			Input::CMouse* mouse = static_cast<Input::CMouse*>(m_mouse);
-			mouse->updateSDLMouse(event);
 		}
-		
-		CVector2i mousePos = m_mouse->GetMouseGlobalPosition();
-		printf("mousePos: %d - %d\n", mousePos.x, mousePos.y);
+		m_mouse->Update(deltaTime);
+		m_keyboard->Update(deltaTime);
 
-		m_keyboard->Update(0.016f);
+		UpdateProject(deltaTime);
 
-		UpdateProject();
-
-		//m_elapsed = timer.elapsed();
+		timeNow = SDL_GetPerformanceCounter();
 	}
 }
 

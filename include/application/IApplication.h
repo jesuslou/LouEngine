@@ -28,7 +28,7 @@ public:
 
 protected:
 	virtual bool InitProject(CGameSystems& gameSystems) = 0;
-	virtual void UpdateProject() = 0;
+	virtual void UpdateProject(float dt) = 0;
 	virtual void DestroyProject() = 0;
 
 	CGameSystems m_gameSystems;
