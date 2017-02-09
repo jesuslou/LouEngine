@@ -28,6 +28,33 @@ function (generate_static_library)
 	add_target_dependencies("${lib_name}" "${lib_dependencies}" "${lib_dependencies_folder}")
 endfunction(generate_static_library)
 
+# work in progress
+function (generate_shared_library)
+	cmake_parse_arguments(lib "" "name;dependencies_folder;pch" "dependencies" ${ARGN})
+	
+	file(GLOB_RECURSE header_files "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+	file(GLOB_RECURSE source_files "${CMAKE_CURRENT_SOURCE_DIR}/source/common/*.cpp")
+	set(header_files  "${header_files}" CACHE INTERNAL "header_files")
+	set(source_files  "${source_files}" CACHE INTERNAL "source_files")
+	add_platform_files("${header_files}" "${source_files}")
+	add_framework_files("${header_files}" "${source_files}")
+	
+	add_source_groups("${header_files}")
+	add_source_groups("${source_files}")
+
+	if(lib_pch)
+		add_precompiled_header("${lib_pch}" "${source_files}")
+	endif()
+	
+	add_library("${lib_name}" SHARED ${header_files} ${source_files})
+	target_include_directories ("${lib_name}" PUBLIC "include")
+	add_framework_include_directories("${lib_name}")
+	
+	set_target_properties("${lib_name}" PROPERTIES LINKER_LANGUAGE CXX)
+	
+	add_target_dependencies("${lib_name}" "${lib_dependencies}" "${lib_dependencies_folder}")
+endfunction(generate_shared_library)
+
 function (generate_game)
 	cmake_parse_arguments(game "" "name;dependencies_folder;pch" "dependencies" ${ARGN})
 

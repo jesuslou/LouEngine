@@ -5,6 +5,8 @@ import argparse
 import subprocess
 from subprocess import DEVNULL
 
+VALID_FRAMEWORKS = ["none", "sfml", "sdl"]
+
 def path_to_os(path):
 	full_path = os.path.abspath(path)
 	parts = full_path.split("/")
@@ -44,7 +46,7 @@ def read_parameters():
 	parser.add_argument('-d', '--deploy_path', default=".", help='Path where the project will be created under folder with name -n/--name')
 	parser.add_argument('-r', '--remote', default="none", help='Remote to initialize the project in')
 	parser.add_argument('-p', '--push', action='store_true', help='whether the changes will be pushed to the specified remote')
-	parser.add_argument('-g', '--generate', action='store_true', help='Generate the solution when finished')
+	parser.add_argument('-g', '--generate', choices=VALID_FRAMEWORKS, default="none", help='Generate the solution when finished for one of [{}]'.format(''.join(VALID_FRAMEWORKS)))
 	parser.add_argument('-rf', '--remove_folder', action='store_true', help='Remove folder if already exists')
 
 	args = parser.parse_args()
@@ -74,12 +76,12 @@ def create_windows_framework_specific_generate_script(framework, project_name, d
 		elif(framework == "sdl"):
 			framework_flags = "-DUSE_SDL=1 -DSDL_STATIC=0 -DSDL_SHARED=1"
 		generate_win_file.write(
-			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_TESTING=0 -DENTITYX_BUILD_SHARED=0 {}\n'.format(
+			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 {}\n'.format(
 				project_name, framework_flags))
 		generate_win_file.write('cd ../..\n')
 		generate_win_file.write('pause\n')
 
-def create_project(project_name, deploy_path, remote, push, generate, remove_folder):
+def create_project(project_name, deploy_path, remote, push, framework, remove_folder):
 	deploy_path = "{}/{}".format(deploy_path, project_name)
 
 	if remove_folder:
@@ -174,12 +176,12 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 		if subprocess.call('git push -u origin master', cwd=r"{}".format(deploy_path)) != 0:
 			message_and_die('Cannot push to {}!'.format(remote))
 
-	if generate and os.path.isdir(path_to_os("{}/dependencies/LouEngine/dependencies/SFML".format(deploy_path))):
-		print("Deploy finished. Starting project generation...")
-		os.system("cd {} && generate_sfml_win.bat".format(deploy_path))
+	if framework != "none":
+		print("Deploy finished. Starting project generation for {}...".format(framework))
+		os.system("cd {} && generate_{}_win.bat".format(deploy_path, framework))
 
 if __name__ == '__main__':
 	check_git_in_path()
 	check_cmake_in_path()
-	name, deploy_path, remote, push, generate, remove_folder = read_parameters()
-	create_project(name, deploy_path, remote, push, generate, remove_folder)
+	name, deploy_path, remote, push, framework, remove_folder = read_parameters()
+	create_project(name, deploy_path, remote, push, framework, remove_folder)
