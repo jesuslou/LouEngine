@@ -74,7 +74,7 @@ def create_windows_framework_specific_generate_script(framework, project_name, d
 		elif(framework == "sdl"):
 			framework_flags = "-DUSE_SDL=1 -DSDL_STATIC=0 -DSDL_SHARED=1"
 		generate_win_file.write(
-			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 {}\n'.format(
+			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_TESTING=0 -DENTITYX_BUILD_SHARED=0 {}\n'.format(
 				project_name, framework_flags))
 		generate_win_file.write('cd ../..\n')
 		generate_win_file.write('pause\n')
@@ -140,7 +140,7 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 		app_h_file.write('\t{}();\n\n'.format(application_class_name))
 		app_h_file.write('protected:\n')
 		app_h_file.write('\tbool InitProject(CGameSystems& gameSystems) override;\n')
-		app_h_file.write('\tvoid UpdateProject() override;\n')
+		app_h_file.write('\tvoid UpdateProject(float dt) override;\n')
 		app_h_file.write('\tvoid DestroyProject() override;\n')
 		app_h_file.write('};\n')
 
@@ -148,7 +148,7 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 		app_cpp_file.write('#include <application/{}.h>\n\n'.format(application_class_name))
 		app_cpp_file.write('{}::{}()\n{{\n\t\n}}\n\n'.format(application_class_name, application_class_name))
 		app_cpp_file.write('bool {}::InitProject(CGameSystems& gameSystems)\n{{\n\treturn true;\n}}\n\n'.format(application_class_name))
-		app_cpp_file.write('void {}::UpdateProject()\n{{\n\t\n}}\n\n'.format(application_class_name))
+		app_cpp_file.write('void {}::UpdateProject(float dt)\n{{\n\t\n}}\n\n'.format(application_class_name))
 		app_cpp_file.write('void {}::DestroyProject()\n{{\n\t\n}}\n'.format(application_class_name))
 
 	with open(path_to_os("{}/CMakeLists.txt".format(game_path)), "w") as cmake_file:
