@@ -72,7 +72,7 @@ def create_windows_framework_specific_generate_script(framework, project_name, d
 		if(framework == "sfml"):
 			framework_flags = "-DBUILD_SHARED_LIBS=0 -DUSE_SFML=1"
 		elif(framework == "sdl"):
-			framework_flags = "-DGLM_STATIC_LIBRARY_ENABLE=1 -DSDL_STATIC=1 -DSDL_SHARED=0 -DSDL_JOYSTICK=0 -DSDL_HAPTIC=0 -DUSE_SDL=1"
+			framework_flags = "-DUSE_SDL=1 -DSDL_STATIC=0 -DSDL_SHARED=1"
 		generate_win_file.write(
 			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 {}\n'.format(
 				project_name, framework_flags))
@@ -153,6 +153,8 @@ def create_project(project_name, deploy_path, remote, push, generate, remove_fol
 
 	with open(path_to_os("{}/CMakeLists.txt".format(game_path)), "w") as cmake_file:
 		cmake_file.write('cmake_minimum_required(VERSION 3.6)\n\n')
+		cmake_file.write('set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n')
+		cmake_file.write('set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n\n')
 		cmake_file.write('set(dependencies_folder "${CMAKE_SOURCE_DIR}/../dependencies/")\n')
 		cmake_file.write('include(${dependencies_folder}/LouEngine/build/cmake/LouEngine.cmake)\n\n')
 		cmake_file.write('add_dependency_subdirectory("LouEngine" "${dependencies_folder}")\n\n')
