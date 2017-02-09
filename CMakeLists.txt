@@ -48,8 +48,8 @@ if(USE_SFML)
 	link_sfml_libraries("${project_name}" "${sfml_dependencies}" "${dependencies_folder}/SFML")
 elseif(USE_SDL)
 	set(sdl_dependencies 
-	"SDL2-static"
-	"glm_static"
+	"SDL2"
+	"glm"
 	"SDL_image"
 	)
 	link_sdl_libraries("${project_name}" "${sdl_dependencies}" "${dependencies_folder}/SDL")
