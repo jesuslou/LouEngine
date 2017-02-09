@@ -6,7 +6,7 @@ namespace Input
 {
 	enum EMouseButton
 	{
-		MB_INVALID = 0,
+		MB_INVALID = -1,
 		MB_LEFT = sf::Mouse::Left,
 		MB_MIDDLE = sf::Mouse::Middle,
 		MB_RIGHT = sf::Mouse::Right,

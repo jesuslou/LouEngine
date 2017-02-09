@@ -3,6 +3,7 @@
 #include <application/CApplication.h>
 #include <application/SApplicationWindowParameters.h>
 #include <input/CKeyboard.h>
+#include <input/CMouse.h>
 #include <graphics/CRenderer.h>
 #include <systems/CSystems.h>
 
@@ -51,6 +52,14 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 								  , windowStyle
 								  );
 
+	m_mouse = new Input::CMouse(m_mainWindow);
+	if (!m_mouse->Init())
+	{
+		delete m_mouse;
+		return false;
+	}
+	CSystems::SetSystem<Input::IMouse>(m_mouse);
+
 	if (applicationWindowParameters.m_hasVerticalSync)
 	{
 		m_mainWindow->setVerticalSyncEnabled(true);
@@ -93,8 +102,9 @@ void CApplication::Update()
 			}
 		}
 		m_keyboard->Update(elapsed);
+		m_mouse->Update(elapsed);
 
-		UpdateProject();
+		UpdateProject(elapsed);
 
 		m_mainWindow->clear();
 		// Draw

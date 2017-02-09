@@ -71,10 +71,8 @@ void CApplication::Update()
 		deltaTime = static_cast<float>(timeNow - timeLast) * 1000.f / static_cast<float>(SDL_GetPerformanceFrequency()) / 1000.f;
 		timeLast = timeNow;
 
-		//Handle events on queue
 		while (SDL_PollEvent(&event) != 0)
 		{
-			//User requests quit
 			if (event.type == SDL_QUIT)
 			{
 				break;
