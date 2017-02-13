@@ -51,14 +51,6 @@ CApplication::~CApplication()
 
 bool CApplication::Init(const SApplicationWindowParameters& applicationWindowParameters)
 {
-	m_renderer = new CRenderer();
-	if (!m_renderer->Init())
-	{
-		delete m_renderer;
-		return false;
-	}
-	CSystems::SetSystem<IRenderer>(m_renderer);
-
 	m_keyboard = new Input::CKeyboard();
 	if (!m_keyboard->Init())
 	{
@@ -99,7 +91,7 @@ void CApplication::Update()
 		{
 			if (event.type == SDL_QUIT)
 			{
-				break;
+				return;
 			}
 		}
 		m_mouse->Update(deltaTime);
@@ -118,6 +110,10 @@ void CApplication::Destroy()
 	CSystems::DestroySystem<IRenderer>();
 	m_keyboard->Destroy();
 	CSystems::DestroySystem<Input::IKeyboard>();
+	m_mouse->Destroy();
+	CSystems::DestroySystem<Input::IMouse>();
+
+	SDL_Quit();
 }
 
 bool CApplication::InitSDL(const SApplicationWindowParameters& applicationWindowParameters)
@@ -144,20 +140,13 @@ bool CApplication::InitSDL(const SApplicationWindowParameters& applicationWindow
 		}
 		else
 		{
-			//printf("CRenderer::SDL Window creation SUCCESS!\n");
-			//m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-			//// Project specific initialization
-			//if (m_renderer == nullptr)
-			//{
-			//	printf("CRenderer::Renderer creation FAILURE! SDL Error: %s\n", SDL_GetError());
-			//	return false;
-			//}
-			//else
-			//{
-			//	printf("CRenderer::SDL Renderer creation SUCCESS!\n");
-			//	//Initialize renderer color
-			//	SDL_SetRenderDrawColor(m_renderer, m_clear_color.r, m_clear_color.g, m_clear_color.b, m_clear_color.a);
-			//}
+			m_renderer = new CRenderer(m_window);
+			if (!m_renderer->Init(applicationWindowParameters))
+			{
+				delete m_renderer;
+				return false;
+			}
+			CSystems::SetSystem<IRenderer>(m_renderer);
 		}
 	}
 	return true;

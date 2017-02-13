@@ -24,15 +24,26 @@
 
 #pragma once
 
+#include <graphics/IRenderer.h>
+
 struct SApplicationWindowParameters;
 
-class IRenderer
+namespace sf
+{
+	class RenderWindow;
+}
+
+class CRenderer : public IRenderer
 {
 public:
-	IRenderer() {}
-	virtual ~IRenderer() {}
+	CRenderer();
+	CRenderer(sf::RenderWindow* mainWindow);
+	~CRenderer();
 
-	virtual bool Init(const SApplicationWindowParameters& applicationWindowParameters) = 0;
-	virtual void Destroy() = 0;
-	virtual void Render() = 0;
+	bool Init(const SApplicationWindowParameters& applicationWindowParameters) override;
+	void Destroy() override;
+	void Render() override;
+
+private:
+	sf::RenderWindow* m_mainWindow;
 };

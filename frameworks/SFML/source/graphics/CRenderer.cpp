@@ -22,17 +22,48 @@
 //
 ////////////////////////////////////////////////////////////
 
-#pragma once
+#include <LouEnginePrecompile.h>
 
-#include <graphics/IRenderer.h>
 
-class CRenderer : public IRenderer
+#include <application/SApplicationWindowParameters.h>
+#include <graphics/CRenderer.h>
+
+#include <SFML/Graphics/RenderWindow.hpp>
+
+CRenderer::CRenderer()
+	: m_mainWindow(nullptr)
 {
-public:
-	CRenderer();
-	~CRenderer();
+}
 
-	bool Init() override;
-	void Destroy() override;
-	void Render() override;
-};
+CRenderer::CRenderer(sf::RenderWindow* mainWindow)
+	: m_mainWindow(mainWindow)
+{
+}
+
+CRenderer::~CRenderer()
+{
+
+}
+
+bool CRenderer::Init(const SApplicationWindowParameters& applicationWindowParameters)
+{
+	if (applicationWindowParameters.m_hasVerticalSync)
+	{
+		m_mainWindow->setVerticalSyncEnabled(true);
+	}
+	else
+	{
+		m_mainWindow->setFramerateLimit(applicationWindowParameters.m_frameRateLimit);
+	}
+	return true;
+}
+
+void CRenderer::Destroy()
+{
+
+}
+
+void CRenderer::Render()
+{
+
+}

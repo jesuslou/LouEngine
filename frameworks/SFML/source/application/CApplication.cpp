@@ -50,14 +50,6 @@ CApplication::~CApplication()
 
 bool CApplication::Init(const SApplicationWindowParameters& applicationWindowParameters)
 {
-	m_renderer = new CRenderer();
-	if (!m_renderer->Init())
-	{
-		delete m_renderer;
-		return false;
-	}
-	CSystems::SetSystem<IRenderer>(m_renderer);
-
 	m_keyboard = new Input::CKeyboard();
 	if (!m_keyboard->Init())
 	{
@@ -76,6 +68,14 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 								  , windowStyle
 								  );
 
+	m_renderer = new CRenderer(m_mainWindow);
+	if (!m_renderer->Init(applicationWindowParameters))
+	{
+		delete m_renderer;
+		return false;
+	}
+	CSystems::SetSystem<IRenderer>(m_renderer);
+
 	m_mouse = new Input::CMouse(m_mainWindow);
 	if (!m_mouse->Init())
 	{
@@ -83,15 +83,6 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 		return false;
 	}
 	CSystems::SetSystem<Input::IMouse>(m_mouse);
-
-	if (applicationWindowParameters.m_hasVerticalSync)
-	{
-		m_mainWindow->setVerticalSyncEnabled(true);
-	}
-	else
-	{
-		m_mainWindow->setFramerateLimit(applicationWindowParameters.m_frameRateLimit);
-	}
 
 	return InitProject(m_gameSystems);
 }
@@ -130,6 +121,7 @@ void CApplication::Update()
 
 		UpdateProject(elapsed);
 
+		// this must be done by the renderer
 		m_mainWindow->clear();
 		// Draw
 		m_mainWindow->display();

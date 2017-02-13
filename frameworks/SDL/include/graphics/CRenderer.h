@@ -24,15 +24,29 @@
 
 #pragma once
 
+#include <graphics/IRenderer.h>
+
+#include <SDL_pixels.h>
+
 struct SApplicationWindowParameters;
 
-class IRenderer
+struct SDL_Window;
+struct SDL_Renderer;
+
+class CRenderer : public IRenderer
 {
 public:
-	IRenderer() {}
-	virtual ~IRenderer() {}
+	CRenderer();
+	CRenderer(SDL_Window* window);
+	~CRenderer();
 
-	virtual bool Init(const SApplicationWindowParameters& applicationWindowParameters) = 0;
-	virtual void Destroy() = 0;
-	virtual void Render() = 0;
+	bool Init(const SApplicationWindowParameters& applicationWindowParameters) override;
+	void Destroy() override;
+	void Render() override;
+
+private:
+	SDL_Window* m_window;
+
+	SDL_Renderer *m_renderer;
+	SDL_Color m_clearColor;
 };

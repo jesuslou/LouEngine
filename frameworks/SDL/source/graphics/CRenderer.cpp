@@ -24,26 +24,57 @@
 
 #include <LouEnginePrecompile.h>
 
+#include <application/SApplicationWindowParameters.h>
 #include <graphics/CRenderer.h>
 
-CRenderer::CRenderer()
-{
+#include <SDL_render.h>
 
+CRenderer::CRenderer()
+	: m_renderer(nullptr)
+	, m_clearColor()
+{
+	m_clearColor.r = 0;
+	m_clearColor.g = 0;
+	m_clearColor.b = 0;
+	m_clearColor.a = 1;
+}
+
+CRenderer::CRenderer(SDL_Window* window)
+	: m_window(window)
+	, m_renderer(nullptr)
+	, m_clearColor()
+{
+	m_clearColor.r = 0;
+	m_clearColor.g = 0;
+	m_clearColor.b = 0;
+	m_clearColor.a = 1;
 }
 
 CRenderer::~CRenderer()
 {
-
+	Destroy();
 }
 
-bool CRenderer::Init()
+bool CRenderer::Init(const SApplicationWindowParameters& applicationWindowParameters)
 {
-	return true;
+	Uint32 flags = SDL_RENDERER_ACCELERATED;
+	flags |= applicationWindowParameters.m_hasVerticalSync ? SDL_RENDERER_PRESENTVSYNC : 0;
+	m_renderer = SDL_CreateRenderer(m_window, -1, flags);
+	if (m_renderer)
+	{
+		SDL_SetRenderDrawColor(m_renderer, m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
+		return true;//CTextureManager::get().init();
+	}
+	return false;
 }
 
 void CRenderer::Destroy()
 {
-
+	if (m_renderer)
+	{
+		SDL_DestroyRenderer(m_renderer);
+		m_renderer = nullptr;
+	}
 }
 
 void CRenderer::Render()
