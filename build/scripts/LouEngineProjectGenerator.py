@@ -48,6 +48,7 @@ def read_parameters():
 	parser.add_argument('-p', '--push', action='store_true', help='whether the changes will be pushed to the specified remote')
 	parser.add_argument('-g', '--generate', choices=VALID_FRAMEWORKS, default="none", help='Generate the solution when finished for one of [{}]'.format(''.join(VALID_FRAMEWORKS)))
 	parser.add_argument('-rf', '--remove_folder', action='store_true', help='Remove folder if already exists')
+	parser.add_argument('-sl', '--framework_static_lib', action='store_true', help="Generate project with framework's static libraries")
 
 	args = parser.parse_args()
 
@@ -55,13 +56,13 @@ def read_parameters():
 		print("No remote specified. -p/--push option ignored.")
 		args.push = False
 
-	return args.name, args.deploy_path, args.remote, args.push, args.generate, args.remove_folder
+	return args.name, args.deploy_path, args.remote, args.push, args.generate, args.remove_folder, args.framework_static_lib
 
 def create_folder_if_not_exists(path):
 	if not os.path.exists(path):
 		os.makedirs(path)
 
-def create_windows_framework_specific_generate_script(framework, project_name, deploy_path):
+def create_windows_framework_specific_generate_script(framework, project_name, deploy_path, framework_static_lib):
 	framework = framework.lower();
 	with open(path_to_os("{}/generate_{}_win.bat".format(deploy_path, framework)), "w") as generate_win_file:
 		folder_name = "{}-{}-win32".format(project_name, framework)
@@ -72,16 +73,16 @@ def create_windows_framework_specific_generate_script(framework, project_name, d
 		generate_win_file.write('cd projects/{}\n'.format(folder_name))
 		framework_flags = ""
 		if(framework == "sfml"):
-			framework_flags = "-DBUILD_SHARED_LIBS=0 -DUSE_SFML=1"
+			framework_flags = "-DBUILD_SHARED_LIBS={} -DUSE_SFML=1".format("0" if framework_static_lib else "1")
 		elif(framework == "sdl"):
-			framework_flags = "-DUSE_SDL=1 -DSDL_STATIC=0 -DSDL_SHARED=1"
+			framework_flags = "-DUSE_SDL=1 -DSDL_STATIC={} -DSDL_SHARED={}".format("1" if framework_static_lib else "0", "0" if framework_static_lib else "1")
 		generate_win_file.write(
 			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 {}\n'.format(
 				project_name, framework_flags))
 		generate_win_file.write('cd ../..\n')
 		generate_win_file.write('pause\n')
 
-def create_project(project_name, deploy_path, remote, push, framework, remove_folder):
+def create_project(project_name, deploy_path, remote, push, framework, remove_folder, framework_static_lib):
 	deploy_path = "{}/{}".format(deploy_path, project_name)
 
 	if remove_folder:
@@ -165,8 +166,8 @@ def create_project(project_name, deploy_path, remote, push, framework, remove_fo
 		cmake_file.write(')\n\n')
 		cmake_file.write('generate_game(name "{}" dependencies "${{dependencies}}" dependencies_folder "${{dependencies_folder}}")\n'.format(project_name))
 
-	create_windows_framework_specific_generate_script("sfml", project_name, deploy_path)
-	create_windows_framework_specific_generate_script("sdl", project_name, deploy_path)
+	create_windows_framework_specific_generate_script("sfml", project_name, deploy_path, framework_static_lib)
+	create_windows_framework_specific_generate_script("sdl", project_name, deploy_path, framework_static_lib)
 
 	if push:
 		if subprocess.call('git add .', cwd=r"{}".format(deploy_path)) != 0:
@@ -183,5 +184,5 @@ def create_project(project_name, deploy_path, remote, push, framework, remove_fo
 if __name__ == '__main__':
 	check_git_in_path()
 	check_cmake_in_path()
-	name, deploy_path, remote, push, framework, remove_folder = read_parameters()
-	create_project(name, deploy_path, remote, push, framework, remove_folder)
+	name, deploy_path, remote, push, framework, remove_folder, framework_static_lib = read_parameters()
+	create_project(name, deploy_path, remote, push, framework, remove_folder, framework_static_lib)
