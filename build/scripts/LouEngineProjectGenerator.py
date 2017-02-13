@@ -122,37 +122,43 @@ def create_project(project_name, deploy_path, remote, push, framework, remove_fo
 
 	application_class_name = "C{}Application".format(project_name)
 
-	with open(path_to_os("{}/{}/main.cpp".format(deploy_path, project_name)), "w") as main_cpp_file:
-		main_cpp_file.write('#include <application\{}.h>\n'.format(application_class_name))
-		main_cpp_file.write('#include <application\SApplicationWindowParameters.h>\n\n'.format(application_class_name))
-		main_cpp_file.write('{} application; // This class is your starting point\n\n'.format(application_class_name))
-		main_cpp_file.write('int main(int argc, char** argv)\n')
-		main_cpp_file.write('{\n')
-		main_cpp_file.write('\tSApplicationWindowParameters applicationWindowParameters(800, 600, "{}");\n'.format(project_name))
-		main_cpp_file.write('\tapplication.Init(applicationWindowParameters);\n')
-		main_cpp_file.write('\tapplication.Update();\n')
-		main_cpp_file.write('\tapplication.Destroy();\n')
-		main_cpp_file.write('}\n')
+	main_path = path_to_os("{}/{}/main.cpp".format(deploy_path, project_name))
+	if os.path.isfile(main_path) == False:
+		with open(main_path, "w") as main_cpp_file:
+			main_cpp_file.write('#include <application\{}.h>\n'.format(application_class_name))
+			main_cpp_file.write('#include <application\SApplicationWindowParameters.h>\n\n'.format(application_class_name))
+			main_cpp_file.write('{} application; // This class is your starting point\n\n'.format(application_class_name))
+			main_cpp_file.write('int main(int argc, char** argv)\n')
+			main_cpp_file.write('{\n')
+			main_cpp_file.write('\tSApplicationWindowParameters applicationWindowParameters(800, 600, "{}");\n'.format(project_name))
+			main_cpp_file.write('\tapplication.Init(applicationWindowParameters);\n')
+			main_cpp_file.write('\tapplication.Update();\n')
+			main_cpp_file.write('\tapplication.Destroy();\n')
+			main_cpp_file.write('}\n')
 
-	with open(path_to_os("{}/include/application/{}.h".format(game_path, application_class_name)), "w") as app_h_file:
-		app_h_file.write('#pragma once\n\n')
-		app_h_file.write('#include <application/CApplication.h>\n\n')
-		app_h_file.write('class {} : public CApplication\n'.format(application_class_name))
-		app_h_file.write('{\n')
-		app_h_file.write('public:\n')
-		app_h_file.write('\t{}();\n\n'.format(application_class_name))
-		app_h_file.write('protected:\n')
-		app_h_file.write('\tbool InitProject(CGameSystems& gameSystems) override;\n')
-		app_h_file.write('\tvoid UpdateProject(float dt) override;\n')
-		app_h_file.write('\tvoid DestroyProject() override;\n')
-		app_h_file.write('};\n')
+	app_h_path = path_to_os("{}/include/application/{}.h".format(game_path, application_class_name))
+	if os.path.isfile(app_h_path) == False:
+		with open(app_h_path, "w") as app_h_file:
+			app_h_file.write('#pragma once\n\n')
+			app_h_file.write('#include <application/CApplication.h>\n\n')
+			app_h_file.write('class {} : public CApplication\n'.format(application_class_name))
+			app_h_file.write('{\n')
+			app_h_file.write('public:\n')
+			app_h_file.write('\t{}();\n\n'.format(application_class_name))
+			app_h_file.write('protected:\n')
+			app_h_file.write('\tbool InitProject(CGameSystems& gameSystems) override;\n')
+			app_h_file.write('\tvoid UpdateProject(float dt) override;\n')
+			app_h_file.write('\tvoid DestroyProject() override;\n')
+			app_h_file.write('};\n')
 
-	with open(path_to_os("{}/source/common/application/{}.cpp".format(game_path, application_class_name)), "w") as app_cpp_file:
-		app_cpp_file.write('#include <application/{}.h>\n\n'.format(application_class_name))
-		app_cpp_file.write('{}::{}()\n{{\n\t\n}}\n\n'.format(application_class_name, application_class_name))
-		app_cpp_file.write('bool {}::InitProject(CGameSystems& gameSystems)\n{{\n\treturn true;\n}}\n\n'.format(application_class_name))
-		app_cpp_file.write('void {}::UpdateProject(float dt)\n{{\n\t\n}}\n\n'.format(application_class_name))
-		app_cpp_file.write('void {}::DestroyProject()\n{{\n\t\n}}\n'.format(application_class_name))
+	app_cpp_path = path_to_os("{}/source/common/application/{}.cpp".format(game_path, application_class_name))
+	if os.path.isfile(app_cpp_path) == False:
+		with open(app_cpp_path, "w") as app_cpp_file:
+			app_cpp_file.write('#include <application/{}.h>\n\n'.format(application_class_name))
+			app_cpp_file.write('{}::{}()\n{{\n\t\n}}\n\n'.format(application_class_name, application_class_name))
+			app_cpp_file.write('bool {}::InitProject(CGameSystems& gameSystems)\n{{\n\treturn true;\n}}\n\n'.format(application_class_name))
+			app_cpp_file.write('void {}::UpdateProject(float dt)\n{{\n\t\n}}\n\n'.format(application_class_name))
+			app_cpp_file.write('void {}::DestroyProject()\n{{\n\t\n}}\n'.format(application_class_name))
 
 	with open(path_to_os("{}/CMakeLists.txt".format(game_path)), "w") as cmake_file:
 		cmake_file.write('cmake_minimum_required(VERSION 3.6)\n\n')
