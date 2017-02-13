@@ -54,7 +54,7 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 	m_keyboard = new Input::CKeyboard();
 	if (!m_keyboard->Init())
 	{
-		delete m_keyboard;
+		DELETE_POINTER(m_keyboard);
 		return false;
 	}
 	CSystems::SetSystem<Input::IKeyboard>(m_keyboard);
@@ -62,7 +62,7 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 	m_mouse = new Input::CMouse();
 	if (!m_mouse->Init())
 	{
-		delete m_mouse;
+		DELETE_POINTER(m_mouse);
 		return false;
 	}
 	CSystems::SetSystem<Input::IMouse>(m_mouse);
@@ -143,7 +143,7 @@ bool CApplication::InitSDL(const SApplicationWindowParameters& applicationWindow
 			m_renderer = new CRenderer(m_window);
 			if (!m_renderer->Init(applicationWindowParameters))
 			{
-				delete m_renderer;
+				DELETE_POINTER(m_renderer);
 				return false;
 			}
 			CSystems::SetSystem<IRenderer>(m_renderer);

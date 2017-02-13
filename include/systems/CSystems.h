@@ -36,7 +36,7 @@ public:
 	{
 		for (auto& system : m_systems)
 		{
-			delete system.second;
+			DELETE_POINTER(system.second);
 		}
 		m_systems.clear();
 	}
@@ -82,7 +82,7 @@ public:
 			{
 				m_systems.erase(systemIt);
 			}
-			delete system;
+			DELETE_POINTER(system);
 		}
 	}
 

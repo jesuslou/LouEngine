@@ -22,28 +22,7 @@
 //
 ////////////////////////////////////////////////////////////
 
-// LouEngine
-#include <common/MemoryUtils.h>
+#pragma once
 
-// Framework
-#include <Definitions.h>
-
-// STD
-#include <algorithm>
-#include <array>
-#include <assert.h>
-#include <cassert>
-#include <cstdlib>
-#include <cstring>
-#include <functional>
-#include <iostream>
-#include <limits>
-#include <map>
-#include <queue>
-#include <random>
-#include <sstream>
-#include <stdint.h>
-#include <string>
-#include <typeinfo>
-#include <unordered_map>
-#include <vector>
+#define DELETE_POINTER(X) if(X) { delete X; X = nullptr; }
+#define DELETE_ARRAY(X) if(X) { delete[] X; X = nullptr; }
