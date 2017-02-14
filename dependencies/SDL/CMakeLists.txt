@@ -9,7 +9,7 @@ set(sdl_ide_group "SDL")
 add_dependency_subdirectory("SDL2" "${sdl_dependencies_folder}")
 set_target_properties ("SDL2main" PROPERTIES FOLDER "${sdl_ide_group}")
 set_target_properties ("SDL2" PROPERTIES FOLDER "${sdl_ide_group}")
-set_target_properties ("uninstall" PROPERTIES FOLDER "${sdl_ide_group}")
+#set_target_properties ("uninstall" PROPERTIES FOLDER "${sdl_ide_group}")
 
 # GLM
 add_dependency_subdirectory("glm" "${sdl_dependencies_folder}")

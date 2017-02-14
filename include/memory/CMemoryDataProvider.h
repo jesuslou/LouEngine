@@ -61,13 +61,13 @@ public:
 	template< class T >
 	T *AssignPOD()
 	{
-		return consumeBytes<T>(sizeof(T));
+		return ConsumeBytes<T>(sizeof(T));
 	}
 
 	template< class T >
 	T *AssignPODArray(std::size_t nobjects)
 	{
-		return consumeBytes<T>(sizeof(T) * nobjects);
+		return ConsumeBytes<T>(sizeof(T) * nobjects);
 	}
 
 	const unsigned char *GetTop() const
@@ -79,9 +79,9 @@ public:
 	T* ConsumeBytes(std::size_t nBytes)
 	{
 		assert(nBytes <= GetRemainingBytes() || assert("Can't return %ld bytes. There are only %ld bytes remaining (%s)\n"/*, nbytes, GetRemainingBytes(), GetName()*/));
-		assert(mCurrentPosition + nBytes <= mBase + GetSize());
-		T* base = static_cast<T*>(mCurrentPosition);
-		mCurrentPosition += nBytes;
+		assert(m_currentPosition + nBytes <= m_base + GetSize());
+		T* base = static_cast<T*>(m_currentPosition);
+		m_currentPosition += nBytes;
 		return base;
 	}
 
