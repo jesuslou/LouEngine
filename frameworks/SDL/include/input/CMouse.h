@@ -43,7 +43,6 @@ namespace Input
 		bool IsReleased(EMouseButton button) override;
 		bool BecomesReleased(EMouseButton button) override;
 
-		CVector2i GetMouseGlobalPosition() override;
 		CVector2i GetMouseScreenPosition() override;
 
 	private:

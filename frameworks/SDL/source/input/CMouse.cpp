@@ -73,13 +73,6 @@ namespace Input
 		return m_oldMouseState[button] && !!m_currentMouseState[button];
 	}
 
-	CVector2i CMouse::GetMouseGlobalPosition()
-	{
-		CVector2i mousePosition;
-		SDL_GetGlobalMouseState(&mousePosition.x, &mousePosition.y);
-		return mousePosition;
-	}
-
 	CVector2i CMouse::GetMouseScreenPosition()
 	{
 		return m_mousePosition;

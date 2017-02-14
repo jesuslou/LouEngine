@@ -44,7 +44,6 @@ namespace Input
 		virtual bool IsReleased(EMouseButton button) = 0;
 		virtual bool BecomesReleased(EMouseButton button) = 0;
 
-		virtual CVector2i GetMouseGlobalPosition() = 0;
 		virtual CVector2i GetMouseScreenPosition() = 0;
 	};
 }

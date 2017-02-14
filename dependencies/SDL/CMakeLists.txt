@@ -39,6 +39,7 @@ set_output_directory_and_ide_group("OGG" "${sdl_mixer_ide_group}")
 set_output_directory_and_ide_group("SDLMIXER" "${sdl_mixer_ide_group}")
 set_output_directory_and_ide_group("VORBIS" "${sdl_mixer_ide_group}")
 set_output_directory_and_ide_group("VORBIS_FILE" "${sdl_mixer_ide_group}")
+set_output_directory_and_ide_group("SMPEG" "${sdl_mixer_ide_group}")
 
 
 #SDL_image
