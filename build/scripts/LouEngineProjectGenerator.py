@@ -82,6 +82,26 @@ def create_windows_framework_specific_generate_script(framework, project_name, d
 		generate_win_file.write('cd ../..\n')
 		generate_win_file.write('pause\n')
 
+def create_osx_framework_specific_generate_script(framework, project_name, deploy_path, framework_static_lib):
+	framework = framework.lower();
+	with open(path_to_os("{}/generate_{}_osx.sh".format(deploy_path, framework)), "w") as generate_osx_file:
+		folder_name = "{}-{}-osx".format(project_name, framework)
+		generate_osx_file.write('#!/bin/bash\n\n')
+		generate_osx_file.write('if [ ! -d "projects/{}" ]; then\n'.format(folder_name))
+		generate_osx_file.write('\tmkdir "projects/{}"\n'.format(folder_name))
+		generate_osx_file.write('fi\n\n')
+		generate_osx_file.write('cd projects/{}\n'.format(folder_name))
+		framework_flags = ""
+		if(framework == "sfml"):
+			framework_flags = "-DBUILD_SHARED_LIBS={} -DUSE_SFML=1".format("0" if framework_static_lib else "1")
+		elif(framework == "sdl"):
+			framework_flags = "-DUSE_SDL=1 -DSDL_STATIC={} -DSDL_SHARED={}".format("1" if framework_static_lib else "0", "0" if framework_static_lib else "1")
+		generate_osx_file.write(
+			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 {} -G Xcode\n'.format(
+				project_name, framework_flags))
+		generate_osx_file.write('cd ../..\n')
+		generate_osx_file.write('read -p "Press any key to continue..."\n')
+
 def create_project(project_name, deploy_path, remote, push, framework, remove_folder, framework_static_lib):
 	deploy_path = "{}/{}".format(deploy_path, project_name)
 
@@ -172,8 +192,12 @@ def create_project(project_name, deploy_path, remote, push, framework, remove_fo
 		cmake_file.write(')\n\n')
 		cmake_file.write('generate_game(name "{}" dependencies "${{dependencies}}" dependencies_folder "${{dependencies_folder}}")\n'.format(project_name))
 
-	create_windows_framework_specific_generate_script("sfml", project_name, deploy_path, framework_static_lib)
-	create_windows_framework_specific_generate_script("sdl", project_name, deploy_path, framework_static_lib)
+	if os.name == "posix":
+		create_osx_framework_specific_generate_script("sfml", project_name, deploy_path, framework_static_lib)
+		create_osx_framework_specific_generate_script("sdl", project_name, deploy_path, framework_static_lib)
+	else:
+		create_windows_framework_specific_generate_script("sfml", project_name, deploy_path, framework_static_lib)
+		create_windows_framework_specific_generate_script("sdl", project_name, deploy_path, framework_static_lib)
 
 	if push:
 		if subprocess.call('git add .', shell=True, cwd=r"{}".format(deploy_path)) != 0:
