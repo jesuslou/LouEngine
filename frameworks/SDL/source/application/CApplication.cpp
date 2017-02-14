@@ -32,6 +32,7 @@
 #include <systems/CSystems.h>
 
 #include <SDL.h>
+#include <SDL_mixer.h>
 
 CApplication::CApplication()
 	: m_window(nullptr)
@@ -105,7 +106,7 @@ void CApplication::Update()
 
 void CApplication::Destroy() 
 {
-	DestroyProject( );
+	DestroyProject();
 	m_renderer->Destroy();
 	CSystems::DestroySystem<IRenderer>();
 	m_keyboard->Destroy();
@@ -118,6 +119,12 @@ void CApplication::Destroy()
 
 bool CApplication::InitSDL(const SApplicationWindowParameters& applicationWindowParameters)
 {
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		printf("CAudioManager::SDL Mixer initialization FAILURE! SDL_mixer Error: %s\n", Mix_GetError());
+		return false;
+	}
+
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{

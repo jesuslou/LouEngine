@@ -9,10 +9,36 @@ set(sdl_ide_group "SDL")
 add_dependency_subdirectory("SDL2" "${sdl_dependencies_folder}")
 set_target_properties ("SDL2main" PROPERTIES FOLDER "${sdl_ide_group}")
 set_target_properties ("SDL2" PROPERTIES FOLDER "${sdl_ide_group}")
+set_target_properties ("uninstall" PROPERTIES FOLDER "${sdl_ide_group}")
 
 # GLM
 add_dependency_subdirectory("glm" "${sdl_dependencies_folder}")
 set_target_properties ("glm_dummy" PROPERTIES FOLDER "${sdl_ide_group}")	
+
+# SDL_mixer
+set(SDL2_LIBRARY "SDL2")
+set(SDL2_INCLUDE_DIR "${sdl_dependencies_folder}/SDL2/include")
+add_dependency_subdirectory("SDL_mixer" "${sdl_dependencies_folder}")
+set(sdl_mixer_ide_group "SDL/SDL_mixer")
+
+function (set_output_directory_and_ide_group lib_name ide_group)
+	set_target_properties ("${lib_name}" PROPERTIES FOLDER "${ide_group}")
+	set_target_properties ("${lib_name}"
+		PROPERTIES
+		ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+		LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+		RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+	)
+endfunction(set_output_directory_and_ide_group)
+
+set_output_directory_and_ide_group("FLAC" "${sdl_mixer_ide_group}")
+set_output_directory_and_ide_group("LIBMAD" "${sdl_mixer_ide_group}")
+set_output_directory_and_ide_group("MIKMOD" "${sdl_mixer_ide_group}")
+set_output_directory_and_ide_group("MODPLUG" "${sdl_mixer_ide_group}")
+set_output_directory_and_ide_group("OGG" "${sdl_mixer_ide_group}")
+set_output_directory_and_ide_group("SDLMIXER" "${sdl_mixer_ide_group}")
+set_output_directory_and_ide_group("VORBIS" "${sdl_mixer_ide_group}")
+set_output_directory_and_ide_group("VORBIS_FILE" "${sdl_mixer_ide_group}")
 
 
 #SDL_image

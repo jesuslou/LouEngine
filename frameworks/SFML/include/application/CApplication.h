@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <application\IApplication.h>
+#include <application/IApplication.h>
 
 namespace sf
 {

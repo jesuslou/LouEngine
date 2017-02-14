@@ -51,6 +51,7 @@ elseif(USE_SDL)
 	"SDL2"
 	"glm"
 	"SDL_image"
+	"SDLMIXER"
 	)
 	link_sdl_libraries("${project_name}" "${sdl_dependencies}" "${dependencies_folder}/SDL")
 endif()
