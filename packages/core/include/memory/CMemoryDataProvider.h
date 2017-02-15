@@ -32,24 +32,24 @@ public:
 	using u8 = unsigned char;
 
 	CMemoryDataProvider();
-	explicit CMemoryDataProvider(const char *fileName);
+	explicit CMemoryDataProvider(const char* fileName);
 	// Memory not owned by this class
-	CMemoryDataProvider(const u8 *data, std::size_t nBytes);
+	CMemoryDataProvider(const u8* data, std::size_t nBytes);
 	// Memory owned by this class
 	explicit CMemoryDataProvider(std::size_t nBytes);
-	CMemoryDataProvider(const CMemoryDataProvider &mdp);
+	CMemoryDataProvider(const CMemoryDataProvider& mdp);
 
-	void operator =(const CMemoryDataProvider &mdp);
+	void operator =(const CMemoryDataProvider& mdp);
 
 	~CMemoryDataProvider();
 	void Destroy();
-	bool Load(const char *fileName);
+	bool Load(const char* fileName);
 	bool Load(IDataProvider& dp, std::size_t nBytes);
 
 	std::size_t GetSize() const { return m_nBytes; }
 	const u8* GetBaseData() const { return m_base; }
 
-	void Read(void *where, std::size_t nBytes) override;
+	void Read(void* where, std::size_t nBytes) override;
 	bool IsValid() const override;
 
 	std::size_t Seek(std::size_t offset, ESeekType from) override;
@@ -59,18 +59,18 @@ public:
 	std::size_t GetRemainingBytes() const { return GetSize() - (m_currentPosition - m_base); }
 
 	template< class T >
-	T *AssignPOD()
+	T* AssignPOD()
 	{
 		return ConsumeBytes<T>(sizeof(T));
 	}
 
 	template< class T >
-	T *AssignPODArray(std::size_t nobjects)
+	T* AssignPODArray(std::size_t nobjects)
 	{
-		return ConsumeBytes<T>(sizeof(T) * nobjects);
+		return ConsumeBytes<T>(sizeof(T)*  nobjects);
 	}
 
-	const unsigned char *GetTop() const
+	const unsigned char* GetTop() const
 	{
 		return m_currentPosition;
 	}

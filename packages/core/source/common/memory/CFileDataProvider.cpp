@@ -37,7 +37,7 @@ CFileDataProvider::CFileDataProvider()
 {
 }
 
-CFileDataProvider::CFileDataProvider(const char *fileName)
+CFileDataProvider::CFileDataProvider(const char* fileName)
 	: m_startOffset(0)
 	, m_maxBytes(CFileDataProviderInternal::INFINITE_SIZE)
 {
@@ -51,7 +51,7 @@ CFileDataProvider::~CFileDataProvider()
 	Close();
 }
 
-std::size_t CFileDataProvider::GetFileSize(const char *fileName)
+std::size_t CFileDataProvider::GetFileSize(const char* fileName)
 {
 	CFileDataProvider dataProvider(fileName);
 	if (!dataProvider.IsValid())
@@ -62,7 +62,7 @@ std::size_t CFileDataProvider::GetFileSize(const char *fileName)
 	return nBytes;
 }
 
-std::size_t CFileDataProvider::GetSize()
+std::size_t CFileDataProvider::GetSize() const
 {
 	if (!m_file)
 	{
@@ -75,9 +75,9 @@ std::size_t CFileDataProvider::GetSize()
 	return size;
 }
 
-bool CFileDataProvider::FileExist(const char *fileName)
+bool CFileDataProvider::FileExist(const char* fileName)
 {
-	FILE *file = fopen(fileName, "rb");
+	FILE* file = fopen(fileName, "rb");
 	if (file)
 	{
 		fclose(file);
@@ -86,7 +86,7 @@ bool CFileDataProvider::FileExist(const char *fileName)
 	return false;
 }
 
-bool CFileDataProvider::Open(const char *fileName)
+bool CFileDataProvider::Open(const char* fileName)
 {
 	SetName(fileName);
 	m_file = fopen(fileName, "rb");
@@ -111,7 +111,7 @@ void CFileDataProvider::Close()
 	}
 }
 
-void CFileDataProvider::Read(void *where, std::size_t nBytes)
+void CFileDataProvider::Read(void* where, std::size_t nBytes)
 {
 	assert(IsValid());
 	size_t nBytesRead = fread(where, 1, nBytes, m_file);

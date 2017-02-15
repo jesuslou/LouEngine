@@ -30,10 +30,10 @@ class CFileDataSaver : public IDataSaver
 {
 public:
 	CFileDataSaver();
-	CFileDataSaver(const char *fileName, bool appendMode = false);
+	CFileDataSaver(const char* fileName, bool appendMode = false);
 	void Close();
 
 	virtual ~CFileDataSaver();
-	virtual void Write(const void *ptr, std::size_t nBytes) override;
+	virtual void Write(const void* ptr, std::size_t nBytes) override;
 	virtual bool IsValid() const override;
 };

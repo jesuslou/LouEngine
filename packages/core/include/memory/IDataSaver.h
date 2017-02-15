@@ -29,7 +29,6 @@
 class IDataSaver
 {
 public:
-	IDataSaver(const char *filename, bool appendMode = false);
 	virtual ~IDataSaver() {}
 
 	virtual void Write(const void *ptr, std::size_t nBytes) = 0;

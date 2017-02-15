@@ -29,23 +29,23 @@
 class CFileDataProvider : public IDataProvider
 {
 public:
-	static bool FileExist(const char *fileName);
-	static std::size_t GetFileSize(const char *fileName);
+	static bool FileExist(const char* fileName);
+	static std::size_t GetFileSize(const char* fileName);
 
 	CFileDataProvider();
-	CFileDataProvider(const char *fileName);
+	CFileDataProvider(const char* fileName);
 	~CFileDataProvider();
 
-	void Read(void *where, std::size_t nBytes) override;
+	void Read(void* where, std::size_t nBytes) override;
 	bool IsValid() const override;
 
-	bool Open(const char *fileName);
+	bool Open(const char* fileName);
 	void Close();
 
 	std::size_t Seek(std::size_t offset, ESeekType from) override;
 	std::size_t Tell() const override;
 
-	std::size_t GetSize();
+	std::size_t GetSize() const;
 
 private:
 	std::size_t m_startOffset;
