@@ -85,9 +85,8 @@ public:
 		return prev_top;
 	}
 
-	// Save to disc in a single operation
-	//const void *GetBufferToWrite() const { return mBase; }
-	//std::size_t getNumBytesToWrite() const { return GetSize(); }
+	const void *GetBufferToWrite() const { return m_base; }
+	std::size_t getNumBytesToWrite() const { return GetSize(); }
 
 private:
 	u8 *m_base;

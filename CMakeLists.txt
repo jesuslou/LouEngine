@@ -38,4 +38,5 @@ set_target_properties ("gtest_main" PROPERTIES FOLDER "${gtest_ide_group}")
 # LouEngine packages
 set(louengine_ide_group "LouEngine")
 add_dependency_subdirectory("core" "${packages_folder}")
+add_dependency_subdirectory("packer" "${packages_folder}")
 add_dependency_subdirectory("engine" "${packages_folder}")

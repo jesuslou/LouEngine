@@ -85,8 +85,7 @@ public:
 		return base;
 	}
 
-	// ???
-	//const void* GetBufferToWrite() const { return m_base; }
+	const void* GetBufferToWrite() const { return m_base; }
 	std::size_t GetNumBytesRemainingToWrite() const { return GetSize(); }
 
 private:

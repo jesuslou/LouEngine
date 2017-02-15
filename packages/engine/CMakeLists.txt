@@ -5,6 +5,7 @@ set(project_name "LouEngine")
 set(dependencies 
 	# LouEngine
 	"core"
+	"packer"
 	
 	# Third Party
 	"entityx"
@@ -40,3 +41,5 @@ elseif(USE_SDL)
 	endif()
 	link_sdl_libraries("${project_name}" "${sdl_dependencies}" "${dependencies_folder}/SDL")
 endif()
+
+warnings_as_errors("${project_name}")

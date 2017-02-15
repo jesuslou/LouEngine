@@ -62,6 +62,8 @@ def create_folder_if_not_exists(path):
 	if not os.path.exists(path):
 		os.makedirs(path)
 
+common_cmake_flags = "-DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 -DBUILD_STATIC_LIBS=0 -DBUILD_SHARED_LIBS=1 -DJSONCPP_WITH_TESTS=0"
+
 def create_windows_framework_specific_generate_script(framework, project_name, deploy_path, framework_static_lib):
 	framework = framework.lower();
 	with open(path_to_os("{}/generate_{}_win.bat".format(deploy_path, framework)), "w") as generate_win_file:
@@ -75,10 +77,10 @@ def create_windows_framework_specific_generate_script(framework, project_name, d
 		if(framework == "sfml"):
 			framework_flags = "-DBUILD_SHARED_LIBS={} -DUSE_SFML=1".format("0" if framework_static_lib else "1")
 		elif(framework == "sdl"):
-			framework_flags = "-DUSE_SDL=1 -DSDL_STATIC={} -DSDL_SHARED={}".format("1" if framework_static_lib else "0", "0" if framework_static_lib else "1")
+			framework_flags = "-DUSE_SDL=1 -DSDL_STATIC={} -DSDL_SHARED={} -DSDL_JOYSTICK=0 -DSDL_HAPTIC=0".format("1" if framework_static_lib else "0", "0" if framework_static_lib else "1")
 		generate_win_file.write(
-			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 {}\n'.format(
-				project_name, framework_flags))
+			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" {} {}\n'.format(
+				project_name, common_cmake_flags, framework_flags))
 		generate_win_file.write('cd ../..\n')
 		generate_win_file.write('pause\n')
 
@@ -97,8 +99,8 @@ def create_osx_framework_specific_generate_script(framework, project_name, deplo
 		elif(framework == "sdl"):
 			framework_flags = "-DUSE_SDL=1 -DSDL_STATIC={} -DSDL_SHARED={}".format("1" if framework_static_lib else "0", "0" if framework_static_lib else "1")
 		generate_osx_file.write(
-			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" -DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 {} -G Xcode\n'.format(
-				project_name, framework_flags))
+			'cmake ../../{} -DCMAKE_CONFIGURATION_TYPES="Debug;Release" {} {} -G Xcode\n'.format(
+				project_name, common_cmake_flags, framework_flags))
 		generate_osx_file.write('cd ../..\n')
 		generate_osx_file.write('read -p "Press any key to continue..."\n')
 
