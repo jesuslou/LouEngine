@@ -11,6 +11,6 @@ set(dependencies
 )
 	
 generate_static_library(name "${project_name}" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}")
-set_target_properties ("${project_name}" PROPERTIES FOLDER "${louengine_ide_group}")
+set_target_properties ("${project_name}" PROPERTIES FOLDER "${ide_group}")
 
 warnings_as_errors("${project_name}")

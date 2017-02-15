@@ -37,6 +37,11 @@ CFileDataSaver::~CFileDataSaver()
 
 CFileDataSaver::CFileDataSaver(const char* fileName, bool appendMode/* = false*/)
 {
+	Open(fileName, appendMode);
+}
+
+void CFileDataSaver::Open(const char* fileName, bool appendMode/* = false*/)
+{
 	m_file = fopen(fileName, appendMode ? "wb+" : "wb");
 }
 

@@ -151,6 +151,11 @@ bool CMemoryDataProvider::IsValid() const
 	return (m_base != nullptr && GetSize() > 0);
 }
 
+bool CMemoryDataProvider::IsOwner() const
+{
+	return m_allocatedMemory != nullptr;
+}
+
 void CMemoryDataProvider::Read(void *where, std::size_t nbytes)
 {
 	if (m_currentPosition + nbytes > m_base + GetSize())
@@ -177,7 +182,7 @@ std::size_t CMemoryDataProvider::Seek(std::size_t offset, ESeekType whence)
 	{
 		m_currentPosition = m_base + GetSize() - offset;
 	}
-	return 0;
+	return Tell();
 }
 
 void CMemoryDataProvider::Rewind()

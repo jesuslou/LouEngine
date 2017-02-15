@@ -54,7 +54,10 @@ public:
 	}
 
 protected:
-	IDataSaver() {}
+	IDataSaver() 
+		: m_file(nullptr)
+	{
+	}
 
 	FILE *m_file;
 };

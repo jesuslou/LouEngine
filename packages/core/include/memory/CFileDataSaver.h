@@ -31,6 +31,8 @@ class CFileDataSaver : public IDataSaver
 public:
 	CFileDataSaver();
 	CFileDataSaver(const char* fileName, bool appendMode = false);
+
+	void Open(const char* fileName, bool appendMode = false);
 	void Close();
 
 	virtual ~CFileDataSaver();

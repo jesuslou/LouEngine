@@ -27,6 +27,9 @@ function (generate_static_library)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 	
 	add_target_dependencies("${lib_name}" "${lib_dependencies}" "${lib_dependencies_folder}")
+	
+	generate_tests("${lib_name}")
+	
 endfunction(generate_static_library)
 
 # work in progress
@@ -54,6 +57,9 @@ function (generate_shared_library)
 	set_target_properties("${lib_name}" PROPERTIES LINKER_LANGUAGE CXX)
 	
 	add_target_dependencies("${lib_name}" "${lib_dependencies}" "${lib_dependencies_folder}")
+	
+	generate_tests("${lib_name}")
+	
 endfunction(generate_shared_library)
 
 function (generate_game)
@@ -81,6 +87,8 @@ function (generate_game)
 	endif()
 	
 	add_target_dependencies("${game_name}" "${lib_name}" "${game_dependencies_folder}")
+	
+	generate_tests("${game_name}")
 	
 endfunction(generate_game)
 

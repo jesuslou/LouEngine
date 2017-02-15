@@ -24,7 +24,9 @@
 
 #pragma once
 
-#include "memory/IDataProvider.h"
+#include <memory/IDataProvider.h>
+
+#include <cassert>
 
 class CMemoryDataProvider : public IDataProvider
 {
@@ -51,6 +53,7 @@ public:
 
 	void Read(void* where, std::size_t nBytes) override;
 	bool IsValid() const override;
+	bool IsOwner() const;
 
 	std::size_t Seek(std::size_t offset, ESeekType from) override;
 	std::size_t Tell() const override { return m_currentPosition - m_base; }
@@ -78,15 +81,14 @@ public:
 	template< class T >
 	T* ConsumeBytes(std::size_t nBytes)
 	{
-		assert(nBytes <= GetRemainingBytes() || assert("Can't return %ld bytes. There are only %ld bytes remaining (%s)\n"/*, nbytes, GetRemainingBytes(), GetName()*/));
+		assert(nBytes <= GetRemainingBytes());
 		assert(m_currentPosition + nBytes <= m_base + GetSize());
-		T* base = static_cast<T*>(m_currentPosition);
+		T* base = (T*)(m_currentPosition);
 		m_currentPosition += nBytes;
 		return base;
 	}
 
 	const void* GetBufferToWrite() const { return m_base; }
-	std::size_t GetNumBytesRemainingToWrite() const { return GetSize(); }
 
 private:
 	u8* m_allocatedMemory;

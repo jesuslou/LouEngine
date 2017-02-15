@@ -118,3 +118,34 @@ function(warnings_as_errors TARGET)
         endif()
     endif()
 endfunction(warnings_as_errors)
+
+function(generate_tests name)
+	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+		set(project_name "${name}_tests")
+		project("${project_name}")
+
+		file(GLOB_RECURSE header_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/include/*.h")
+		file(GLOB_RECURSE source_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/source/*.cpp")
+	
+		add_source_groups("${header_files}")
+		add_source_groups("${source_files}")
+
+		include_directories("${CMAKE_CURRENT_SOURCE_DIR}/tests/include")		
+		
+		add_executable ("${project_name}" "${header_files}" "${source_files}")
+		set_target_properties("${project_name}" PROPERTIES LINKER_LANGUAGE CXX)
+		
+		set(dependencies 
+			"${name}"
+			"gmock"
+			"gtest"
+		)
+		
+		add_target_dependencies("${project_name}" "${dependencies}" "${game_dependencies_folder}")
+		
+		if(ide_group)
+			set_target_properties ("${project_name}" PROPERTIES FOLDER "${ide_group}/tests")
+		endif()
+	endif()
+endfunction(generate_tests)
+

@@ -17,7 +17,7 @@ set(dependencies
 )
 	
 generate_static_library(name "${project_name}" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}" pch "LouEnginePrecompile")
-set_target_properties ("${project_name}" PROPERTIES FOLDER "${louengine_ide_group}")
+set_target_properties ("${project_name}" PROPERTIES FOLDER "${ide_group}")
 
 if(USE_SFML)
 	set(sfml_dependencies 
