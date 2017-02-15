@@ -29,10 +29,14 @@ if(USE_SFML)
 	link_sfml_libraries("${project_name}" "${sfml_dependencies}" "${dependencies_folder}/SFML")
 elseif(USE_SDL)
 	set(sdl_dependencies 
-	"SDL2"
 	"glm"
 	"SDL_image"
 	"SDLMIXER"
 	)
+	if(SDL_STATIC)
+		set(sdl_dependencies "${sdl_dependencies} SDL2-static")
+	else()
+		set(sdl_dependencies "${sdl_dependencies} SDL2")
+	endif()
 	link_sdl_libraries("${project_name}" "${sdl_dependencies}" "${dependencies_folder}/SDL")
 endif()

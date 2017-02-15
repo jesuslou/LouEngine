@@ -5,10 +5,15 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../build/cmake/LouEngine.cmake)
 set(sdl_dependencies_folder "${CMAKE_CURRENT_SOURCE_DIR}")
 set(sdl_ide_group "SDL")
 
+set(sdl_lib "SDL2")
+if(SDL_STATIC)
+	set(sdl_lib "SDL2-static")
+endif()
+
 # SDL2
 add_dependency_subdirectory("SDL2" "${sdl_dependencies_folder}")
 set_target_properties ("SDL2main" PROPERTIES FOLDER "${sdl_ide_group}")
-set_target_properties ("SDL2" PROPERTIES FOLDER "${sdl_ide_group}")
+set_target_properties ("${sdl_lib}" PROPERTIES FOLDER "${sdl_ide_group}")
 #set_target_properties ("uninstall" PROPERTIES FOLDER "${sdl_ide_group}")
 
 # GLM
@@ -16,7 +21,7 @@ add_dependency_subdirectory("glm" "${sdl_dependencies_folder}")
 set_target_properties ("glm_dummy" PROPERTIES FOLDER "${sdl_ide_group}")	
 
 # SDL_mixer
-set(SDL2_LIBRARY "SDL2")
+set(SDL2_LIBRARY "${sdl_lib}")
 set(SDL2_INCLUDE_DIR "${sdl_dependencies_folder}/SDL2/include")
 add_dependency_subdirectory("SDL_mixer" "${sdl_dependencies_folder}")
 set(sdl_mixer_ide_group "SDL/SDL_mixer")
@@ -57,7 +62,7 @@ add_library("${lib_name}" SHARED ${header_files} ${source_files})
 target_include_directories ("${lib_name}" PUBLIC "SDL_image")
 	
 set(dependencies 
-	"SDL2"
+	"${sdl_lib}"
 	)
 link_sdl_libraries("${lib_name}" "${dependencies}" "${sdl_dependencies_folder}")
 
