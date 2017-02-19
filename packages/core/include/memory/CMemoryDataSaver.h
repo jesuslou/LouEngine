@@ -45,6 +45,7 @@ public:
 
 	void Write(const void *data, std::size_t data_bytes) override;
 	bool IsValid() const override { return m_base != nullptr; }
+	bool IsOwner() const { return m_isOwnerOfBase; }
 
 	unsigned char *GetBuffer() { return m_base; }
 	const unsigned char *GetBuffer() const { return m_base; }
@@ -68,11 +69,11 @@ public:
 	}
 
 	template< class TObj >
-	TObj *ConsumeBytes(std::size_t nbytes)
+	TObj *ConsumePOD()
 	{
-		assert(GetSize() + nbytes <= GetCapacity()/* || sys_fatal("CMemoryDataSaver::consumeBytes( %d ) failed. Size:%ld Capacity:%ld\n", nbytes, GetSize(), GetCapacity())*/);
+		assert(GetSize() + sizeof(TObj) <= GetCapacity()/* || sys_fatal("CMemoryDataSaver::consumeBytes( %d ) failed. Size:%ld Capacity:%ld\n", nbytes, GetSize(), GetCapacity())*/);
 		TObj *prev_top = (TObj *) m_top;
-		m_top += nbytes;
+		m_top += sizeof(TObj);
 		return prev_top;
 	}
 

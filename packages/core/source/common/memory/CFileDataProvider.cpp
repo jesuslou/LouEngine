@@ -58,7 +58,7 @@ std::size_t CFileDataProvider::GetFileSize(const char* fileName)
 	{
 		return 0;
 	}
-	std::size_t nBytes = dataProvider.Seek(0, ESeekType::FROM_END_OF_FILE);
+	std::size_t nBytes = dataProvider.Seek(0, ESeekType::FromEndOfFile);
 	return nBytes;
 }
 
@@ -124,7 +124,7 @@ std::size_t CFileDataProvider::Seek(std::size_t offset, ESeekType from)
 	int rc = fseek(m_file, static_cast<long>(offset), static_cast<int>(from));
 	assert(rc == 0);
 	int newPosition = ftell(m_file);
-	assert(from != ESeekType::FROM_START || newPosition == offset);
+	assert(from != ESeekType::FromStart || newPosition == offset);
 	return newPosition;
 }
 

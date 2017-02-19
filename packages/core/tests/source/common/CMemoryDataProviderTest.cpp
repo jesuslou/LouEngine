@@ -109,7 +109,7 @@ TEST_F(CMemoryDataProviderTest, test_file_data_provider_read_POD)
 TEST_F(CMemoryDataProviderTest, test_file_data_provider_seek_from_start)
 {
 	CMemoryDataProvider m_sut(MemoryDataProviderTestInternal::FILE_NAME);
-	std::size_t newPos = m_sut.Seek(sizeof(SutDataType), IDataProvider::ESeekType::FROM_START);
+	std::size_t newPos = m_sut.Seek(sizeof(SutDataType), IDataProvider::ESeekType::FromStart);
 	EXPECT_EQ(newPos, sizeof(SutDataType));
 	int secondValue = m_sut.ReadLong();
 	EXPECT_EQ(secondValue, MemoryDataProviderTestInternal::SECOND_VALUE);
@@ -118,14 +118,14 @@ TEST_F(CMemoryDataProviderTest, test_file_data_provider_seek_from_start)
 TEST_F(CMemoryDataProviderTest, test_file_data_provider_seek_from_end_of_file)
 {
 	CMemoryDataProvider m_sut(MemoryDataProviderTestInternal::FILE_NAME);
-	std::size_t newPos = m_sut.Seek(sizeof(SutDataType), IDataProvider::ESeekType::FROM_END_OF_FILE);
+	std::size_t newPos = m_sut.Seek(sizeof(SutDataType), IDataProvider::ESeekType::FromEndOfFile);
 	EXPECT_EQ(newPos, m_sut.GetSize() - sizeof(SutDataType));
 }
 
 TEST_F(CMemoryDataProviderTest, test_file_data_provider_ftell)
 {
 	CMemoryDataProvider m_sut(MemoryDataProviderTestInternal::FILE_NAME);
-	std::size_t newPos = m_sut.Seek(sizeof(SutDataType), IDataProvider::ESeekType::FROM_START);
+	std::size_t newPos = m_sut.Seek(sizeof(SutDataType), IDataProvider::ESeekType::FromStart);
 	EXPECT_EQ(newPos, sizeof(SutDataType));
 	std::size_t ftellPos = m_sut.Tell();
 	EXPECT_EQ(ftellPos, newPos);

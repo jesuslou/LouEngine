@@ -31,9 +31,9 @@ class IDataProvider
 public:
 	enum class ESeekType
 	{
-		FROM_START = SEEK_SET,
-		FROM_CURRENT = SEEK_CUR,
-		FROM_END_OF_FILE = SEEK_END
+		FromStart = SEEK_SET,
+		FromCurrent = SEEK_CUR,
+		FromEndOfFile = SEEK_END
 	};
 
 	IDataProvider() {}

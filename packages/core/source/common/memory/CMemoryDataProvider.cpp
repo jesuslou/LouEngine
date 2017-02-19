@@ -170,15 +170,15 @@ void CMemoryDataProvider::Read(void *where, std::size_t nbytes)
 
 std::size_t CMemoryDataProvider::Seek(std::size_t offset, ESeekType whence)
 {
-	if (whence == ESeekType::FROM_START)
+	if (whence == ESeekType::FromStart)
 	{
 		m_currentPosition = m_base + offset;
 	}
-	else if (whence == ESeekType::FROM_CURRENT)
+	else if (whence == ESeekType::FromCurrent)
 	{
 		m_currentPosition = m_currentPosition + offset;
 	}
-	else if (whence == ESeekType::FROM_END_OF_FILE)
+	else if (whence == ESeekType::FromEndOfFile)
 	{
 		m_currentPosition = m_base + GetSize() - offset;
 	}
