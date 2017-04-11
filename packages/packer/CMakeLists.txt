@@ -7,7 +7,7 @@ set(dependencies
 	"core"
 	
 	# Third Party
-	"jsoncpp_lib"
+	"jsoncpp"
 )
 	
 generate_static_library(name "${project_name}" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}")

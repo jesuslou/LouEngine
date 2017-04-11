@@ -9,7 +9,7 @@ set(dependencies
 	
 	# Third Party
 	"entityx"
-	"jsoncpp_lib"
+	"jsoncpp"
 	"gmock"
 	"gmock_main"
 	"gtest"
@@ -19,27 +19,15 @@ set(dependencies
 generate_static_library(name "${project_name}" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}" pch "LouEnginePrecompile")
 set_target_properties ("${project_name}" PROPERTIES FOLDER "${ide_group}")
 
-if(USE_SFML)
-	set(sfml_dependencies 
-		"sfml-window"
-		"sfml-system"
-		"sfml-network"
-		"sfml-graphics"
-		"sfml-audio"
-		)
-	link_sfml_libraries("${project_name}" "${sfml_dependencies}" "${dependencies_folder}/SFML")
-elseif(USE_SDL)
-	set(sdl_dependencies 
-	"glm"
-	"SDL_image"
-	"SDLMIXER"
+
+set(sfml_dependencies 
+	"sfml-window"
+	"sfml-system"
+	"sfml-network"
+	"sfml-graphics"
+	"sfml-audio"
 	)
-	if(SDL_STATIC)
-		set(sdl_dependencies "${sdl_dependencies} SDL2-static")
-	else()
-		set(sdl_dependencies "${sdl_dependencies} SDL2")
-	endif()
-	link_sdl_libraries("${project_name}" "${sdl_dependencies}" "${dependencies_folder}/SDL")
-endif()
+link_sfml_libraries("${project_name}" "${sfml_dependencies}" "${dependencies_folder}/SFML")
+
 
 warnings_as_errors("${project_name}")
