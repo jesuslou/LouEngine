@@ -22,6 +22,3 @@
 [submodule "dependencies/SDL/SDL_mixer"]
 	path = dependencies/SDL/SDL_mixer
 	url = https://github.com/soulik/SDL_mixer.git
-[submodule "dependencies/jsoncpp"]
-	path = dependencies/jsoncpp
-	url = https://github.com/open-source-parsers/jsoncpp.git
