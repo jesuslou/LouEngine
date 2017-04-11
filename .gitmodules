@@ -7,18 +7,3 @@
 [submodule "dependencies/googletest"]
 	path = dependencies/googletest
 	url = https://github.com/google/googletest.git
-[submodule "dependencies/glm"]
-
-	path = dependencies/SDL/glm
-
-	url = https://github.com/g-truc/glm.git
-
-[submodule "dependencies/SDL/SDL_image"]
-	path = dependencies/SDL/SDL_image
-	url = https://github.com/aduros/SDL_image.git
-[submodule "dependencies/SDL/SDL2"]
-	path = dependencies/SDL/SDL2
-	url = https://github.com/spurious/SDL-mirror.git
-[submodule "dependencies/SDL/SDL_mixer"]
-	path = dependencies/SDL/SDL_mixer
-	url = https://github.com/soulik/SDL_mixer.git
