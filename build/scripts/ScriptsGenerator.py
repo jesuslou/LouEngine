@@ -62,12 +62,12 @@ def create_platform_scripts(project_name, deploy_path, platform):
 		platform_flags = "-G Xcode"
 
 	script_folder_platform = path_to_os("{}/{}".format(script_folder, platform))
-	generate_script_file_debug = path_to_os("{}/{}-debug-01-generate.sh".format(script_folder_platform, platform))
-	generate_script_file_release = path_to_os("{}/{}-release-01-generate.sh".format(script_folder_platform, platform))
-	update_script_file_debug = path_to_os("{}/{}-debug-02-update.sh".format(script_folder_platform, platform))
-	update_script_file_release = path_to_os("{}/{}-release-02-update.sh".format(script_folder_platform, platform))
-	project_folder_path_debug = path_to_os("{}/projects/{}-{}-debug".format(deploy_path, project_name, platform))
-	project_folder_path_release = path_to_os("{}/projects/{}-{}-release".format(deploy_path, project_name, platform))
+	generate_script_file_debug = path_to_os("{}/debug-01-generate.sh".format(script_folder_platform))
+	generate_script_file_release = path_to_os("{}/release-01-generate.sh".format(script_folder_platform))
+	update_script_file_debug = path_to_os("{}/debug-02-update.sh".format(script_folder_platform))
+	update_script_file_release = path_to_os("{}/release-02-update.sh".format(script_folder_platform))
+	project_folder_path_debug = path_to_os("{}/projects/{}-debug".format(deploy_path, platform))
+	project_folder_path_release = path_to_os("{}/projects/{}-release".format(deploy_path, platform))
 
 	create_folder_if_not_exists(script_folder_platform)
 
