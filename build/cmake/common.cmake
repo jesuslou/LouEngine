@@ -108,7 +108,7 @@ function(warnings_as_errors TARGET)
 endfunction(warnings_as_errors)
 
 function(generate_tests name)
-	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+	if(ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 		set(project_name "${name}_tests")
 		project("${project_name}")
 

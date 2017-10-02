@@ -5,6 +5,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/common.cmake)
 function (generate_static_library)
 	cmake_parse_arguments(lib "" "name;dependencies_folder;pch" "dependencies" ${ARGN})
 	
+	log("Generating ${lib_name}")
+	
 	file(GLOB_RECURSE header_files "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 	file(GLOB_RECURSE source_files "${CMAKE_CURRENT_SOURCE_DIR}/source/common/*.cpp")
 	set(header_files  "${header_files}" CACHE INTERNAL "header_files")
@@ -32,33 +34,39 @@ function (generate_static_library)
 	
 endfunction(generate_static_library)
 
-function (generate_game)
-	cmake_parse_arguments(game "" "name;dependencies_folder;pch" "dependencies" ${ARGN})
+function (generate_executable)
+	cmake_parse_arguments(executable "" "name;dependencies_folder;pch" "dependencies" ${ARGN})
 
 	# .lib with all game source, to use as well in unit tests
-	set(lib_name "${game_name}_LIB")
-	generate_static_library(name "${lib_name}" dependencies "${game_dependencies}" dependencies_folder "${game_dependencies_folder}" pch "${game_pch}")
+	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+		set(lib_name "${executable_name}_LIB")
+		generate_static_library(name "${lib_name}" dependencies "${executable_dependencies}" dependencies_folder "${executable_dependencies_folder}" pch "${executable_pch}")
+	endif()
 	
 	# game itself
-	project("${game_name}")
+	project("${executable_name}")
 
 	include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 	set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
 	add_source_groups("${SOURCES}")
 
-	add_executable ("${game_name}" "${SOURCES}")
-	set_target_properties("${game_name}" PROPERTIES LINKER_LANGUAGE CXX)
-	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "${game_name}")
+	add_executable ("${executable_name}" "${SOURCES}")
+	set_target_properties("${executable_name}" PROPERTIES LINKER_LANGUAGE CXX)
+	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "${executable_name}")
 	if(NOT BUILD_SHARED_LIBS)
 		add_definitions(-DSFML_STATIC)
 	endif()
 	
-	add_target_dependencies("${game_name}" "${lib_name}" "${game_dependencies_folder}")
+	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include")
+		add_target_dependencies("${executable_name}" "${lib_name}" "${executable_dependencies_folder}")
+	else()
+		add_target_dependencies("${executable_name}" "${executable_dependencies}" "${executable_dependencies_folder}")
+	endif()
 	
-	generate_tests("${game_name}")
+	generate_tests("${executable_name}")
 	
-endfunction(generate_game)
+endfunction(generate_executable)
 
 function(add_dependency_subdirectory dependency_name dependency_dir)
 	add_subdirectory("${dependency_dir}/${dependency_name}" "${CMAKE_BINARY_DIR}/${dependency_name}")

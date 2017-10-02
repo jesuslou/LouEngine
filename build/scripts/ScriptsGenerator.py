@@ -22,7 +22,7 @@ mkdir "{project_folder_path}"
 
 cd "{project_folder_path}"
 
-cmake "{root_cmake_path}" -DCMAKE_CONFIGURATION_TYPES="{configuration}" {common_cmake_flags} {framework_flags} {platform_flags}
+cmake "{root_cmake_path}" -DCMAKE_CONFIGURATION_TYPES="{configuration}" {common_cmake_flags} {framework_flags} {platform_flags} -DENABLE_TESTS={enable_tests}
 
 read -p "Press any key to continue..."
 """
@@ -35,7 +35,7 @@ fi
 
 cd "{project_folder_path}"
 
-cmake "{root_cmake_path}" -DCMAKE_CONFIGURATION_TYPES="{configuration}" {common_cmake_flags} {framework_flags} {platform_flags}
+cmake "{root_cmake_path}" -DCMAKE_CONFIGURATION_TYPES="{configuration}" {common_cmake_flags} {framework_flags} {platform_flags} -DENABLE_TESTS={enable_tests}
 
 read -p "Press any key to continue..."
 """
@@ -51,7 +51,8 @@ def generate_templated_file(script_file_path, template, configuration, script_fo
 			project_folder_path=project_folder_path,
 			common_cmake_flags=common_cmake_flags,
 			framework_flags=extra_flags,
-			platform_flags=platform_flags
+			platform_flags=platform_flags,
+			enable_tests="1" if configuration == "Debug" else "0"
 		))
 
 def create_platform_scripts(project_name, deploy_path, platform):
