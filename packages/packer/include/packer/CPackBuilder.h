@@ -55,5 +55,6 @@ private:
 	bool IsExtensionAllowed(const std::vector<CPackerFileExtensionProperties>& allowedExtensions, const std::string& extension) const;
 
 	CPackerGlobalProperties m_packerGlobalProperties;
-	std::string mSinglePackName;
+	std::string m_outputDestinationPath;
+	std::string m_singlePackName;
 };

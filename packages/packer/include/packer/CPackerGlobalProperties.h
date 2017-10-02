@@ -44,14 +44,12 @@ public:
 
 	const std::vector<CPackerFileExtensionProperties>& GetFileProperties(PackerDefinitions::EPackType packType) const;
 
-	const std::string& GetOutputDestinationPath() const { return m_outputDestinationPath; }
 	int GetCurrentVersion() const { return m_version; }
 
 private:
 	bool ParseJSONString(const char* str);
 	void ParsePackerFileTypes(PackerDefinitions::EPackType packType, Json::Value& jsonArray);
 
-	std::string m_outputDestinationPath;
 	int m_version;
 	std::vector<CPackerFileExtensionProperties> mFileProperties[PackerDefinitions::PACK_TYPE_COUNT];
 };

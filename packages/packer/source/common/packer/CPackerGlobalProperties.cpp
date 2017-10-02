@@ -64,7 +64,6 @@ bool CPackerGlobalProperties::ParseJSONString(const char* str)
 		return false;
 	}
 
-	m_outputDestinationPath = std::string(jsonValue["outputDestinationPath"].asCString());
 	m_version = jsonValue["version"].asInt();
 
 	ParsePackerFileTypes(PackerDefinitions::PACK_TYPE_DATA, jsonValue["dataPackFileTypes"]);
@@ -81,8 +80,7 @@ void CPackerGlobalProperties::ParsePackerFileTypes(PackerDefinitions::EPackType 
 		{
 			Json::Value& extensionDef = jsonArray[i];
 			const char* extension = extensionDef["extension"].asCString();
-			const char* rule = extensionDef["rule"].asCString();
-			mFileProperties[packType].emplace_back(CPackerFileExtensionProperties{extension, rule});
+			mFileProperties[packType].emplace_back(extension);
 		}
 	}
 }

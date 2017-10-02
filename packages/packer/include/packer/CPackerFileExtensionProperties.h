@@ -29,16 +29,13 @@
 class CPackerFileExtensionProperties
 {
 public:
-	CPackerFileExtensionProperties(const char* extension, const char* rule)
+	CPackerFileExtensionProperties(const char* extension)
 		: m_extension(extension)
-		, m_rule(rule)
 	{
 	}
 
 	const std::string& GetExtension() const { return m_extension; }
-	const std::string& GetRule() const { return m_rule; }
 
 private:
 	std::string m_extension;
-	std::string m_rule;
 };

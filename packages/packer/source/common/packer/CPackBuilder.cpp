@@ -42,7 +42,7 @@ CPackBuilder::CPackBuilder(const char* globalPropertiesFilePath)
 
 bool CPackBuilder::GeneratePacksFromConfigurationFile(const char* filePath, const char* singlePackName /*= ""*/)
 {
-	mSinglePackName = std::string(singlePackName);
+	m_singlePackName = std::string(singlePackName);
 	CMemoryDataProvider mdp(filePath);
 	if (!mdp.IsValid())
 	{
@@ -64,6 +64,8 @@ bool CPackBuilder::ParseJSONString(const char* str)
 		return false;
 	}
 
+	m_outputDestinationPath = std::string(jsonValue["outputDestinationPath"].asCString());
+
 	Json::Value& packsArray = jsonValue["packs"];
 	if (packsArray.type() == Json::arrayValue)
 	{
@@ -72,7 +74,7 @@ bool CPackBuilder::ParseJSONString(const char* str)
 			Json::Value& packDefinition = packsArray[i];
 			const char* packName = packDefinition["packName"].asCString();
 			const bool separatedPacks = packDefinition["separatedPacks"].asBool();
-			if (mSinglePackName.empty() || mSinglePackName == packName)
+			if (m_singlePackName.empty() || m_singlePackName == packName)
 			{
 				GeneratePacks(packName, separatedPacks, packDefinition["sourcePaths"]);
 			}
@@ -86,12 +88,13 @@ void CPackBuilder::GeneratePacks(const char* packName, bool separatedPacks, Json
 {
 	if (dataArray.type() == Json::arrayValue)
 	{
+		printf("-- PACKERTOOL - Generating pack %s - SeparatedPacks: %s\n", packName, separatedPacks ? "True" : "False");
 		std::vector<std::string> includedPaths;
 		includedPaths.reserve(dataArray.size());
 		for (size_t i = 0; i < dataArray.size(); ++i)
 		{
 			Json::Value& path = dataArray[i];
-			includedPaths.emplace_back(path["path"].asString());
+			includedPaths.emplace_back(path.asString());
 		}
 
 		if (separatedPacks)
@@ -110,9 +113,8 @@ void CPackBuilder::GeneratePack(PackerDefinitions::EPackType packType, const cha
 {
 	const std::vector<CPackerFileExtensionProperties> allowedExtensions = GetAllowedExtensions(packType);
 
-	const char* outputDestinationPath = m_packerGlobalProperties.GetOutputDestinationPath().c_str();
 	const char* extension = PackerDefinitions::GetExtensionStr(packType);
-	std::string finalPath = StringUtils::Format(outputDestinationPath, "/", packName, extension);
+	std::string finalPath = StringUtils::Format(m_outputDestinationPath.c_str(), "/", packName, extension);
 	CFileDataSaver fileDataSaver(finalPath.c_str());
 
 	PackerDefinitions::SPackHeader packHeader;
