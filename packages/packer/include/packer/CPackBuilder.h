@@ -41,7 +41,8 @@ public:
 	CPackBuilder() {}
 	CPackBuilder(const char* globalPropertiesFilePath);
 
-	bool GeneratePacksFromConfigurationFile(const char* filePath, const char* singlePackName = "");
+	bool GeneratePacksFromConfigurationFile(const char* filePath);
+	bool GeneratePacksFromConfigurationFile(const char* filePath, const std::vector<std::string>& specificPacks);
 private:
 	bool ParseJSONString(const char* str);
 
@@ -56,5 +57,5 @@ private:
 
 	CPackerGlobalProperties m_packerGlobalProperties;
 	std::string m_outputDestinationPath;
-	std::string m_singlePackName;
+	std::vector<std::string> m_specificPacks;
 };

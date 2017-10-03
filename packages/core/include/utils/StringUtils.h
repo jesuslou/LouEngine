@@ -25,6 +25,8 @@
 #pragma once
 
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace StringUtils
 {
@@ -83,5 +85,18 @@ namespace StringUtils
 	static void FormatInternal(std::ostringstream& os, T lastArg)
 	{
 		os << lastArg;
+	}
+
+	static std::vector<std::string> SplitString(const std::string& str, const std::string& sep)
+	{
+		std::vector<std::string> result;
+		auto first = str.find_first_not_of(sep);
+		while (first != std::string::npos)
+		{
+			auto last = str.find_first_of(sep, first);
+			result.push_back(str.substr(first, last - first));
+			first = str.find_first_not_of(sep, last);
+		}
+		return result;
 	}
 }

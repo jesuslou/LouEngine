@@ -33,16 +33,15 @@
 #include <json/writer.h>
 
 #include <assert.h>
+#include <algorithm>
 
 CPackBuilder::CPackBuilder(const char* globalPropertiesFilePath)
 	: m_packerGlobalProperties(globalPropertiesFilePath)
 {
-	printf("");
 }
 
-bool CPackBuilder::GeneratePacksFromConfigurationFile(const char* filePath, const char* singlePackName /*= ""*/)
+bool CPackBuilder::GeneratePacksFromConfigurationFile(const char* filePath)
 {
-	m_singlePackName = std::string(singlePackName);
 	CMemoryDataProvider mdp(filePath);
 	if (!mdp.IsValid())
 	{
@@ -50,6 +49,12 @@ bool CPackBuilder::GeneratePacksFromConfigurationFile(const char* filePath, cons
 		return false;
 	}
 	return ParseJSONString((const char*) mdp.GetBaseData());
+}
+
+bool CPackBuilder::GeneratePacksFromConfigurationFile(const char* filePath, const std::vector<std::string>& specificPacks)
+{
+	m_specificPacks = specificPacks;
+	return GeneratePacksFromConfigurationFile(filePath);
 }
 
 bool CPackBuilder::ParseJSONString(const char* str)
@@ -74,7 +79,8 @@ bool CPackBuilder::ParseJSONString(const char* str)
 			Json::Value& packDefinition = packsArray[i];
 			const char* packName = packDefinition["packName"].asCString();
 			const bool separatedPacks = packDefinition["separatedPacks"].asBool();
-			if (m_singlePackName.empty() || m_singlePackName == packName)
+			if (m_specificPacks.empty() ||
+				std::find(m_specificPacks.begin(), m_specificPacks.end(), packName) != m_specificPacks.end())
 			{
 				GeneratePacks(packName, separatedPacks, packDefinition["sourcePaths"]);
 			}
