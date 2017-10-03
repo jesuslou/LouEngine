@@ -94,12 +94,15 @@ def create_project(project_name, deploy_path, remote, remove_folder, override_fi
 	if override_files:
 		TemplateProjectFilesGenerator = importlib.import_module("{}.dependencies.LouEngine.build.scripts.TemplateProjectFilesGenerator".format(project_name))
 		TemplateProjectFilesGenerator.generate_templated_files(project_name, deploy_path)
+		TemplateProjectFilesGenerator.generate_packs_definition_file(deploy_path)
 
 	ScriptsGenerator = importlib.import_module("{}.dependencies.LouEngine.build.scripts.ScriptsGenerator".format(project_name))
 	generation_platforms = ["win32", "osx"]
 	ScriptsGenerator.create_generate_scripts(project_name, deploy_path, generation_platforms)
-	ScriptsGenerator.create_generator_script(app_folder)
-	ScriptsGenerator.create_rp_script(app_folder)
+
+	deploy_path_absolute = path_to_os(app_folder + "/" + project_name + "/")
+	ScriptsGenerator.create_generator_script(deploy_path_absolute)
+	ScriptsGenerator.create_rp_script(deploy_path_absolute)
 
 
 if __name__ == '__main__':
