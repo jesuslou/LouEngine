@@ -26,7 +26,7 @@ mkdir "{project_folder_path}"
 
 cd "{project_folder_path}"
 
-cmake "{root_cmake_path}" -DCMAKE_CONFIGURATION_TYPES="{configuration}" {common_cmake_flags} {framework_flags} {platform_flags} -DENABLE_TESTS={enable_tests}
+cmake "{root_cmake_path}" -DCMAKE_CONFIGURATION_TYPES="{configuration}" -DENABLE_TESTS={enable_tests} {common_cmake_flags} {framework_flags} {platform_flags}
 
 read -p "Press any key to continue..."
 """
@@ -40,7 +40,7 @@ fi
 
 cd "{project_folder_path}"
 
-cmake "{root_cmake_path}" -DCMAKE_CONFIGURATION_TYPES="{configuration}" {common_cmake_flags} {framework_flags} {platform_flags} -DENABLE_TESTS={enable_tests}
+cmake "{root_cmake_path}" -DCMAKE_CONFIGURATION_TYPES="{configuration}" -DENABLE_TESTS={enable_tests} {common_cmake_flags} {framework_flags} {platform_flags}
 
 read -p "Press any key to continue..."
 """
@@ -48,13 +48,13 @@ read -p "Press any key to continue..."
 
 generate_scripts_template="""#!/bin/bash
 
-{python_version} {script_path} --all --folder {project_folder_path}
+{python_version} "{script_path}" --folder "{project_folder_path}"
 """
 
 
 generate_resource_pipeline_template="""#!/bin/bash
 
-{python_version} {script_path} --folder {project_folder_path}
+{python_version} "{script_path}" --folder "{project_folder_path}"
 """
 
 
