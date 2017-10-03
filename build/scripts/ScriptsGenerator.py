@@ -49,12 +49,16 @@ read -p "Press any key to continue..."
 generate_scripts_template="""#!/bin/bash
 
 {python_version} "{script_path}" --folder "{project_folder_path}"
+
+read -p "Press any key to continue..."
 """
 
 
 generate_resource_pipeline_template="""#!/bin/bash
 
-{python_version} "{script_path}" --folder "{project_folder_path}"
+{python_version} "{rp_script_path}" --packs_file "{packs_file_path}"
+
+read -p "Press any key to continue..."
 """
 
 
@@ -115,7 +119,7 @@ def create_generator_script(deploy_path):
     with open(script_file_path, "w", newline='') as file:
         file.write(generate_scripts_template.format(
             python_version="python3" if _platform == "darwin" else "python",
-			script_path=path_to_os("{}/dependencies/LouEngine/build/scripts/generate_base_scripts.py".format(deploy_path)),
+            script_path=path_to_os("{}/dependencies/LouEngine/build/scripts/generate_base_scripts.py".format(deploy_path)),
             project_folder_path=deploy_path,
         ))
 
@@ -124,6 +128,6 @@ def create_rp_script(deploy_path):
     with open(script_file_path, "w", newline='') as file:
         file.write(generate_resource_pipeline_template.format(
             python_version="python3" if _platform == "darwin" else "python",
-			script_path=path_to_os("{}/dependencies/LouEngine/build/scripts/run_resource_pipeline.py".format(deploy_path)),
-            project_folder_path=deploy_path,
+            rp_script_path=path_to_os("{}/dependencies/LouEngine/tools/scripts/PackingPipeline.py".format(deploy_path)),
+            packs_file_path=path_to_os("{}/res/packerTool/packsDefinition.json".format(deploy_path)),
         ))
