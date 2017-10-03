@@ -6,6 +6,8 @@ import subprocess
 from subprocess import DEVNULL
 import importlib
 
+app_folder, script_name = os.path.split(os.path.abspath(sys.argv[0]))
+
 def path_to_os(path):
 	full_path = os.path.abspath(path)
 	parts = full_path.split("/")
@@ -96,6 +98,8 @@ def create_project(project_name, deploy_path, remote, remove_folder, override_fi
 	ScriptsGenerator = importlib.import_module("{}.dependencies.LouEngine.build.scripts.ScriptsGenerator".format(project_name))
 	generation_platforms = ["win32", "osx"]
 	ScriptsGenerator.create_generate_scripts(project_name, deploy_path, generation_platforms)
+	ScriptsGenerator.create_generator_script(app_folder)
+	ScriptsGenerator.create_rp_script(app_folder)
 
 
 if __name__ == '__main__':
