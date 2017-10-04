@@ -30,6 +30,11 @@
 #include <input/CMouse.h>
 #include <graphics/CRenderer.h>
 #include <systems/CSystems.h>
+#include <entities/CEntityManager.h>
+#include <entities/components/CComponentFactoryManager.h>
+
+#include <components/SPositionComponent.h>
+#include <components/SRotationComponent.h>
 
 #include <SFML/Config.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -52,7 +57,7 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 		DELETE_POINTER(m_keyboard);
 		return false;
 	}
-	CSystems::SetSystem<Input::IKeyboard>(m_keyboard);
+	m_gameSystems.SetSystem<Input::IKeyboard>(m_keyboard);
 
 	sf::Uint32 windowStyle = applicationWindowParameters.m_hasTitleBar ? sf::Style::Titlebar : sf::Style::None;
 	windowStyle |= applicationWindowParameters.m_hasCloseButton ? sf::Style::Close : sf::Style::None;
@@ -79,6 +84,8 @@ bool CApplication::Init(const SApplicationWindowParameters& applicationWindowPar
 		return false;
 	}
 	CSystems::SetSystem<Input::IMouse>(m_mouse);
+
+	RegisterComponents();
 
 	return InitProject(m_gameSystems);
 }
@@ -127,8 +134,23 @@ void CApplication::Update()
 void CApplication::Destroy() 
 {
 	DestroyProject( );
+
 	m_renderer->Destroy();
 	CSystems::DestroySystem<IRenderer>();
 	m_keyboard->Destroy();
 	CSystems::DestroySystem<Input::IKeyboard>();
+
+	CSystems::DestroySystem<CComponentFactoryManager>();
+	CSystems::DestroySystem<CEntityManager>();
+}
+
+void CApplication::RegisterComponents()
+{
+	m_gameSystems.SetSystem<CEntityManager>(new CEntityManager());
+	m_gameSystems.SetSystem<CComponentFactoryManager>(new CComponentFactoryManager());
+
+	REGISTER_COMPONENT_FACTORY("position", SPositionComponent);
+	REGISTER_COMPONENT_FACTORY("rotation", SRotationComponent);
+
+	RegisterComponentsProject();
 }

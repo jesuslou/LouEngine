@@ -43,5 +43,7 @@ public:
 protected:
 	virtual ~CApplication();
 
+	void RegisterComponents() override;
+
 	sf::RenderWindow* m_mainWindow;
 };

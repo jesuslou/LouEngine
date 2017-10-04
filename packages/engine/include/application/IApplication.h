@@ -56,6 +56,9 @@ protected:
 	virtual void UpdateProject(float dt) = 0;
 	virtual void DestroyProject() = 0;
 
+	virtual void RegisterComponents() = 0;
+	virtual void RegisterComponentsProject() = 0;
+
 	CGameSystems m_gameSystems;
 
 	IRenderer* m_renderer;

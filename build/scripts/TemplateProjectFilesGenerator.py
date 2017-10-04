@@ -35,6 +35,7 @@ protected:
     bool InitProject(CGameSystems& gameSystems) override;
     void UpdateProject(float dt) override;
     void DestroyProject() override;
+    void RegisterComponentsProject() override;
 }};
 """
 
@@ -57,6 +58,10 @@ void {application_class_name}::UpdateProject(float dt)
 }}
 
 void {application_class_name}::DestroyProject()
+{{
+}}
+
+void {application_class_name}::RegisterComponentsProject()
 {{
 }}
 """
