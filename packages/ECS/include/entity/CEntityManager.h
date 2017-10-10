@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory/CMemoryPool.h>
 #include <utils/CVersionableFactory.h>
 #include <entity/CEntity.h>
 
@@ -8,6 +7,8 @@ class CEntityManager
 {
 	friend class CEntity;
 public:
+	CEntityManager();
+
 	CEntity* CreateEntity();
 
 	void DestroyEntity(CEntity* entity);
@@ -15,6 +16,5 @@ public:
 	int GetEntityPosition(CEntity* entity);
 
 private:
-	static constexpr int MAX_ENTITIES = 2;// 8192;
-	CVersionableFactory<CEntity, MAX_ENTITIES> m_entityPool;
+	CVersionableFactory<CEntity> m_entityPool;
 };

@@ -31,6 +31,7 @@
 #include <graphics/CRenderer.h>
 #include <systems/CSystems.h>
 #include <entity/CEntityManager.h>
+#include <component/CComponentFactoryManager.h>
 
 #include <SFML/Config.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -136,12 +137,14 @@ void CApplication::Destroy()
 	m_keyboard->Destroy();
 	CSystems::DestroySystem<Input::IKeyboard>();
 
+	CSystems::DestroySystem<CComponentFactoryManager>();
 	CSystems::DestroySystem<CEntityManager>();
 }
 
 void CApplication::RegisterComponents()
 {
 	m_gameSystems.SetSystem<CEntityManager>(new CEntityManager());
+	m_gameSystems.SetSystem<CComponentFactoryManager>(new CComponentFactoryManager());
 
 	RegisterComponentsProject();
 }

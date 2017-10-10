@@ -38,13 +38,14 @@ class CVersionableFactoryTest : public ::testing::Test
 {
 public:
 	CVersionableFactoryTest()
+		: m_factory(1)
 	{
 	}
 
 	~CVersionableFactoryTest()
 	{
 	}
-	CVersionableFactory<VersionableFactoryTestInternal::Foo, 1> m_factory;
+	CVersionableFactory<VersionableFactoryTestInternal::Foo> m_factory;
 };
 
 TEST_F(CVersionableFactoryTest, init_test)
@@ -82,6 +83,13 @@ TEST_F(CVersionableFactoryTest, check_free)
 	EXPECT_NE(nullptr, foo2);
 }
 
+TEST_F(CVersionableFactoryTest, check_destroy_null_value)
+{
+	VersionableFactoryTestInternal::Foo* foo = nullptr;
+	m_factory.Destroy(&foo);
+	EXPECT_TRUE(true);
+}
+
 TEST_F(CVersionableFactoryTest, check_version_increment)
 {
 	VersionableFactoryTestInternal::Foo* foo1 = m_factory.Get();
@@ -95,7 +103,7 @@ TEST_F(CVersionableFactoryTest, check_version_increment)
 
 TEST_F(CVersionableFactoryTest, check_get_position)
 {
-	CVersionableFactory<VersionableFactoryTestInternal::Foo, 2> factory;
+	CVersionableFactory<VersionableFactoryTestInternal::Foo> factory(2);
 	VersionableFactoryTestInternal::Foo* foo1 = factory.Get();
 	EXPECT_NE(nullptr, foo1);
 	int pos1 = factory.GetPosition(foo1);

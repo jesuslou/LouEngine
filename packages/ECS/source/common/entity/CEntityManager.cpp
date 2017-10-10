@@ -1,6 +1,16 @@
 #include <entity/CEntityManager.h>
 #include <entity/CEntity.h>
 
+namespace EntityManagerInternal
+{
+	constexpr int MAX_ENTITIES = 8192;
+}
+
+CEntityManager::CEntityManager()
+	: m_entityPool(EntityManagerInternal::MAX_ENTITIES)
+{
+}
+
 CEntity* CEntityManager::CreateEntity()
 {
 	return m_entityPool.Get();

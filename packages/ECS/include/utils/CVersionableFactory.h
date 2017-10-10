@@ -5,8 +5,9 @@
 #include <cstdio>
 #include <cassert>
 #include <memory>
+#include <vector>
 
-template< typename T, size_t N>
+template< typename T>
 class CVersionableFactory
 {
 	static_assert(
@@ -17,21 +18,22 @@ public:
 	struct SEntry
 	{
 		T* m_data;
-		int m_pos;
 		int m_version;
 		bool m_used;
-		SEntry() : m_data(nullptr), m_pos(0), m_version(0) {}
-		SEntry(T* data, int pos) : m_data(data), m_pos(pos), m_version(0), m_used(false) {}
+		SEntry() : m_data(nullptr), m_version(0) {}
+		SEntry(T* data) : m_data(data), m_version(0), m_used(false) {}
 	};
 
-	CVersionableFactory()
+	CVersionableFactory(std::size_t elements)
+		: m_n_elements(elements)
 	{
-		m_buffer = malloc(sizeof(T) * N);
+		m_entries.resize(m_n_elements);
+		m_buffer = malloc(sizeof(T) * m_n_elements);
 
 		T* buffer = (T*) (m_buffer);
-		for (size_t i = 0; i < N; ++i)
+		for (SEntry& entry : m_entries)
 		{
-			m_entries[i] = SEntry(buffer, i);
+			entry = SEntry(buffer);
 			++buffer;
 		}
 	}
@@ -66,31 +68,37 @@ public:
 
 	void Destroy(T** data)
 	{
-		SEntry *entry = Find(*data);
-		if (entry)
+		if (*data)
 		{
-			entry->m_data->~T();
-			++entry->m_version;
-			entry->m_used = false;
-			*data = nullptr;
+			SEntry *entry = Find(*data);
+			if (entry)
+			{
+				entry->m_data->~T();
+				++entry->m_version;
+				entry->m_used = false;
+				*data = nullptr;
+			}
 		}
 	}
 
 	int GetPosition(T* data)
 	{
-		for (int i = 0; i < N; ++i)
+		if (data)
 		{
-			if (m_entries[i].m_data == data && data->GetVersion() == m_entries[i].m_version)
+			for (std::size_t i = 0; i < m_n_elements; ++i)
 			{
-				return i;
+				if (m_entries[i].m_data == data && data->GetVersion() == m_entries[i].m_version)
+				{
+					return i;
+				}
 			}
 		}
 		return -1;
 	}
 
-	T* GetByIdxAndVersion(int index, int version)
+	T* GetByIdxAndVersion(std::size_t index, int version)
 	{
-		if (index >= 0 && index < N && m_entries[index].m_version == version)
+		if (index >= 0 && index < m_n_elements && m_entries[index].m_version == version)
 		{
 			return m_entries[index].m_data;
 		}
@@ -100,7 +108,8 @@ public:
 private:
 	void* m_buffer;
 
-	SEntry m_entries[N];
+	std::size_t m_n_elements;
+	std::vector<SEntry> m_entries;
 
 	SEntry* Find(T* data)
 	{
