@@ -29,6 +29,5 @@ External libraries used by LouEngine
 -------------------------------
 
 * SFML is under the zlib/libpng License (Zlib)
-* entityx under the MIT License
 * googletest is under the 3-Clause BSD License
 * jsoncpp is unthe the MIT License

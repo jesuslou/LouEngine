@@ -24,9 +24,8 @@
 
 #pragma once
 
-#include <LouEnginePrecompile.h>
-
 #include <utils/CTypeHasher.h>
+#include <utils/MemoryUtils.h>
 
 #include <unordered_map>
 

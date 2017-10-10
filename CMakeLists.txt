@@ -6,8 +6,6 @@ set(dependencies_folder "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/")
 set(packages_folder "${CMAKE_CURRENT_SOURCE_DIR}/packages/")
 
 add_dependency_subdirectory("SFML" "${dependencies_folder}")
-add_dependency_subdirectory("entityx" "${dependencies_folder}")
-#add_dependency_subdirectory("jsoncpp" "${dependencies_folder}")
 
 set(gtest_ide_group "GoogleTest")
 add_dependency_subdirectory("googletest" "${dependencies_folder}")
@@ -24,4 +22,5 @@ set(ide_group "LouEngine")
 add_dependency_subdirectory("core" "${packages_folder}")
 add_dependency_subdirectory("packer" "${packages_folder}")
 add_dependency_subdirectory("engine" "${packages_folder}")
+add_dependency_subdirectory("ECS" "${packages_folder}")
 

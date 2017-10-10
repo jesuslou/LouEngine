@@ -22,8 +22,33 @@
 //
 ////////////////////////////////////////////////////////////
 
-#include <LouEnginePrecompile.h>
+#pragma once
 
-#include <systems/CSystems.h>
+class CEntity;
 
-CGameSystems* CSystems::s_gameSystems = nullptr;
+class CHandle
+{
+public:
+	static constexpr int MAX_ELEMENT_TYPES = 4;
+	static constexpr int MAX_COMPONENT_TYPES = 512;
+	static constexpr int MAX_ELEMENTS = 8192;
+	static constexpr int MAX_VERSIONS = 256;
+
+	CHandle()
+		: m_elementType(0)
+		, m_componentIdx(0)
+		, m_elementPosition(0)
+		, m_version(0)
+	{}
+	CHandle(CEntity* rhs);
+
+	const CHandle & operator=(CEntity* rhs);
+	operator CEntity*();
+	operator bool();
+
+//private:
+	unsigned m_elementType : 2; //  4
+	unsigned m_componentIdx : 9; // 512
+	unsigned m_elementPosition : 13; // 8.192
+	unsigned m_version : 8; // 256
+};

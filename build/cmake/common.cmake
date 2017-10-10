@@ -126,7 +126,9 @@ function(generate_tests name)
 		set(dependencies 
 			"${name}"
 			"gmock"
+			"gmock_main"
 			"gtest"
+			"gtest_main"
 		)
 		
 		add_target_dependencies("${project_name}" "${dependencies}" "${game_dependencies_folder}")

@@ -22,7 +22,7 @@ if [ -d "{project_folder_path}" ]; then
     rm -rf "{project_folder_path}"
 fi
 
-mkdir "{project_folder_path}"
+mkdir -p "{project_folder_path}"
 
 cd "{project_folder_path}"
 
@@ -35,7 +35,7 @@ read -p "Press any key to continue..."
 update_file_template="""#!/bin/bash
 
 if [ ! -d "{project_folder_path}" ]; then
-    mkdir "{project_folder_path}"
+    mkdir -p "{project_folder_path}"
 fi
 
 cd "{project_folder_path}"
@@ -62,7 +62,7 @@ read -p "Press any key to continue..."
 """
 
 
-common_cmake_flags = "-DENTITYX_BUILD_SHARED=0 -DENTITYX_BUILD_TESTING=0 -DBUILD_STATIC_LIBS=0 -DBUILD_SHARED_LIBS=1 -DJSONCPP_WITH_TESTS=0"
+common_cmake_flags = "-DBUILD_STATIC_LIBS=0 -DBUILD_SHARED_LIBS=1 -DJSONCPP_WITH_TESTS=0"
 
 
 def generate_templated_file(script_file_path, template, configuration, script_folder_path, root_cmake_path, project_folder_path, common_cmake_flags, extra_flags, platform_flags):

@@ -30,11 +30,7 @@
 #include <input/CMouse.h>
 #include <graphics/CRenderer.h>
 #include <systems/CSystems.h>
-#include <entities/CEntityManager.h>
-#include <entities/components/CComponentFactoryManager.h>
-
-#include <components/SPositionComponent.h>
-#include <components/SRotationComponent.h>
+#include <entity/CEntityManager.h>
 
 #include <SFML/Config.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -140,17 +136,12 @@ void CApplication::Destroy()
 	m_keyboard->Destroy();
 	CSystems::DestroySystem<Input::IKeyboard>();
 
-	CSystems::DestroySystem<CComponentFactoryManager>();
 	CSystems::DestroySystem<CEntityManager>();
 }
 
 void CApplication::RegisterComponents()
 {
 	m_gameSystems.SetSystem<CEntityManager>(new CEntityManager());
-	m_gameSystems.SetSystem<CComponentFactoryManager>(new CComponentFactoryManager());
-
-	REGISTER_COMPONENT_FACTORY("position", SPositionComponent);
-	REGISTER_COMPONENT_FACTORY("rotation", SRotationComponent);
 
 	RegisterComponentsProject();
 }
