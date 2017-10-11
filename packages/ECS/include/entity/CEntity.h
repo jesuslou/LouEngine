@@ -84,6 +84,8 @@ public:
 	void Activate() override;
 	void Deactivate() override;
 
+	bool IsActive() const { return m_numDeactivations == 0; }
+
 private:
 	CEntity();
 	~CEntity();
@@ -92,6 +94,7 @@ private:
 
 	CComponentFactoryManager& m_componentFactoryManager;
 
-	int n_deactivations;
+	int m_numDeactivations;
 	bool m_initialized;
+	bool m_destroyed;
 };
