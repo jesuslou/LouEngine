@@ -38,6 +38,7 @@
 #include <SFML/Window/Event.hpp>
 
 CApplication::CApplication()
+	: m_componentFactoryManager(nullptr)
 {
 }
 
@@ -119,6 +120,8 @@ void CApplication::Update()
 		m_keyboard->Update(elapsed);
 		m_mouse->Update(elapsed);
 
+		m_componentFactoryManager->Update(elapsed);
+
 		UpdateProject(elapsed);
 
 		// this must be done by the renderer
@@ -138,13 +141,16 @@ void CApplication::Destroy()
 	CSystems::DestroySystem<Input::IKeyboard>();
 
 	CSystems::DestroySystem<CComponentFactoryManager>();
+	m_componentFactoryManager = nullptr;
 	CSystems::DestroySystem<CEntityManager>();
 }
 
 void CApplication::RegisterComponents()
 {
 	m_gameSystems.SetSystem<CEntityManager>(new CEntityManager());
-	m_gameSystems.SetSystem<CComponentFactoryManager>(new CComponentFactoryManager());
+
+	m_componentFactoryManager = new CComponentFactoryManager();
+	m_gameSystems.SetSystem<CComponentFactoryManager>(m_componentFactoryManager);
 
 	RegisterComponentsProject();
 }

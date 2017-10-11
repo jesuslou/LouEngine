@@ -135,3 +135,11 @@ int CComponentFactoryManager::GetFactoryIndexByName(CStrID nameId)
 	}
 	return -1;
 }
+
+void CComponentFactoryManager::Update(float dt)
+{
+	for (SFactoryData& data : m_factories)
+	{
+		data.m_address->Update(dt);
+	}
+}

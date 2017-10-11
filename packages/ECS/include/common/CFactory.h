@@ -123,7 +123,7 @@ public:
 		return nullptr;
 	}
 
-private:
+protected:
 	struct SEntry
 	{
 		T* m_data;

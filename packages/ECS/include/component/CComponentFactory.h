@@ -35,6 +35,7 @@ public:
 	virtual bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle) = 0;
 	virtual int GetComponentPosition(CComponent* component) = 0;
 	virtual bool DestroyComponent(CComponent* component) = 0;
+	virtual void Update(float dt) = 0;
 };
 
 template <typename T>
@@ -82,5 +83,16 @@ public:
 	{
 		T* tmp = static_cast<T*>(component);
 		return DestroyElement(&tmp);
+	}
+
+	void Update(float dt) override
+	{
+		for (SEntry& entry : m_entries)
+		{
+			if (entry.m_used)
+			{
+				entry.m_data->Update(dt);
+			}
+		}
 	}
 };

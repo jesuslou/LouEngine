@@ -117,6 +117,9 @@ public:
 	int GetFactoryIndexByName(CStrID nameId);
 
 	int GetRegisteredComponentsAmount() const { return m_factories.size(); }
+
+	void Update(float dt);
+
 private:
 
 	template<typename T>

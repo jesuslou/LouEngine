@@ -26,6 +26,8 @@
 
 #include <application/IApplication.h>
 
+class CComponentFactoryManager;
+
 namespace sf
 {
 	class RenderWindow;
@@ -46,4 +48,6 @@ protected:
 	void RegisterComponents() override;
 
 	sf::RenderWindow* m_mainWindow;
+
+	CComponentFactoryManager* m_componentFactoryManager;
 };
