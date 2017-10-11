@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/CVersionable.h>
+#include <common/CVersionable.h>
 
 #include <cstdio>
 #include <cassert>
@@ -8,29 +8,20 @@
 #include <vector>
 
 template< typename T>
-class CVersionableFactory
+class CFactory
 {
 	static_assert(
 		std::is_base_of<CVersionable, T>::value,
-		"T must inherits from CVersionable"
+		"T must inherits from CVersionable if you want to use a CFactory"
 		);
 public:
-	struct SEntry
+	CFactory(std::size_t numElements)
+		: m_numElements(numElements)
 	{
-		T* m_data;
-		int m_version;
-		bool m_used;
-		SEntry() : m_data(nullptr), m_version(0) {}
-		SEntry(T* data) : m_data(data), m_version(0), m_used(false) {}
-	};
+		m_entries.resize(m_numElements);
+		m_buffer = malloc(sizeof(T) * m_numElements);
 
-	CVersionableFactory(std::size_t elements)
-		: m_n_elements(elements)
-	{
-		m_entries.resize(m_n_elements);
-		m_buffer = malloc(sizeof(T) * m_n_elements);
-
-		T* buffer = (T*) (m_buffer);
+		T* buffer = static_cast<T*>(m_buffer);
 		for (SEntry& entry : m_entries)
 		{
 			entry = SEntry(buffer);
@@ -38,7 +29,7 @@ public:
 		}
 	}
 
-	~CVersionableFactory()
+	virtual ~CFactory()
 	{
 		for (SEntry& entry : m_entries)
 		{
@@ -50,13 +41,13 @@ public:
 		delete m_buffer;
 	}
 
-	T* Get()
+	T* GetNewElement()
 	{
 		for (SEntry& entry : m_entries)
 		{
 			if (!entry.m_used)
 			{
-				T* data = new((void*)entry.m_data)T();
+				T* data = new(static_cast<void*>(entry.m_data))T();
 				data->SetVersion(entry.m_version);
 				entry.m_used = true;
 				return data;
@@ -66,26 +57,28 @@ public:
 		return nullptr;
 	}
 
-	void Destroy(T** data)
+	bool DestroyElement(T** data)
 	{
 		if (*data)
 		{
-			SEntry *entry = Find(*data);
+			SEntry *entry = FindElement(*data);
 			if (entry)
 			{
 				entry->m_data->~T();
 				++entry->m_version;
 				entry->m_used = false;
 				*data = nullptr;
+				return true;
 			}
 		}
+		return false;
 	}
 
-	int GetPosition(T* data)
+	int GetPositionForElement(T* data)
 	{
 		if (data)
 		{
-			for (std::size_t i = 0; i < m_n_elements; ++i)
+			for (std::size_t i = 0; i < m_numElements; ++i)
 			{
 				if (m_entries[i].m_data == data && data->GetVersion() == m_entries[i].m_version)
 				{
@@ -96,9 +89,9 @@ public:
 		return -1;
 	}
 
-	T* GetByIdxAndVersion(std::size_t index, int version)
+	T* GetElementByIdxAndVersion(std::size_t index, int version)
 	{
-		if (index >= 0 && index < m_n_elements && m_entries[index].m_version == version)
+		if (index >= 0 && index < m_numElements && m_entries[index].m_version == version)
 		{
 			return m_entries[index].m_data;
 		}
@@ -106,12 +99,21 @@ public:
 	}
 
 private:
+	struct SEntry
+	{
+		T* m_data;
+		int m_version;
+		bool m_used;
+		SEntry() : m_data(nullptr), m_version(0) {}
+		SEntry(T* data) : m_data(data), m_version(0), m_used(false) {}
+	};
+
 	void* m_buffer;
 
-	std::size_t m_n_elements;
+	std::size_t m_numElements;
 	std::vector<SEntry> m_entries;
 
-	SEntry* Find(T* data)
+	SEntry* FindElement(T* data)
 	{
 		for (SEntry& entry : m_entries)
 		{

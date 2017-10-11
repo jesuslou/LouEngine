@@ -2,7 +2,6 @@
 
 #include <component/CComponent.h>
 #include <component/CComponentFactory.h>
-#include <utils/CVersionableFactory.h>
 #include <utils/CTypeHasher.h>
 #include <hash/CStrID.h>
 #include <systems/CSystems.h>
@@ -41,6 +40,68 @@ public:
 			return factory->CreateComponent();
 		}
 		return nullptr;
+	}
+
+	template<typename T>
+	CComponent* GetByIdxAndVersion(int index, int version)
+	{
+		IComponentFactory* factory = GetFactory<T>();
+		if (factory)
+		{
+			return factory->GetByIdxAndVersion(index, version);
+		}
+		return nullptr;
+	}
+
+	CComponent* Get(std::size_t componentTypeIdx, int index, int version)
+	{
+		if (componentTypeIdx < m_factories.size())
+		{
+			IComponentFactory* factory = m_factories[componentTypeIdx].m_address;
+			if (factory)
+			{
+				return factory->GetByIdxAndVersion(index, version);
+			}
+		}
+		return nullptr;
+	}
+
+	CHandle SetHandleInfoFromComponent(CComponent* component)
+	{
+		CHandle handle;
+		for (std::size_t i = 0; i < m_factories.size(); ++i)
+		{
+			if (m_factories[i].m_address->SetHandleInfoFromComponent(component, handle))
+			{
+				handle.m_componentIdx = i;
+			}
+		}
+		return handle;
+	}
+
+	int GetPositionForElement(CComponent* component)
+	{
+		for (std::size_t i = 0; i < m_factories.size(); ++i)
+		{
+			int pos = m_factories[i].m_address->GetComponentPosition(component);
+			if (pos >= 0)
+			{
+				return pos;
+			}
+		}
+		return -1;
+	}
+
+	void DestroyComponent(CComponent** component)
+	{
+		for (std::size_t i = 0; i < m_factories.size(); ++i)
+		{
+			if (m_factories[i].m_address->DestroyComponent(*component))
+			{
+				*component = nullptr;
+				return;
+			}
+		}
 	}
 
 private:

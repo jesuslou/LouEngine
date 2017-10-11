@@ -1,20 +1,13 @@
 #pragma once
 
-#include <utils/CVersionableFactory.h>
+#include <common/CFactory.h>
 #include <entity/CEntity.h>
 
-class CEntityManager
+class CEntityManager : public CFactory<CEntity>
 {
 	friend class CEntity;
 public:
 	CEntityManager();
-
-	CEntity* CreateEntity();
-
-	void DestroyEntity(CEntity* entity);
-	CEntity* GetByIdxAndVersion(int index, int version);
-	int GetEntityPosition(CEntity* entity);
-
+	~CEntityManager() override {}
 private:
-	CVersionableFactory<CEntity> m_entityPool;
 };

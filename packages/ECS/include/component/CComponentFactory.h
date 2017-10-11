@@ -1,16 +1,20 @@
 #pragma once
 
 #include <component/CComponent.h>
-#include <utils/CVersionableFactory.h>
+#include <common/CFactory.h>
 
 class IComponentFactory 
 {
 public:
 	virtual CComponent* CreateComponent() = 0;
+	virtual CComponent* GetByIdxAndVersion(int index, int version) = 0;
+	virtual bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle) = 0;
+	virtual int GetComponentPosition(CComponent* component) = 0;
+	virtual bool DestroyComponent(CComponent* component) = 0;
 };
 
 template <typename T>
-class CComponentFactory : public CVersionable, public IComponentFactory
+class CComponentFactory : public IComponentFactory, public CFactory<T>
 {
 	static_assert(
 		std::is_base_of<CComponent, T>::value,
@@ -18,20 +22,41 @@ class CComponentFactory : public CVersionable, public IComponentFactory
 		);
 public:
 	CComponentFactory(int nElements)
-		: m_componentPool(nElements)
+		: CFactory(nElements)
 	{
 	}
 
 	CComponent* CreateComponent() override
 	{
-		return m_componentPool.Get();
+		return GetNewElement();
 	}
 
-	void DestroyComponent(T* component)
+	CComponent* GetByIdxAndVersion(int index, int version) override
 	{
-		m_componentPool.Destroy(&component);
+		return GetElementByIdxAndVersion(index, version);
 	}
-private:
-	static constexpr int MAX_COMPONENTS = 8192;
-	CVersionableFactory<T> m_componentPool;
+
+	bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle) override
+	{
+		int pos = GetPositionForElement(static_cast<T*>(component));
+		if (pos != -1)
+		{
+			handle.m_elementType = CHandle::EElementType::Component;
+			handle.m_elementPosition = pos;
+			handle.m_version = component->GetVersion();
+			return true;
+		}
+		return false;
+	}
+
+	int GetComponentPosition(CComponent* component) override
+	{
+		return GetPositionForElement(static_cast<T*>(component));
+	}
+
+	bool DestroyComponent(CComponent* component) override
+	{
+		T* tmp = static_cast<T*>(component);
+		return DestroyElement(&tmp);
+	}
 };

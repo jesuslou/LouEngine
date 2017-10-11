@@ -25,6 +25,7 @@
 #pragma once
 
 class CEntity;
+class CComponent;
 
 class CHandle
 {
@@ -34,17 +35,36 @@ public:
 	static constexpr int MAX_ELEMENTS = 8192;
 	static constexpr int MAX_VERSIONS = 256;
 
+	enum EElementType : unsigned { None = 0, Entity, Component };
+
 	CHandle()
-		: m_elementType(0)
+		: m_elementType(EElementType::None)
 		, m_componentIdx(0)
 		, m_elementPosition(0)
 		, m_version(0)
 	{}
 	CHandle(CEntity* rhs);
+	CHandle(CComponent* rhs);
 
 	const CHandle & operator=(CEntity* rhs);
+	const CHandle & operator=(CComponent* rhs);
 	operator CEntity*();
 	operator bool();
+
+	template<typename T>
+	operator T*()
+	{
+		static_assert(
+			std::is_base_of<CComponent, T>::value,
+			"T must inherits from CComponent"
+			);
+
+		if (*this)
+		{
+			return static_cast<T*>(CSystems::GetSystem<CComponentFactoryManager>()->Get(m_componentIdx, m_elementPosition, m_version));
+		}
+		return nullptr;
+	}
 
 //private:
 	unsigned m_elementType : 2; //  4

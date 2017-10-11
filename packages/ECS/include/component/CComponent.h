@@ -1,17 +1,14 @@
 #pragma once
 
 #include <handle/CHandle.h>
-#include <utils/CVersionable.h>
+#include <common/CVersionable.h>
 
 class CComponent : public CVersionable
 {
 	template<class CEntity> friend class CVersionableFactory;
 public:
-	operator CHandle();
+	virtual ~CComponent() {}
 
+	operator CHandle();
 	const CComponent* operator=(const CHandle& rhs);
-	CComponent()
-	{}
-	~CComponent()
-	{}
 };

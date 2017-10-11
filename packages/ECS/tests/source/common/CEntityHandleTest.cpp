@@ -57,21 +57,21 @@ public:
 
 TEST_F(CEntityHandleTest, get_new_entity_pointer)
 {
-	CEntity* entity = m_entityManager->CreateEntity();
+	CEntity* entity = m_entityManager->GetNewElement();
 	EXPECT_NE(nullptr, entity);
 }
 
 TEST_F(CEntityHandleTest, get_new_entity_as_handle)
 {
-	CHandle entityHandle = m_entityManager->CreateEntity();
-	EXPECT_EQ(1, entityHandle.m_elementType);
+	CHandle entityHandle = m_entityManager->GetNewElement();
+	EXPECT_EQ(CHandle::EElementType::Entity, entityHandle.m_elementType);
 	EXPECT_EQ(0, entityHandle.m_componentIdx);
 	EXPECT_EQ(0, entityHandle.m_elementPosition);
 	EXPECT_EQ(0, entityHandle.m_version);
 	EXPECT_TRUE(static_cast<bool>(entityHandle));
 
-	CHandle entityHandle2 = m_entityManager->CreateEntity();
-	EXPECT_EQ(1, entityHandle2.m_elementType);
+	CHandle entityHandle2 = m_entityManager->GetNewElement();
+	EXPECT_EQ(CHandle::EElementType::Entity, entityHandle2.m_elementType);
 	EXPECT_EQ(0, entityHandle2.m_componentIdx);
 	EXPECT_EQ(1, entityHandle2.m_elementPosition);
 	EXPECT_EQ(0, entityHandle2.m_version);
@@ -80,25 +80,25 @@ TEST_F(CEntityHandleTest, get_new_entity_as_handle)
 
 TEST_F(CEntityHandleTest, cast_handle_to_entity)
 {
-	CHandle entityHandle = m_entityManager->CreateEntity();
+	CHandle entityHandle = m_entityManager->GetNewElement();
 
 	CEntity* entity = entityHandle;
 	EXPECT_NE(nullptr, entity);
 
-	int pos = m_entityManager->GetEntityPosition(entity);
+	int pos = m_entityManager->GetPositionForElement(entity);
 	EXPECT_EQ(pos, entityHandle.m_elementPosition);
 	EXPECT_EQ(entity->GetVersion(), entityHandle.m_version);
-	CEntity* entity2 = m_entityManager->GetByIdxAndVersion(pos, entity->GetVersion());
+	CEntity* entity2 = m_entityManager->GetElementByIdxAndVersion(pos, entity->GetVersion());
 	EXPECT_EQ(entity2, entity);
 }
 
 TEST_F(CEntityHandleTest, cast_entity_to_handle)
 {
-	CEntity* entity = m_entityManager->CreateEntity();
+	CEntity* entity = m_entityManager->GetNewElement();
 	EXPECT_NE(nullptr, entity);
 
 	CHandle entityHandle = entity;
-	EXPECT_EQ(1, entityHandle.m_elementType);
+	EXPECT_EQ(CHandle::EElementType::Entity, entityHandle.m_elementType);
 	EXPECT_EQ(0, entityHandle.m_componentIdx);
 	EXPECT_EQ(0, entityHandle.m_elementPosition);
 	EXPECT_EQ(0, entityHandle.m_version);
@@ -107,12 +107,12 @@ TEST_F(CEntityHandleTest, cast_entity_to_handle)
 
 TEST_F(CEntityHandleTest, invalidate_handle)
 {
-	CEntity* entity = m_entityManager->CreateEntity();
+	CEntity* entity = m_entityManager->GetNewElement();
 	EXPECT_NE(nullptr, entity);
 
 	CHandle entityHandle = entity;
 	EXPECT_TRUE(static_cast<bool>(entityHandle));
-	m_entityManager->DestroyEntity(entity);
+	m_entityManager->DestroyElement(&entity);
 	EXPECT_FALSE(static_cast<bool>(entityHandle));
 }
 
@@ -131,14 +131,14 @@ TEST_F(CEntityHandleTest, invalid_handle_from_null_entity)
 	EXPECT_FALSE(static_cast<bool>(handle));
 }
 
-TEST_F(CEntityHandleTest, invalid_handle_because_of_version)
+TEST_F(CEntityHandleTest, invalid_cast_to_handle_after_destroy)
 {
-	CEntity* entity = m_entityManager->CreateEntity();
+	CEntity* entity = m_entityManager->GetNewElement();
 	EXPECT_NE(nullptr, entity);
 	CHandle handle = entity;
 	EXPECT_TRUE(static_cast<bool>(handle));
 
-	m_entityManager->DestroyEntity(entity);
+	m_entityManager->DestroyElement(&entity);
 
 	EXPECT_FALSE(static_cast<bool>(handle));
 	entity = handle;

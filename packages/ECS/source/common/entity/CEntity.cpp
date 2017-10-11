@@ -6,9 +6,9 @@ CEntity::operator CHandle()
 {
 	CHandle handle;
 
-	handle.m_elementType = 1;
+	handle.m_elementType = CHandle::EElementType::Entity;
 	handle.m_componentIdx = 0;
-	handle.m_elementPosition = CSystems::GetSystem<CEntityManager>()->GetEntityPosition(this);
+	handle.m_elementPosition = CSystems::GetSystem<CEntityManager>()->GetPositionForElement(this);
 	handle.m_version = GetVersion();
 
 	return handle;
@@ -16,9 +16,9 @@ CEntity::operator CHandle()
 
 const CEntity* CEntity::operator=(const CHandle& rhs)
 {
-	if (rhs.m_elementType == 1)
+	if (rhs.m_elementType == CHandle::EElementType::Entity)
 	{
-		*this = CSystems::GetSystem<CEntityManager>()->GetByIdxAndVersion(rhs.m_elementPosition, rhs.m_version);
+		*this = CSystems::GetSystem<CEntityManager>()->GetElementByIdxAndVersion(rhs.m_elementPosition, rhs.m_version);
 		return this;
 	}
 	return nullptr;

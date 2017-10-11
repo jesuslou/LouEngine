@@ -1,11 +1,11 @@
 #pragma once
 
 #include <handle/CHandle.h>
-#include <utils/CVersionable.h>
+#include <common/CVersionable.h>
 
 class CEntity : public CVersionable
 {
-	template<class CEntity> friend class CVersionableFactory;
+	template<class CEntity> friend class CFactory;
 public:
 	operator CHandle();
 
