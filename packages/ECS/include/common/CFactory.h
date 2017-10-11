@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <common/CVersionable.h>
+#include <common/CECSElement.h>
 
 #include <cstdio>
 #include <memory>
@@ -34,8 +34,8 @@ template< typename T>
 class CFactory
 {
 	static_assert(
-		std::is_base_of<CVersionable, T>::value,
-		"T must inherits from CVersionable if you want to use a CFactory"
+		std::is_base_of<CECSElement, T>::value,
+		"T must inherits from CECSElement if you want to use a CFactory"
 		);
 public:
 	CFactory(std::size_t numElements)
@@ -58,6 +58,7 @@ public:
 		{
 			if (entry.m_used)
 			{
+				entry.m_data->Destroy();
 				entry.m_data->~T();
 			}
 		}
@@ -87,6 +88,7 @@ public:
 			SEntry *entry = FindElement(*data);
 			if (entry)
 			{
+				entry->m_data->Destroy();
 				entry->m_data->~T();
 				++entry->m_version;
 				entry->m_used = false;

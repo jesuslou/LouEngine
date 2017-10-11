@@ -51,6 +51,8 @@ public:
 	operator CEntity*();
 	operator bool();
 
+	bool operator==(const CHandle& rhs) const;
+
 	template<typename T>
 	operator T*()
 	{

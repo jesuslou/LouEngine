@@ -25,7 +25,7 @@
 #pragma once
 
 #include <handle/CHandle.h>
-#include <common/CVersionable.h>
+#include <common/CECSElement.h>
 #include <hash/CStrID.h>
 
 #include <vector>
@@ -33,7 +33,7 @@
 class CComponent;
 class CComponentFactoryManager;
 
-class CEntity : public CVersionable
+class CEntity : public CECSElement
 {
 	template<class CEntity> friend class CFactory;
 public:
@@ -43,19 +43,25 @@ public:
 	template<typename T>
 	CHandle AddComponent()
 	{
-		return m_componentFactoryManager.AddComponent<T>(m_components);
+		CComponent* component = m_componentFactoryManager.AddComponent<T>(m_components);
+		if (component)
+		{
+			component->SetOwner(this);
+		}
+		return component;
 	}
 	template<typename T>
-	void RemoveComponent()
+	bool RemoveComponent()
 	{
 		if (!m_components.empty())
 		{
 			int componentIdx = m_componentFactoryManager.GetFactoryindex<T>();
 			if (m_components[componentIdx])
 			{
-				m_componentFactoryManager.DestroyComponent(&m_components[componentIdx]);
+				return m_componentFactoryManager.DestroyComponent(&m_components[componentIdx]);
 			}
 		}
+		return false;
 	}
 	template<typename T>
 	CHandle GetComponent()
@@ -69,8 +75,10 @@ public:
 	}
 
 	CHandle AddComponent(CStrID nameId);
-	void RemoveComponent(CStrID nameId);
+	bool RemoveComponent(CStrID nameId);
 	CHandle GetComponent(CStrID nameId);
+
+	void Destroy() override;
 
 private:
 	CEntity();

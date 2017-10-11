@@ -90,16 +90,17 @@ int CComponentFactoryManager::GetPositionForElement(CComponent* component)
 	return -1;
 }
 
-void CComponentFactoryManager::DestroyComponent(CComponent** component)
+bool CComponentFactoryManager::DestroyComponent(CComponent** component)
 {
 	for (std::size_t i = 0; i < m_factories.size(); ++i)
 	{
 		if (m_factories[i].m_address->DestroyComponent(*component))
 		{
 			*component = nullptr;
-			return;
+			return true;
 		}
 	}
+	return false;
 }
 
 IComponentFactory* CComponentFactoryManager::GetFactoryByName(CStrID nameId)

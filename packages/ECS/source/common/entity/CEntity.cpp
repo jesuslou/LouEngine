@@ -61,16 +61,22 @@ const CEntity* CEntity::operator=(const CHandle& rhs)
 
 CHandle CEntity::AddComponent(CStrID nameId)
 {
-	return m_componentFactoryManager.AddComponent(nameId, m_components);
+	CComponent* component = m_componentFactoryManager.AddComponent(nameId, m_components);
+	if (component)
+	{
+		component->SetOwner(this);
+	}
+	return component;
 }
 
-void CEntity::RemoveComponent(CStrID nameId)
+bool CEntity::RemoveComponent(CStrID nameId)
 {
 	int componentIdx = m_componentFactoryManager.GetFactoryIndexByName(nameId);
 	if (componentIdx >= 0 && m_components[componentIdx])
 	{
-		m_componentFactoryManager.DestroyComponent(&m_components[componentIdx]);
+		return m_componentFactoryManager.DestroyComponent(&m_components[componentIdx]);
 	}
+	return false;
 }
 
 CHandle CEntity::GetComponent(CStrID nameId)
@@ -81,4 +87,12 @@ CHandle CEntity::GetComponent(CStrID nameId)
 		return m_components[componentIdx];
 	}
 	return CHandle();
+}
+
+void CEntity::Destroy()
+{
+	for (CComponent* component : m_components)
+	{
+		m_componentFactoryManager.DestroyComponent(&component);
+	}
 }

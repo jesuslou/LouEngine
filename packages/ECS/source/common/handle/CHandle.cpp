@@ -69,3 +69,11 @@ CHandle::operator bool()
 	}
 	return false;
 }
+
+bool CHandle::operator==(const CHandle& rhs) const
+{
+	return m_elementType == rhs.m_elementType &&
+		m_componentIdx == rhs.m_componentIdx &&
+		m_elementPosition == rhs.m_elementPosition &&
+		m_version == rhs.m_version;
+}

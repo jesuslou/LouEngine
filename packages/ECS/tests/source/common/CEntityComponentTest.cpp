@@ -140,7 +140,8 @@ TEST_F(CEntityComponentTest, remove_component_by_class)
 	CHandle handle = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_TRUE(static_cast<bool>(handle));
 
-	entity->RemoveComponent<EntityComponentTestInternal::CCompFoo>();
+	bool success = entity->RemoveComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_TRUE(success);
 
 	CComponent* component = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_EQ(nullptr, component);
@@ -155,7 +156,8 @@ TEST_F(CEntityComponentTest, remove_component_by_name)
 	CHandle handle = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_TRUE(static_cast<bool>(handle));
 
-	entity->RemoveComponent("foo");
+	bool success = entity->RemoveComponent("foo");
+	EXPECT_TRUE(success);
 
 	CComponent* component = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_EQ(nullptr, component);
@@ -179,7 +181,36 @@ TEST_F(CEntityComponentTest, check_cant_remove_component_twice)
 	CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_TRUE(static_cast<bool>(handle));
 	
-	entity->RemoveComponent("foo");
-	entity->RemoveComponent<EntityComponentTestInternal::CCompFoo>();
-	EXPECT_TRUE(true);
+	bool success = entity->RemoveComponent("foo");
+	EXPECT_TRUE(success);
+	success = entity->RemoveComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_FALSE(success);
+}
+
+TEST_F(CEntityComponentTest, check_component_invalid_after_deleting_entity)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_TRUE(static_cast<bool>(handle));
+
+	m_entityManager->DestroyElement(&entity);
+
+	EXPECT_FALSE(static_cast<bool>(handle));
+	CComponent* component = handle;
+	EXPECT_EQ(nullptr, entity);
+}
+
+TEST_F(CEntityComponentTest, check_component_owner)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	CHandle entityHandle = entity;
+	EXPECT_TRUE(static_cast<bool>(entityHandle));
+	CHandle ownerHandle = component->GetOwner();
+
+	EXPECT_EQ(ownerHandle, entityHandle);
 }

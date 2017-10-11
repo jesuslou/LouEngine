@@ -25,14 +25,32 @@
 #pragma once
 
 #include <handle/CHandle.h>
-#include <common/CVersionable.h>
+#include <common/CECSElement.h>
 
-class CComponent : public CVersionable
+class CComponent : public CECSElement
 {
-	template<class CEntity> friend class CVersionableFactory;
+	template<class CComponent> friend class CFactory;
 public:
 	virtual ~CComponent() {}
 
+	void Update(float dt) override;
+
 	operator CHandle();
 	const CComponent* operator=(const CHandle& rhs);
+
+	bool GetIsActive() const { return m_isActive; }
+	void SetIsActive(bool active) { m_isActive = active; }
+
+	void SetOwner(CHandle owner) { m_owner = owner; }
+	CHandle GetOwner() const { return m_owner; }
+
+protected:
+	CComponent();
+
+	virtual void DoUpdate(float dt) {}
+
+	CHandle m_owner;
+
+private:
+	bool m_isActive;
 };

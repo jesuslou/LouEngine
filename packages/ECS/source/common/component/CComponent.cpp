@@ -26,6 +26,12 @@
 #include <component/CComponentFactoryManager.h>
 #include <systems/CSystems.h>
 
+
+CComponent::CComponent()
+	: m_isActive(false)
+{
+}
+
 CComponent::operator CHandle()
 {
 	return CSystems::GetSystem<CComponentFactoryManager>()->SetHandleInfoFromComponent(this);
@@ -39,4 +45,12 @@ const CComponent* CComponent::operator=(const CHandle& rhs)
 		return this;
 	}
 	return nullptr;
+}
+
+void CComponent::Update(float dt)
+{
+	if (m_isActive)
+	{
+		DoUpdate(dt);
+	}
 }

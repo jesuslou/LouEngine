@@ -32,7 +32,7 @@
 
 namespace VersionableFactoryTestInternal
 {
-	class Foo : public CVersionable
+	class Foo : public CECSElement
 	{
 	};
 }

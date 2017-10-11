@@ -24,12 +24,20 @@
 
 #pragma once
 
-class CVersionable
+class CECSElement
 {
 public:
-	CVersionable()
+	CECSElement()
 		: m_version(0)
 	{}
+
+	virtual void Init() {}
+	virtual void Update(float dt) {}
+	virtual void Destroy() {}
+
+	virtual void Activate() {}
+	virtual void Deactivate() {}
+
 
 	void SetVersion(int version) { m_version = version; }
 	int GetVersion() const { return m_version; }

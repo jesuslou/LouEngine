@@ -23,43 +23,43 @@
 ////////////////////////////////////////////////////////////
 
 #include <common/CFactory.h>
-#include <common/CVersionable.h>
+#include <common/CECSElement.h>
 
 #include <gtest/gtest.h>
 
 namespace VersionableFactoryTestInternal
 {
-	class Foo : public CVersionable
+	class Foo : public CECSElement
 	{
 	};
 }
 
-class CVersionableFactoryTest : public ::testing::Test
+class CFactoryTest : public ::testing::Test
 {
 public:
-	CVersionableFactoryTest()
+	CFactoryTest()
 		: m_factory(1)
 	{
 	}
 
-	~CVersionableFactoryTest()
+	~CFactoryTest()
 	{
 	}
 	CFactory<VersionableFactoryTestInternal::Foo> m_factory;
 };
 
-TEST_F(CVersionableFactoryTest, init_test)
+TEST_F(CFactoryTest, init_test)
 {
 	EXPECT_TRUE(true);
 }
 
-TEST_F(CVersionableFactoryTest, get_valid_value)
+TEST_F(CFactoryTest, get_valid_value)
 {
 	VersionableFactoryTestInternal::Foo* foo1 = m_factory.GetNewElement();
 	EXPECT_NE(nullptr, foo1);
 }
 
-TEST_F(CVersionableFactoryTest, get_invalid_value_if_overflow)
+TEST_F(CFactoryTest, get_invalid_value_if_overflow)
 {
 	VersionableFactoryTestInternal::Foo* foo1 = m_factory.GetNewElement();
 	EXPECT_NE(nullptr, foo1);
@@ -67,13 +67,13 @@ TEST_F(CVersionableFactoryTest, get_invalid_value_if_overflow)
 	EXPECT_EQ(nullptr, foo2);
 }
 
-TEST_F(CVersionableFactoryTest, check_value_version)
+TEST_F(CFactoryTest, check_value_version)
 {
 	VersionableFactoryTestInternal::Foo* foo1 = m_factory.GetNewElement();
 	EXPECT_EQ(0, foo1->GetVersion());
 }
 
-TEST_F(CVersionableFactoryTest, check_free)
+TEST_F(CFactoryTest, check_free)
 {
 	VersionableFactoryTestInternal::Foo* foo1 = m_factory.GetNewElement();
 	EXPECT_NE(nullptr, foo1);
@@ -83,14 +83,14 @@ TEST_F(CVersionableFactoryTest, check_free)
 	EXPECT_NE(nullptr, foo2);
 }
 
-TEST_F(CVersionableFactoryTest, check_destroy_null_value)
+TEST_F(CFactoryTest, check_destroy_null_value)
 {
 	VersionableFactoryTestInternal::Foo* foo = nullptr;
 	m_factory.DestroyElement(&foo);
 	EXPECT_TRUE(true);
 }
 
-TEST_F(CVersionableFactoryTest, check_version_increment)
+TEST_F(CFactoryTest, check_version_increment)
 {
 	VersionableFactoryTestInternal::Foo* foo1 = m_factory.GetNewElement();
 	EXPECT_NE(nullptr, foo1);
@@ -101,7 +101,7 @@ TEST_F(CVersionableFactoryTest, check_version_increment)
 	EXPECT_EQ(1, foo2->GetVersion());
 }
 
-TEST_F(CVersionableFactoryTest, check_get_position)
+TEST_F(CFactoryTest, check_get_position)
 {
 	CFactory<VersionableFactoryTestInternal::Foo> factory(2);
 	VersionableFactoryTestInternal::Foo* foo1 = factory.GetNewElement();
@@ -114,7 +114,7 @@ TEST_F(CVersionableFactoryTest, check_get_position)
 	EXPECT_EQ(pos2, 1);
 }
 
-TEST_F(CVersionableFactoryTest, check_get_value_with_position_and_version)
+TEST_F(CFactoryTest, check_get_value_with_position_and_version)
 {
 	VersionableFactoryTestInternal::Foo* foo1 = m_factory.GetNewElement();
 	EXPECT_NE(nullptr, foo1);
@@ -122,7 +122,7 @@ TEST_F(CVersionableFactoryTest, check_get_value_with_position_and_version)
 	EXPECT_EQ(foo2, foo1);
 }
 
-TEST_F(CVersionableFactoryTest, check_get_value_with_position_and_incorrect_version)
+TEST_F(CFactoryTest, check_get_value_with_position_and_incorrect_version)
 {
 	VersionableFactoryTestInternal::Foo* foo1 = m_factory.GetNewElement();
 	EXPECT_NE(nullptr, foo1);

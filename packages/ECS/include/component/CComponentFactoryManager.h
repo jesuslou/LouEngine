@@ -112,7 +112,7 @@ public:
 	CComponent* Get(std::size_t componentTypeIdx, int index, int version);
 	CHandle SetHandleInfoFromComponent(CComponent* component);
 	int GetPositionForElement(CComponent* component);
-	void DestroyComponent(CComponent** component);
+	bool DestroyComponent(CComponent** component);
 
 	int GetFactoryIndexByName(CStrID nameId);
 
