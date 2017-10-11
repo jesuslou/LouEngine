@@ -29,6 +29,7 @@
 
 CComponent::CComponent()
 	: m_isActive(false)
+	, m_initialized(false)
 {
 }
 
@@ -45,6 +46,14 @@ const CComponent* CComponent::operator=(const CHandle& rhs)
 		return this;
 	}
 	return nullptr;
+}
+
+void CComponent::Init()
+{
+	if (!m_initialized)
+	{
+		DoInit();
+	}
 }
 
 void CComponent::Update(float dt)

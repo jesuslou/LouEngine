@@ -33,6 +33,7 @@ class CComponent : public CECSElement
 public:
 	virtual ~CComponent() {}
 
+	void Init() override;
 	void Update(float dt) override;
 
 	operator CHandle();
@@ -47,10 +48,11 @@ public:
 protected:
 	CComponent();
 
+	virtual void DoInit() {}
 	virtual void DoUpdate(float dt) {}
 
 	CHandle m_owner;
 
-private:
 	bool m_isActive;
+	bool m_initialized;
 };

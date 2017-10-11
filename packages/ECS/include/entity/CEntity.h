@@ -78,7 +78,11 @@ public:
 	bool RemoveComponent(CStrID nameId);
 	CHandle GetComponent(CStrID nameId);
 
+	void Init() override;
 	void Destroy() override;
+
+	void Activate() override;
+	void Deactivate() override;
 
 private:
 	CEntity();
@@ -87,4 +91,7 @@ private:
 	std::vector<CComponent*> m_components;
 
 	CComponentFactoryManager& m_componentFactoryManager;
+
+	int n_deactivations;
+	bool m_initialized;
 };

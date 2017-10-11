@@ -29,6 +29,8 @@
 
 CEntity::CEntity()
 	: m_componentFactoryManager(*CSystems::GetSystem<CComponentFactoryManager>())
+	, n_deactivations(1)
+	, m_initialized(false)
 {
 	m_components.resize(m_componentFactoryManager.GetRegisteredComponentsAmount());
 }
@@ -89,10 +91,44 @@ CHandle CEntity::GetComponent(CStrID nameId)
 	return CHandle();
 }
 
+void CEntity::Init()
+{
+	if (!m_initialized)
+	{
+		for (CComponent* component : m_components)
+		{
+			component->Init();
+		}
+		m_initialized = true;
+	}
+}
+
 void CEntity::Destroy()
 {
 	for (CComponent* component : m_components)
 	{
 		m_componentFactoryManager.DestroyComponent(&component);
+	}
+}
+
+void CEntity::Activate()
+{
+	--n_deactivations;
+	n_deactivations = n_deactivations < 0 ? 0 : n_deactivations;
+	if (n_deactivations == 0)
+	{
+		for (CComponent* component : m_components)
+		{
+			component->Activate();
+		}
+	}
+}
+
+void CEntity::Deactivate()
+{
+	++n_deactivations;
+	for (CComponent* component : m_components)
+	{
+		component->Deactivate();
 	}
 }
