@@ -25,6 +25,7 @@
 #include <entity/CEntityManager.h>
 #include <entity/CEntity.h>
 #include <handle/CHandle.h>
+#include <component/CComponentFactoryManager.h>
 #include <systems/CSystems.h>
 
 #include <gtest/gtest.h>
@@ -41,18 +42,22 @@ class CEntityHandleTest : public ::testing::Test
 public:
 	CEntityHandleTest()
 		: m_entityManager(new CEntityManager)
+		, m_componentFactoryManager(new CComponentFactoryManager)
 	{
 		CSystems::SetGameSystems(&m_gameSystems);
 		m_gameSystems.SetSystem<CEntityManager>(m_entityManager);
+		m_gameSystems.SetSystem<CComponentFactoryManager>(m_componentFactoryManager);
 	}
 
 	~CEntityHandleTest()
 	{
+		m_gameSystems.DestroySystem<CComponentFactoryManager>();
 		m_gameSystems.DestroySystem<CEntityManager>();
 	}
 
 	CGameSystems m_gameSystems;
 	CEntityManager *m_entityManager;
+	CComponentFactoryManager *m_componentFactoryManager;
 };
 
 TEST_F(CEntityHandleTest, get_new_entity_pointer)

@@ -26,17 +26,57 @@
 
 #include <handle/CHandle.h>
 #include <common/CVersionable.h>
+#include <hash/CStrID.h>
+
+#include <vector>
+
+class CComponent;
+class CComponentFactoryManager;
 
 class CEntity : public CVersionable
 {
 	template<class CEntity> friend class CFactory;
 public:
 	operator CHandle();
-
 	const CEntity* operator=(const CHandle& rhs);
+
+	template<typename T>
+	CHandle AddComponent()
+	{
+		return m_componentFactoryManager.AddComponent<T>(m_components);
+	}
+	template<typename T>
+	void RemoveComponent()
+	{
+		if (!m_components.empty())
+		{
+			int componentIdx = m_componentFactoryManager.GetFactoryindex<T>();
+			if (m_components[componentIdx])
+			{
+				m_componentFactoryManager.DestroyComponent(&m_components[componentIdx]);
+			}
+		}
+	}
+	template<typename T>
+	CHandle GetComponent()
+	{
+		int componentIdx = m_componentFactoryManager.GetFactoryindex<T>();
+		if (componentIdx >= 0)
+		{
+			return m_components[componentIdx];
+		}
+		return CHandle();
+	}
+
+	CHandle AddComponent(CStrID nameId);
+	void RemoveComponent(CStrID nameId);
+	CHandle GetComponent(CStrID nameId);
+
 private:
-	CEntity()
-	{}
-	~CEntity()
-	{}
+	CEntity();
+	~CEntity();
+
+	std::vector<CComponent*> m_components;
+
+	CComponentFactoryManager& m_componentFactoryManager;
 };

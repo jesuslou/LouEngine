@@ -35,10 +35,6 @@
 
 // Each CStrID is 4 bytes in size.
 
-#if defined(_DEBUG) || defined(PLATFORM_WINDOWS)
-  #define STR_ID_DEBUG_STRINGS
-#endif
-
 class CStrID {
 public:
   // Helper to disambiguate
@@ -205,9 +201,6 @@ inline CStrID::CStrID( const char (&str)[Len] ) {
 template <unsigned Len>
 inline CStrID & CStrID::operator=( const char (&str)[Len] ) {
   id = murmur3_32( str );
-#ifdef STR_ID_DEBUG_STRINGS
-  registerDebugInternal( str, strlen( str ) );
-#endif
   return *this;
 }
 

@@ -36,6 +36,21 @@ CComponent* CComponentFactoryManager::CreateComponent(CStrID componentNameId)
 	return nullptr;
 }
 
+CComponent* CComponentFactoryManager::AddComponent(CStrID componentNameId, std::vector<CComponent*>& components)
+{
+	int factoryIdx = GetFactoryIndexByName(componentNameId);
+	if (factoryIdx >= 0)
+	{
+		IComponentFactory* factory = GetFactoryByIndex(factoryIdx);
+		if (factory && components[factoryIdx] == nullptr)
+		{
+			components[factoryIdx] = factory->CreateComponent();
+			return components[factoryIdx];
+		}
+	}
+	return nullptr;
+}
+
 CComponent* CComponentFactoryManager::Get(std::size_t componentTypeIdx, int index, int version)
 {
 	if (componentTypeIdx < m_factories.size())
@@ -106,4 +121,16 @@ IComponentFactory* CComponentFactoryManager::GetFactoryByIndex(std::size_t idx)
 		return m_factories[idx].m_address;
 	}
 	return nullptr;
+}
+
+int CComponentFactoryManager::GetFactoryIndexByName(CStrID nameId)
+{
+	for (std::size_t i = 0; i < m_factories.size(); ++i)
+	{
+		if (m_factories[i].m_nameId == nameId)
+		{
+			return i;
+		}
+	}
+	return -1;
 }

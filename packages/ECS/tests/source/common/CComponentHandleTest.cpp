@@ -70,6 +70,16 @@ TEST_F(CComponentHandleTest, get_new_component_pointer)
 	EXPECT_EQ(nullptr, bar);
 }
 
+TEST_F(CComponentHandleTest, get_new_component_pointer_by_name)
+{
+	CComponent* component = m_componentFactoryManager->CreateComponent("foo");
+	EXPECT_NE(nullptr, component);
+	ComponentHandleTestInternal::CCompFoo* foo = dynamic_cast<ComponentHandleTestInternal::CCompFoo*>(component);
+	EXPECT_NE(nullptr, foo);
+	ComponentHandleTestInternal::CCompBar* bar = dynamic_cast<ComponentHandleTestInternal::CCompBar*>(component);
+	EXPECT_EQ(nullptr, bar);
+}
+
 TEST_F(CComponentHandleTest, get_new_component_as_handle)
 {
 	CHandle fooHandle = m_componentFactoryManager->CreateComponent<ComponentHandleTestInternal::CCompFoo>();

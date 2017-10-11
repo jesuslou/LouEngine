@@ -25,6 +25,17 @@
 #include <entity/CEntity.h>
 #include <entity/CEntityManager.h>
 #include <systems/CSystems.h>
+#include <component/CComponentFactoryManager.h>
+
+CEntity::CEntity()
+	: m_componentFactoryManager(*CSystems::GetSystem<CComponentFactoryManager>())
+{
+	m_components.resize(m_componentFactoryManager.GetRegisteredComponentsAmount());
+}
+
+CEntity::~CEntity()
+{
+}
 
 CEntity::operator CHandle()
 {
@@ -46,4 +57,28 @@ const CEntity* CEntity::operator=(const CHandle& rhs)
 		return this;
 	}
 	return nullptr;
+}
+
+CHandle CEntity::AddComponent(CStrID nameId)
+{
+	return m_componentFactoryManager.AddComponent(nameId, m_components);
+}
+
+void CEntity::RemoveComponent(CStrID nameId)
+{
+	int componentIdx = m_componentFactoryManager.GetFactoryIndexByName(nameId);
+	if (componentIdx >= 0 && m_components[componentIdx])
+	{
+		m_componentFactoryManager.DestroyComponent(&m_components[componentIdx]);
+	}
+}
+
+CHandle CEntity::GetComponent(CStrID nameId)
+{
+	int componentIdx = m_componentFactoryManager.GetFactoryIndexByName(nameId);
+	if (componentIdx >= 0)
+	{
+		return m_components[componentIdx];
+	}
+	return CHandle();
 }

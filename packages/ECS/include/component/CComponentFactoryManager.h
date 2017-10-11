@@ -67,6 +67,22 @@ public:
 	}
 
 	template<typename T>
+	CComponent* AddComponent(std::vector<CComponent*>& components)
+	{
+		int factoryIdx = GetFactoryindex<T>();
+		if (factoryIdx >= 0)
+		{
+			IComponentFactory* factory = GetFactory<T>();
+			if (factory)
+			{
+				components[factoryIdx] = factory->CreateComponent();
+				return components[factoryIdx];
+			}
+		}
+		return nullptr;
+	}
+
+	template<typename T>
 	CComponent* GetByIdxAndVersion(int index, int version)
 	{
 		IComponentFactory* factory = GetFactory<T>();
@@ -77,12 +93,30 @@ public:
 		return nullptr;
 	}
 
+	template<typename T>
+	int GetFactoryindex()
+	{
+		long long id = CTypeHasher::Hash<T>();
+		for (std::size_t i = 0; i < m_factories.size(); ++i)
+		{
+			if (m_factories[i].m_id == id)
+			{
+				return i;
+			}
+		}
+		return 1;
+	}
+
 	CComponent* CreateComponent(CStrID componentNameId);
+	CComponent* AddComponent(CStrID componentNameId, std::vector<CComponent*>& components);
 	CComponent* Get(std::size_t componentTypeIdx, int index, int version);
 	CHandle SetHandleInfoFromComponent(CComponent* component);
 	int GetPositionForElement(CComponent* component);
 	void DestroyComponent(CComponent** component);
 
+	int GetFactoryIndexByName(CStrID nameId);
+
+	int GetRegisteredComponentsAmount() const { return m_factories.size(); }
 private:
 
 	template<typename T>
