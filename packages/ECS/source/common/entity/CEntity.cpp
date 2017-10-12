@@ -98,7 +98,10 @@ void CEntity::Init()
 	{
 		for (CComponent* component : m_components)
 		{
-			component->Init();
+			if (component)
+			{
+				component->Init();
+			}
 		}
 		m_initialized = true;
 	}
@@ -106,11 +109,14 @@ void CEntity::Init()
 
 void CEntity::Destroy()
 {
-	if (m_initialized && !m_destroyed)
+	if (!m_destroyed)
 	{
 		for (CComponent* component : m_components)
 		{
-			m_componentFactoryManager.DestroyComponent(&component);
+			if (component)
+			{
+				m_componentFactoryManager.DestroyComponent(&component);
+			}
 		}
 		m_destroyed = true;
 	}
@@ -122,7 +128,10 @@ void CEntity::Activate()
 	{
 		for (CComponent* component : m_components)
 		{
-			component->Activate();
+			if (component)
+			{
+				component->Activate();
+			}
 		}
 	}
 	--m_numDeactivations;
@@ -135,7 +144,10 @@ void CEntity::Deactivate()
 	{
 		for (CComponent* component : m_components)
 		{
-			component->Deactivate();
+			if (component)
+			{
+				component->Deactivate();
+			}
 		}
 	}
 	++m_numDeactivations;

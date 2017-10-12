@@ -30,6 +30,7 @@
 CComponent::CComponent()
 	: m_isActive(false)
 	, m_initialized(false)
+	, m_destroyed(false)
 {
 }
 
@@ -53,6 +54,7 @@ void CComponent::Init()
 	if (!m_initialized)
 	{
 		DoInit();
+		m_initialized = true;
 	}
 }
 
@@ -61,5 +63,32 @@ void CComponent::Update(float dt)
 	if (m_isActive)
 	{
 		DoUpdate(dt);
+	}
+}
+
+void CComponent::Destroy()
+{
+	if(!m_destroyed)
+	{
+		DoDestroy();
+		m_destroyed = true;
+	}
+}
+
+void CComponent::Activate()
+{
+	if (!m_isActive)
+	{
+		DoActivate();
+		m_isActive = true;
+	}
+}
+
+void CComponent::Deactivate()
+{
+	if (m_isActive)
+	{
+		DoDeactivate();
+		m_isActive = false;
 	}
 }

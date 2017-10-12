@@ -35,24 +35,33 @@ public:
 
 	void Init() override;
 	void Update(float dt) override;
+	void Destroy() override;
 
 	operator CHandle();
 	const CComponent* operator=(const CHandle& rhs);
 
-	bool GetIsActive() const { return m_isActive; }
-	void SetIsActive(bool active) { m_isActive = active; }
-
 	void SetOwner(CHandle owner) { m_owner = owner; }
 	CHandle GetOwner() const { return m_owner; }
+
+	void Activate() override;
+	void Deactivate() override;
+
+	bool IsInitialized() const { return m_initialized; }
+	bool IsActive() const { return m_isActive; }
+	bool IsDestroyed() const { return m_destroyed; }
 
 protected:
 	CComponent();
 
 	virtual void DoInit() {}
 	virtual void DoUpdate(float dt) {}
+	virtual void DoDestroy() {}
+	virtual void DoActivate() {}
+	virtual void DoDeactivate() {}
 
 	CHandle m_owner;
 
 	bool m_isActive;
 	bool m_initialized;
+	bool m_destroyed;
 };

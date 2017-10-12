@@ -84,7 +84,9 @@ public:
 	void Activate() override;
 	void Deactivate() override;
 
+	bool IsInitialized() const { return m_initialized; }
 	bool IsActive() const { return m_numDeactivations == 0; }
+	bool IsDestroyed() const { return m_destroyed; }
 
 private:
 	CEntity();

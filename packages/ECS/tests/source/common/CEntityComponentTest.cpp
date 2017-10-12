@@ -38,6 +38,23 @@ namespace EntityComponentTestInternal
 
 	class CCompBar : public CComponent
 	{};
+
+	class CCompActivationTest : public CComponent
+	{
+	public:
+		CCompActivationTest() : m_foo(0) {}
+		void DoActivate() override
+		{
+			++m_foo;
+		}
+
+		void DoDeactivate() override
+		{
+			--m_foo;
+		}
+
+		int m_foo;
+	};
 }
 
 class CEntityComponentTest : public ::testing::Test
@@ -53,6 +70,7 @@ public:
 
 		ADD_COMPONENT_FACTORY("foo", EntityComponentTestInternal::CCompFoo, 1);
 		ADD_COMPONENT_FACTORY("bar", EntityComponentTestInternal::CCompBar, 1);
+		ADD_COMPONENT_FACTORY("activationTest", EntityComponentTestInternal::CCompActivationTest, 1);
 	}
 
 	~CEntityComponentTest()
@@ -195,10 +213,11 @@ TEST_F(CEntityComponentTest, check_component_invalid_after_deleting_entity)
 	EXPECT_TRUE(static_cast<bool>(handle));
 
 	m_entityManager->DestroyElement(&entity);
+	EXPECT_EQ(nullptr, entity);
 
 	EXPECT_FALSE(static_cast<bool>(handle));
 	CComponent* component = handle;
-	EXPECT_EQ(nullptr, entity);
+	EXPECT_EQ(nullptr, component);
 }
 
 TEST_F(CEntityComponentTest, check_component_owner)
@@ -213,4 +232,118 @@ TEST_F(CEntityComponentTest, check_component_owner)
 	CHandle ownerHandle = component->GetOwner();
 
 	EXPECT_EQ(ownerHandle, entityHandle);
+}
+
+TEST_F(CEntityComponentTest, entity_created_uninitalized_and_deactivated)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+
+	EXPECT_FALSE(entity->IsInitialized());
+	EXPECT_FALSE(entity->IsActive());
+}
+
+TEST_F(CEntityComponentTest, entity_not_activated_on_initialization)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+
+	EXPECT_FALSE(entity->IsInitialized());
+	EXPECT_FALSE(entity->IsActive());
+	entity->Init();
+	EXPECT_TRUE(entity->IsInitialized());
+	EXPECT_FALSE(entity->IsActive());
+}
+
+TEST_F(CEntityComponentTest, init_entity_initialize_components)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	EXPECT_FALSE(entity->IsInitialized());
+	EXPECT_FALSE(component->IsInitialized());
+	entity->Init();
+	EXPECT_TRUE(entity->IsInitialized());
+	EXPECT_TRUE(component->IsInitialized());
+}
+
+TEST_F(CEntityComponentTest, destroy_entity_destroys_components)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CHandle compHandle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_TRUE(static_cast<bool>(compHandle));
+
+	EXPECT_FALSE(entity->IsDestroyed());
+	entity->Destroy();
+	EXPECT_TRUE(entity->IsDestroyed());
+	EXPECT_FALSE(static_cast<bool>(compHandle));
+}
+
+TEST_F(CEntityComponentTest, activate_entity_activates_components)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	entity->Activate();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(component->IsActive());
+}
+
+TEST_F(CEntityComponentTest, deactivate_entity_deactivates_components)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	entity->Activate();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(component->IsActive());
+
+	entity->Deactivate();
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+}
+
+TEST_F(CEntityComponentTest, check_doActivate_method_only_called_once)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	EntityComponentTestInternal::CCompActivationTest* component = entity->AddComponent<EntityComponentTestInternal::CCompActivationTest>();
+	EXPECT_NE(nullptr, component);
+
+	entity->Init();
+
+	EXPECT_EQ(0, component->m_foo);
+	entity->Activate();
+	EXPECT_EQ(1, component->m_foo);
+	entity->Activate();
+	EXPECT_EQ(1, component->m_foo);
+}
+
+TEST_F(CEntityComponentTest, check_doDectivate_method_only_called_once)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	EntityComponentTestInternal::CCompActivationTest* component = entity->AddComponent<EntityComponentTestInternal::CCompActivationTest>();
+	EXPECT_NE(nullptr, component);
+
+	entity->Init();
+
+	EXPECT_EQ(0, component->m_foo);
+	entity->Activate();
+	EXPECT_EQ(1, component->m_foo);
+	entity->Deactivate();
+	EXPECT_EQ(0, component->m_foo);
+	entity->Deactivate();
+	EXPECT_EQ(0, component->m_foo);
 }
