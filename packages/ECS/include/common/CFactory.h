@@ -45,11 +45,15 @@ public:
 		m_buffer = malloc(sizeof(T) * m_numElements);
 
 		T* buffer = static_cast<T*>(m_buffer);
-		for (SEntry& entry : m_entries)
+		m_entries[0].m_data = buffer;
+		++buffer;
+		for (size_t i = 1; i < m_numElements; ++i)
 		{
-			entry = SEntry(buffer);
+			m_entries[i].m_data = buffer;
+			m_entries[i - 1].m_next = &m_entries[i];
 			++buffer;
 		}
+		m_current = &m_entries[0];
 	}
 
 	virtual ~CFactory()
@@ -66,15 +70,13 @@ public:
 
 	T* GetNewElement()
 	{
-		for (SEntry& entry : m_entries)
+		if (m_current)
 		{
-			if (!entry.m_used)
-			{
-				T* data = new(static_cast<void*>(entry.m_data))T();
-				data->SetVersion(entry.m_version);
-				entry.m_used = true;
-				return data;
-			}
+			T* data = new(static_cast<void*>(m_current->m_data))T();
+			data->SetVersion(m_current->m_version);
+			m_current->m_used = true;
+			m_current = m_current->m_next;
+			return data;
 		}
 		printf("No room for more!\n");
 		return nullptr;
@@ -89,7 +91,9 @@ public:
 			{
 				entry->m_data->~T();
 				++entry->m_version;
+				entry->m_next = m_current;
 				entry->m_used = false;
+				m_current = entry;
 				*data = nullptr;
 				return true;
 			}
@@ -125,16 +129,17 @@ protected:
 	struct SEntry
 	{
 		T* m_data;
+		SEntry *m_next;
 		int m_version;
 		bool m_used;
-		SEntry() : m_data(nullptr), m_version(0) {}
-		SEntry(T* data) : m_data(data), m_version(0), m_used(false) {}
+		SEntry() : m_data(nullptr), m_next(nullptr), m_version(0), m_used(false) {}
 	};
 
 	void* m_buffer;
 
 	std::size_t m_numElements;
 	std::vector<SEntry> m_entries;
+	SEntry* m_current;
 
 	SEntry* FindElement(T* data)
 	{
