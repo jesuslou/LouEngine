@@ -68,6 +68,8 @@ public:
 		return nullptr;
 	}
 
+	bool Destroy();
+
 	unsigned m_elementType : 2; //  4
 	unsigned m_componentIdx : 9; // 512
 	unsigned m_elementPosition : 13; // 8.192

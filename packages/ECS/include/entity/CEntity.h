@@ -74,6 +74,13 @@ public:
 		return CHandle();
 	}
 
+	void SetParent(CEntity* newParent);
+	CHandle GetParent() const { return m_parent; }
+	bool AddChild(CHandle newChild);
+	bool RemoveChild(CHandle child);
+	bool HasChild(CHandle child) const;
+	int GetChildrenCount() const { return m_children.size(); }
+
 	CHandle AddComponent(CStrID nameId);
 	bool RemoveComponent(CStrID nameId);
 	CHandle GetComponent(CStrID nameId);
@@ -91,6 +98,9 @@ public:
 private:
 	CEntity();
 	~CEntity();
+
+	CHandle m_parent;
+	std::vector<CHandle> m_children;
 
 	std::vector<CComponent*> m_components;
 

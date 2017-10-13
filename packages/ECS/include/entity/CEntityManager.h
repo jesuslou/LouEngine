@@ -33,5 +33,8 @@ class CEntityManager : public CFactory<CEntity>
 public:
 	CEntityManager();
 	~CEntityManager() override {}
+
+	bool DestroyEntity(CEntity** entity);
+	bool DestroyEntity(CHandle handle);
 private:
 };

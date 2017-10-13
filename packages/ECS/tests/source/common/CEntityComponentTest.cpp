@@ -75,8 +75,8 @@ public:
 
 	~CEntityComponentTest()
 	{
-		m_gameSystems.DestroySystem<CComponentFactoryManager>();
 		m_gameSystems.DestroySystem<CEntityManager>();
+		m_gameSystems.DestroySystem<CComponentFactoryManager>();
 	}
 
 	CGameSystems m_gameSystems;
@@ -212,7 +212,7 @@ TEST_F(CEntityComponentTest, check_component_invalid_after_deleting_entity)
 	CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_TRUE(static_cast<bool>(handle));
 
-	m_entityManager->DestroyElement(&entity);
+	m_entityManager->DestroyEntity(&entity);
 	EXPECT_EQ(nullptr, entity);
 
 	EXPECT_FALSE(static_cast<bool>(handle));
@@ -232,27 +232,6 @@ TEST_F(CEntityComponentTest, check_component_owner)
 	CHandle ownerHandle = component->GetOwner();
 
 	EXPECT_EQ(ownerHandle, entityHandle);
-}
-
-TEST_F(CEntityComponentTest, entity_created_uninitalized_and_deactivated)
-{
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-
-	EXPECT_FALSE(entity->IsInitialized());
-	EXPECT_FALSE(entity->IsActive());
-}
-
-TEST_F(CEntityComponentTest, entity_not_activated_on_initialization)
-{
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-
-	EXPECT_FALSE(entity->IsInitialized());
-	EXPECT_FALSE(entity->IsActive());
-	entity->Init();
-	EXPECT_TRUE(entity->IsInitialized());
-	EXPECT_FALSE(entity->IsActive());
 }
 
 TEST_F(CEntityComponentTest, init_entity_initialize_components)

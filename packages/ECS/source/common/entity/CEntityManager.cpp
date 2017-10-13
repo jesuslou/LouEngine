@@ -29,3 +29,25 @@ CEntityManager::CEntityManager()
 	: CFactory(CHandle::MAX_ELEMENTS)
 {
 }
+
+bool CEntityManager::DestroyEntity(CEntity** entity)
+{
+	if (*entity)
+	{
+		(*entity)->Destroy();
+		return DestroyElement(entity);
+	}
+	return false;
+}
+
+bool CEntityManager::DestroyEntity(CHandle handle)
+{
+	CEntity* entity = handle;
+	if (entity)
+	{
+		entity->Destroy();
+		return DestroyElement(&entity);
+	}
+	return false;
+}
+

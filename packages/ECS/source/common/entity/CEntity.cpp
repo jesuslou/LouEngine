@@ -62,6 +62,49 @@ const CEntity* CEntity::operator=(const CHandle& rhs)
 	return nullptr;
 }
 
+void CEntity::SetParent(CEntity* newParent)
+{
+	CEntity* oldParent = m_parent;
+	m_parent = newParent;
+	if (oldParent)
+	{
+		oldParent->RemoveChild(this);
+	}
+}
+
+bool CEntity::AddChild(CHandle newChild)
+{
+	if (!HasChild(newChild))
+	{
+		CEntity* entity = newChild;
+		entity->SetParent(this);
+		m_children.emplace_back(newChild);
+		return true;
+	}
+	return false;
+}
+
+bool CEntity::RemoveChild(CHandle child)
+{
+	auto it = std::find(m_children.begin(), m_children.end(), child);
+	if (it != m_children.end())
+	{
+		CEntity* entity = (*it);
+		m_children.erase(it);
+		if (entity->GetParent() == *this)
+		{
+			entity->SetParent(nullptr);
+		}
+		return true;
+	}
+	return false;
+}
+
+bool CEntity::HasChild(CHandle child) const
+{
+	return std::find(m_children.begin(), m_children.end(), child) != m_children.end();
+}
+
 CHandle CEntity::AddComponent(CStrID nameId)
 {
 	CComponent* component = m_componentFactoryManager.AddComponent(nameId, m_components);
@@ -118,6 +161,16 @@ void CEntity::Destroy()
 				m_componentFactoryManager.DestroyComponent(&component);
 			}
 		}
+
+		CEntityManager* entityManager = CSystems::GetSystem<CEntityManager>();
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				entityManager->DestroyEntity(&child);
+			}
+		}
+
 		m_destroyed = true;
 	}
 }

@@ -58,7 +58,6 @@ public:
 		{
 			if (entry.m_used)
 			{
-				entry.m_data->Destroy();
 				entry.m_data->~T();
 			}
 		}
@@ -88,7 +87,6 @@ public:
 			SEntry *entry = FindElement(*data);
 			if (entry)
 			{
-				entry->m_data->Destroy();
 				entry->m_data->~T();
 				++entry->m_version;
 				entry->m_used = false;

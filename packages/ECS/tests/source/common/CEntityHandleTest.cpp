@@ -51,8 +51,8 @@ public:
 
 	~CEntityHandleTest()
 	{
-		m_gameSystems.DestroySystem<CComponentFactoryManager>();
 		m_gameSystems.DestroySystem<CEntityManager>();
+		m_gameSystems.DestroySystem<CComponentFactoryManager>();
 	}
 
 	CGameSystems m_gameSystems;
@@ -117,7 +117,7 @@ TEST_F(CEntityHandleTest, invalidate_handle)
 
 	CHandle entityHandle = entity;
 	EXPECT_TRUE(static_cast<bool>(entityHandle));
-	m_entityManager->DestroyElement(&entity);
+	m_entityManager->DestroyEntity(&entity);
 	EXPECT_FALSE(static_cast<bool>(entityHandle));
 }
 
@@ -143,7 +143,7 @@ TEST_F(CEntityHandleTest, invalid_cast_to_handle_after_destroy)
 	CHandle handle = entity;
 	EXPECT_TRUE(static_cast<bool>(handle));
 
-	m_entityManager->DestroyElement(&entity);
+	m_entityManager->DestroyEntity(&entity);
 
 	EXPECT_FALSE(static_cast<bool>(handle));
 	entity = handle;

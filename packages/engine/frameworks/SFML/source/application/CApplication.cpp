@@ -140,9 +140,9 @@ void CApplication::Destroy()
 	m_keyboard->Destroy();
 	CSystems::DestroySystem<Input::IKeyboard>();
 
+	CSystems::DestroySystem<CEntityManager>();
 	CSystems::DestroySystem<CComponentFactoryManager>();
 	m_componentFactoryManager = nullptr;
-	CSystems::DestroySystem<CEntityManager>();
 }
 
 void CApplication::RegisterComponents()

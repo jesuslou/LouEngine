@@ -77,3 +77,26 @@ bool CHandle::operator==(const CHandle& rhs) const
 		m_elementPosition == rhs.m_elementPosition &&
 		m_version == rhs.m_version;
 }
+
+bool CHandle::Destroy()
+{
+	bool success = false;
+	if (*this)
+	{
+		if (m_elementType == CHandle::EElementType::Entity)
+		{
+			CEntity* entity = *this;
+			success = CSystems::GetSystem<CEntityManager>()->DestroyEntity(&entity);
+		}
+		else if (m_elementType == CHandle::EElementType::Component)
+		{
+			CComponent* component = *this;
+			success = CSystems::GetSystem<CComponentFactoryManager>()->DestroyComponent(&component);
+		}
+	}
+	if (success)
+	{
+		*this = CHandle();
+	}
+	return success;
+}
