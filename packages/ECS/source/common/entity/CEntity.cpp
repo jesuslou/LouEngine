@@ -186,9 +186,16 @@ void CEntity::Activate()
 				component->Activate();
 			}
 		}
+		--m_numDeactivations;
+
+		for (CEntity* child : m_children)
+		{
+			if(child)
+			{
+				child->ActivateFromParent();
+			}
+		}
 	}
-	--m_numDeactivations;
-	m_numDeactivations = m_numDeactivations < 0 ? 0 : m_numDeactivations;
 }
 
 void CEntity::Deactivate()
@@ -202,6 +209,38 @@ void CEntity::Deactivate()
 				component->Deactivate();
 			}
 		}
+		++m_numDeactivations;
+
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				child->DeactivateFromParent();
+			}
+		}
 	}
-	++m_numDeactivations;
+}
+
+void CEntity::ActivateFromParent()
+{
+	if (m_numDeactivations - 1 == 0)
+	{
+		Activate();
+	}
+	else
+	{
+		--m_numDeactivations;
+	}
+}
+
+void CEntity::DeactivateFromParent()
+{
+	if (m_numDeactivations == 0)
+	{
+		Deactivate();
+	}
+	else
+	{
+		++m_numDeactivations;
+	}
 }

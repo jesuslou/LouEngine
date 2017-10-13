@@ -99,6 +99,9 @@ private:
 	CEntity();
 	~CEntity();
 
+	void ActivateFromParent();
+	void DeactivateFromParent();
+
 	CHandle m_parent;
 	std::vector<CHandle> m_children;
 
