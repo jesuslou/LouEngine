@@ -29,6 +29,7 @@
 
 CEntity::CEntity()
 	: m_componentFactoryManager(*CSystems::GetSystem<CComponentFactoryManager>())
+	, m_tagsManager(*CSystems::GetSystem<CTagsManager>())
 	, m_numDeactivations(1)
 	, m_initialized(false)
 	, m_destroyed(false)

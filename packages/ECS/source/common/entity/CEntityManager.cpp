@@ -45,6 +45,7 @@ bool CEntityManager::DestroyEntity(CHandle handle)
 	CEntity* entity = handle;
 	if (entity)
 	{
+		entity->SetParent(nullptr);
 		entity->Destroy();
 		return DestroyElement(&entity);
 	}

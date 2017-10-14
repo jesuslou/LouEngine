@@ -44,13 +44,15 @@ int CTagsManager::GetTagIdx(CStrID tag) const
 	return -1;
 }
 
-void CTagsManager::SetTag(TagsMask& mask, CStrID tag)
+bool CTagsManager::SetTag(TagsMask& mask, CStrID tag, bool add)
 {
 	int tagIdx = GetTagIdx(tag);
 	if (tagIdx >= 0)
 	{
-		mask[tagIdx] = true;
+		mask[tagIdx] = add;
+		return true;
 	}
+	return false;
 }
 
 

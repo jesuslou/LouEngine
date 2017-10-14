@@ -198,7 +198,7 @@ TEST_F(CEntityComponentTest, check_cant_remove_component_twice)
 	EXPECT_NE(nullptr, entity);
 	CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_TRUE(static_cast<bool>(handle));
-	
+
 	bool success = entity->RemoveComponent("foo");
 	EXPECT_TRUE(success);
 	success = entity->RemoveComponent<EntityComponentTestInternal::CCompFoo>();

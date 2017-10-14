@@ -72,6 +72,116 @@ TEST_F(CTagsTest, register_tag_correct_value)
 	EXPECT_EQ(1, tagId2);
 }
 
+TEST_F(CTagsTest, check_add_tag)
+{
+	bool success = m_tagManager->RegisterTag("test");
+	EXPECT_TRUE(success);
+
+	TagsMask mask;
+	success = m_tagManager->SetTag(mask, "test", true);
+	EXPECT_TRUE(success);
+	success = m_tagManager->SetTag(mask, "test2", true);
+	EXPECT_FALSE(success);
+
+	success = m_tagManager->HasTag(mask, "test");
+	EXPECT_TRUE(success);
+	success = m_tagManager->HasTag(mask, "test2");
+	EXPECT_FALSE(success);
+}
+
+TEST_F(CTagsTest, check_remove_tag)
+{
+	bool success = m_tagManager->RegisterTag("test");
+	EXPECT_TRUE(success);
+
+	TagsMask mask;
+	success = m_tagManager->SetTag(mask, "test", true);
+	EXPECT_TRUE(success);
+	success = m_tagManager->HasTag(mask, "test");
+	EXPECT_TRUE(success);
+
+	success = m_tagManager->SetTag(mask, "test", false);
+	EXPECT_TRUE(success);
+	success = m_tagManager->HasTag(mask, "test");
+	EXPECT_FALSE(success);
+}
+
+TEST_F(CTagsTest, check_add_tags_in_bunch)
+{
+	bool success = m_tagManager->RegisterTag("test");
+	EXPECT_TRUE(success);
+	success = m_tagManager->RegisterTag("test2");
+	EXPECT_TRUE(success);
+
+	TagsMask mask;
+	success = m_tagManager->AddTags(mask, "test", "test2");
+	EXPECT_TRUE(success);
+
+	success = m_tagManager->HasTag(mask, "test");
+	EXPECT_TRUE(success);
+	success = m_tagManager->HasTag(mask, "test2");
+	EXPECT_TRUE(success);
+}
+
+TEST_F(CTagsTest, check_add_tags_in_bunch_with_incorrect_one)
+{
+	bool success = m_tagManager->RegisterTag("test");
+	EXPECT_TRUE(success);
+
+	TagsMask mask;
+	success = m_tagManager->AddTags(mask, "test3", "test", "test2");
+	EXPECT_FALSE(success);
+
+	success = m_tagManager->HasTag(mask, "test");
+	EXPECT_TRUE(success);
+	success = m_tagManager->HasTag(mask, "test2");
+	EXPECT_FALSE(success);
+}
+
+TEST_F(CTagsTest, check_remove_tags_in_bunch)
+{
+	bool success = m_tagManager->RegisterTag("test");
+	EXPECT_TRUE(success);
+	success = m_tagManager->RegisterTag("test2");
+	EXPECT_TRUE(success);
+
+	TagsMask mask;
+	success = m_tagManager->AddTags(mask, "test", "test2");
+	EXPECT_TRUE(success);
+
+	success = m_tagManager->HasTag(mask, "test");
+	EXPECT_TRUE(success);
+	success = m_tagManager->HasTag(mask, "test2");
+	EXPECT_TRUE(success);
+
+	success = m_tagManager->RemoveTags(mask, "test", "test2");
+	EXPECT_TRUE(success);
+
+	success = m_tagManager->HasTag(mask, "test");
+	EXPECT_FALSE(success);
+	success = m_tagManager->HasTag(mask, "test2");
+	EXPECT_FALSE(success);
+}
+
+TEST_F(CTagsTest, check_remove_tags_in_bunch_with_incorrect_one)
+{
+	bool success = m_tagManager->RegisterTag("test");
+	EXPECT_TRUE(success);
+
+	TagsMask mask;
+	success = m_tagManager->AddTags(mask, "test");
+	EXPECT_TRUE(success);
+
+	success = m_tagManager->HasTag(mask, "test");
+	EXPECT_TRUE(success);
+
+	success = m_tagManager->RemoveTags(mask, "test3", "test", "test2");
+	EXPECT_FALSE(success);
+
+	success = m_tagManager->HasTag(mask, "test");
+	EXPECT_FALSE(success);
+}
+
 TEST_F(CTagsTest, check_generate_tag_mask)
 {
 	bool success = m_tagManager->RegisterTag("test");

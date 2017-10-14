@@ -27,6 +27,7 @@
 #include <handle/CHandle.h>
 #include <common/CECSElement.h>
 #include <hash/CStrID.h>
+#include <tags/CTagsManager.h>
 
 #include <vector>
 
@@ -85,6 +86,87 @@ public:
 	bool RemoveComponent(CStrID nameId);
 	CHandle GetComponent(CStrID nameId);
 
+	template<typename... Args>
+	bool AddTags(Args... args)
+	{
+		return m_tagsManager.AddTags(m_tags, std::forward<Args>(args)...);
+	}
+	template<typename... Args>
+	bool RemoveTags(Args... args)
+	{
+		return m_tagsManager.RemoveTags(m_tags, std::forward<Args>(args)...);
+	}
+	template<typename... Args>
+	bool HasTags(Args... args)
+	{
+		return m_tagsManager.HasAllTags(m_tags, std::forward<Args>(args)...);
+	}
+	template<typename... Args>
+	bool HasAnyTag(Args... args)
+	{
+		return m_tagsManager.HasAnyTags(m_tags, std::forward<Args>(args)...);
+	}
+	template<typename... Args>
+	std::vector<CHandle> GetChildrenWithTags(Args... args)
+	{
+		std::vector<CHandle> children;
+		for (CEntity* child : m_children)
+		{
+			if (child && child->HasTags(std::forward<Args>(args)...))
+			{
+				children.emplace_back(child);
+			}
+		}
+		return children;
+	}
+	template<typename... Args>
+	std::vector<CHandle> GetChildrenWithTagsRecursive(Args... args)
+	{
+		std::vector<CHandle> children;
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				if (child->HasTags(std::forward<Args>(args)...))
+				{
+					children.emplace_back(child);
+				}
+				child->GetChildrenWithTagsRecursiveInternal(children, std::forward<Args>(args)...);
+			}
+		}
+		return children;
+	}
+	template<typename... Args>
+	std::vector<CHandle> GetChildrenWithAnyTag(Args... args)
+	{
+		std::vector<CHandle> children;
+		for (CEntity* child : m_children)
+		{
+			if (child && child->HasAnyTag(std::forward<Args>(args)...))
+			{
+				children.emplace_back(child);
+			}
+		}
+		return children;
+	}
+	template<typename... Args>
+	std::vector<CHandle> GetChildrenWithAnyTagRecursive(Args... args)
+	{
+		std::vector<CHandle> children;
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				if (child->HasAnyTag(std::forward<Args>(args)...))
+				{
+					children.emplace_back(child);
+				}
+				child->GetChildrenWithAnyTagRecursiveInternal(children, std::forward<Args>(args)...);
+			}
+		}
+		return children;
+	}
+
 	void Init() override;
 	void Destroy() override;
 
@@ -102,12 +184,47 @@ private:
 	void ActivateFromParent();
 	void DeactivateFromParent();
 
+	template<typename... Args>
+	void GetChildrenWithTagsRecursiveInternal(std::vector<CHandle>& children, Args... args)
+	{
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				if (child->HasTags(std::forward<Args>(args)...))
+				{
+					children.emplace_back(child);
+				}
+				child->GetChildrenWithTagsRecursiveInternal(children, std::forward<Args>(args)...);
+			}
+		}
+	}
+
+	template<typename... Args>
+	void GetChildrenWithAnyTagRecursiveInternal(std::vector<CHandle>& children, Args... args)
+	{
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				if (child->HasAnyTag(std::forward<Args>(args)...))
+				{
+					children.emplace_back(child);
+				}
+				child->GetChildrenWithAnyTagRecursiveInternal(children, std::forward<Args>(args)...);
+			}
+		}
+	}
+
 	CHandle m_parent;
 	std::vector<CHandle> m_children;
 
 	std::vector<CComponent*> m_components;
 
 	CComponentFactoryManager& m_componentFactoryManager;
+	CTagsManager& m_tagsManager;
+
+	TagsMask m_tags;
 
 	int m_numDeactivations;
 	bool m_initialized;

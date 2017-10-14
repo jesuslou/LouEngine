@@ -221,3 +221,23 @@ TEST_F(CEntityTest, entity_delete_also_deletes_children)
 	EXPECT_FALSE(static_cast<bool>(parent));
 	EXPECT_FALSE(static_cast<bool>(child));
 }
+
+TEST_F(CEntityTest, entity_delete_removes_itself_from_its_parent)
+{
+	CHandle parent = m_entityManager->GetNewElement();
+	EXPECT_TRUE(static_cast<bool>(parent));
+	CHandle child = m_entityManager->GetNewElement();
+	EXPECT_TRUE(static_cast<bool>(child));
+
+	CEntity* parentEntity = parent;
+	bool success = parentEntity->AddChild(child);
+	EXPECT_TRUE(success);
+	EXPECT_EQ(1, parentEntity->GetChildrenCount());
+	EXPECT_TRUE(parentEntity->HasChild(child));
+
+	m_entityManager->DestroyEntity(child);
+	EXPECT_FALSE(static_cast<bool>(child));
+
+	EXPECT_EQ(0, parentEntity->GetChildrenCount());
+	EXPECT_FALSE(parentEntity->HasChild(child));
+}

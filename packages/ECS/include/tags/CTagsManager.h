@@ -36,9 +36,21 @@ class CTagsManager
 public:
 	bool RegisterTag(CStrID tag);
 	int GetTagIdx(CStrID tag) const;
-	void SetTag(TagsMask& mask, CStrID tag);
+	bool SetTag(TagsMask& mask, CStrID tag, bool add);
 
 	bool HasTag(const TagsMask& mask, CStrID tag) const;
+
+	template<typename... Args>
+	bool AddTags(TagsMask& mask, Args... args)
+	{
+		return AddTagsInternal(mask, CStrID(args)...);
+	}
+
+	template<typename... Args>
+	bool RemoveTags(TagsMask& mask, Args... args)
+	{
+		return RemoveTagsInternal(mask, CStrID(args)...);
+	}
 
 	template<typename... Args>
 	TagsMask GetTagMask(Args... args)
@@ -62,15 +74,39 @@ public:
 
 private:
 	template<typename... Args>
+	bool AddTagsInternal(TagsMask& mask, CStrID tag, Args... args)
+	{
+		bool success = SetTag(mask, tag, true);
+		return AddTagsInternal(mask, args...) && success;
+	}
+
+	bool AddTagsInternal(TagsMask& mask, CStrID tag)
+	{
+		return SetTag(mask, tag, true);
+	}
+
+	template<typename... Args>
+	bool RemoveTagsInternal(TagsMask& mask, CStrID tag, Args... args)
+	{
+		bool success = SetTag(mask, tag, false);
+		return RemoveTagsInternal(mask, args...) && success;
+	}
+
+	bool RemoveTagsInternal(TagsMask& mask, CStrID tag)
+	{
+		return SetTag(mask, tag, false);
+	}
+
+	template<typename... Args>
 	void GetTagMaskInternal(TagsMask& mask, CStrID tag, Args... args)
 	{
-		SetTag(mask, tag);
+		SetTag(mask, tag, true);
 		GetTagMaskInternal(mask, args...);
 	}
 
 	void GetTagMaskInternal(TagsMask& mask, CStrID tag)
 	{
-		SetTag(mask, tag);
+		SetTag(mask, tag, true);
 	}
 
 	template<typename... Args>
