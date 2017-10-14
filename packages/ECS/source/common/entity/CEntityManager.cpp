@@ -26,7 +26,7 @@
 #include <handle/CHandle.h>
 
 CEntityManager::CEntityManager()
-	: CFactory(CHandle::MAX_ELEMENTS)
+	: CFactory(MAX_ENTITIES)
 {
 }
 

@@ -29,8 +29,6 @@
 #include <bitset>
 #include <map>
 
-#define MAX_TAGS 64
-
 using TagsMask = std::bitset<MAX_TAGS>;
 
 class CTagsManager
