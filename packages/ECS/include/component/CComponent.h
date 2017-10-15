@@ -27,6 +27,11 @@
 #include <handle/CHandle.h>
 #include <common/CECSElement.h>
 
+namespace Json
+{
+	class Value;
+}
+
 class CComponent : public CECSElement
 {
 	template<class CComponent> friend class CFactory;
@@ -49,6 +54,8 @@ public:
 	bool IsInitialized() const { return m_initialized; }
 	bool IsActive() const { return m_isActive; }
 	bool IsDestroyed() const { return m_destroyed; }
+
+	virtual void ParseAtts(const Json::Value& atts) {}
 
 protected:
 	CComponent();

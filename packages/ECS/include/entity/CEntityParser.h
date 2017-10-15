@@ -22,32 +22,34 @@
 //
 ////////////////////////////////////////////////////////////
 
-#include <entity/CEntityManager.h>
-#include <handle/CHandle.h>
+#pragma once
 
-CEntityManager::CEntityManager()
-	: CFactory(MAX_ENTITIES)
+#include <common/CFactory.h>
+#include <entity/CEntity.h>
+
+class CEntity;
+class CEntityManager;
+
+namespace Json
 {
+	class Value;
 }
 
-bool CEntityManager::DestroyEntity(CEntity** entity)
+class CEntityParser
 {
-	if (*entity)
-	{
-		(*entity)->Destroy();
-		return DestroyElement(entity);
-	}
-	return false;
-}
+public:
+	CEntityParser();
 
-bool CEntityManager::DestroyEntity(CHandle handle)
-{
-	CEntity* entity = handle;
-	if (entity)
-	{
-		entity->SetParent(nullptr);
-		entity->Destroy();
-		return DestroyElement(&entity);
-	}
-	return false;
-}
+	CHandle ParseScene(const char* const path);
+	CHandle ParseSceneFromJson(const char* const jsonStr);
+
+private:
+	CHandle ParseEntity(Json::Value& entityData, CEntity* parent);
+	CHandle ParsePrefab(Json::Value& entityData);
+
+	bool ParseTags(Json::Value& tags, CEntity* entity);
+	bool ParseComponents(Json::Value& components, CEntity* entity);
+	bool ParseChildren(Json::Value& children, CEntity* entity);
+
+	CEntityManager& m_entityManager;
+};

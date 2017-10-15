@@ -53,6 +53,17 @@ public:
 	CComponentFactoryManager *m_componentFactoryManager;
 };
 
+TEST_F(CEntityTest, entity_set_name)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	static const std::string entityName("TestName");
+	entity->SetName(entityName.c_str());
+	const std::string& name = entity->GetName();
+
+	EXPECT_EQ(name, entityName);
+}
+
 TEST_F(CEntityTest, entity_created_uninitalized_and_deactivated)
 {
 	CEntity* entity = m_entityManager->GetNewElement();

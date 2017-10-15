@@ -32,6 +32,7 @@
 #include <systems/CSystems.h>
 #include <entity/CEntityManager.h>
 #include <component/CComponentFactoryManager.h>
+#include <tags/CTagsManager.h>
 
 #include <SFML/Config.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -142,6 +143,7 @@ void CApplication::Destroy()
 
 	CSystems::DestroySystem<CEntityManager>();
 	CSystems::DestroySystem<CComponentFactoryManager>();
+	CSystems::DestroySystem<CTagsManager>();
 	m_componentFactoryManager = nullptr;
 }
 
@@ -151,6 +153,7 @@ void CApplication::RegisterComponents()
 
 	m_componentFactoryManager = new CComponentFactoryManager();
 	m_gameSystems.SetSystem<CComponentFactoryManager>(m_componentFactoryManager);
-
+	m_gameSystems.SetSystem<CTagsManager>(new CTagsManager());
+	
 	RegisterComponentsProject();
 }

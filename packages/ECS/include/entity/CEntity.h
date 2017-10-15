@@ -177,6 +177,9 @@ public:
 	bool IsActive() const { return m_numDeactivations == 0; }
 	bool IsDestroyed() const { return m_destroyed; }
 
+	void SetName(const char* const name) { m_name = name; }
+	const std::string& GetName() const { return m_name; }
+
 private:
 	CEntity();
 	~CEntity();
@@ -225,6 +228,8 @@ private:
 	CTagsManager& m_tagsManager;
 
 	TagsMask m_tags;
+
+	std::string m_name;
 
 	int m_numDeactivations;
 	bool m_initialized;
