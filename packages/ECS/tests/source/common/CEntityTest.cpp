@@ -188,6 +188,93 @@ TEST_F(CEntityTest, entity_remove_child_twice_fails)
 	EXPECT_FALSE(success);
 }
 
+TEST_F(CEntityTest, get_children_by_name)
+{
+	static const char* const CHILD_NAME("Test");
+	CEntity* parent = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, parent);
+	CEntity* child = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child);
+	child->SetName(CHILD_NAME);
+
+	bool success = parent->AddChild(child);
+	EXPECT_TRUE(success);
+	EXPECT_EQ(1, parent->GetChildrenCount());
+	EXPECT_TRUE(parent->HasChild(child));
+
+	CHandle childHandle = parent->GetChildByName(CHILD_NAME);
+	EXPECT_TRUE(static_cast<bool>(childHandle));
+	child = childHandle;
+	EXPECT_EQ(child->GetName(), std::string(CHILD_NAME));
+}
+
+TEST_F(CEntityTest, get_children_by_invalid_name_return_invalid_handle)
+{
+	static const char* const CHILD_NAME("Test");
+	static const char* const WRONG_NAME("Test2");
+	CEntity* parent = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, parent);
+	CEntity* child = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child);
+	child->SetName("Test");
+
+	bool success = parent->AddChild(child);
+	EXPECT_TRUE(success);
+	EXPECT_EQ(1, parent->GetChildrenCount());
+	EXPECT_TRUE(parent->HasChild(child));
+
+	CHandle childHandle = parent->GetChildByName(WRONG_NAME);
+	EXPECT_FALSE(static_cast<bool>(childHandle));
+}
+
+TEST_F(CEntityTest, get_children_by_index)
+{
+	static const char* const CHILD_NAME("Test");
+	CEntity* parent = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, parent);
+	CEntity* child = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child);
+	child->SetName(CHILD_NAME);
+
+	bool success = parent->AddChild(child);
+	EXPECT_TRUE(success);
+	EXPECT_EQ(1, parent->GetChildrenCount());
+	EXPECT_TRUE(parent->HasChild(child));
+
+	CHandle childHandle = parent->GetChildByIndex(0);
+	EXPECT_TRUE(static_cast<bool>(childHandle));
+	child = childHandle;
+	EXPECT_EQ(child->GetName(), std::string(CHILD_NAME));
+}
+
+TEST_F(CEntityTest, get_children_by_invalid_index_return_invalid_handle)
+{
+	static const char* const CHILD_NAME("Test");
+	CEntity* parent = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, parent);
+	CEntity* child = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child);
+	child->SetName(CHILD_NAME);
+
+	bool success = parent->AddChild(child);
+	EXPECT_TRUE(success);
+	EXPECT_EQ(1, parent->GetChildrenCount());
+	EXPECT_TRUE(parent->HasChild(child));
+
+	CHandle childHandle = parent->GetChildByIndex(1);
+	EXPECT_FALSE(static_cast<bool>(childHandle));
+}
+
+TEST_F(CEntityTest, get_children_by_index_with_no_children)
+{
+	static const char* const CHILD_NAME("Test");
+	CEntity* parent = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, parent);
+
+	CHandle childHandle = parent->GetChildByIndex(1);
+	EXPECT_FALSE(static_cast<bool>(childHandle));
+}
+
 TEST_F(CEntityTest, entity_change_entity_parent)
 {
 	CEntity* parent1 = m_entityManager->GetNewElement();

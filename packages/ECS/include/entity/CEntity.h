@@ -81,6 +81,8 @@ public:
 	bool RemoveChild(CHandle child);
 	bool HasChild(CHandle child) const;
 	int GetChildrenCount() const { return m_children.size(); }
+	CHandle GetChildByName(const std::string& name);
+	CHandle GetChildByIndex(std::size_t index);
 
 	CHandle AddComponent(CStrID nameId);
 	bool RemoveComponent(CStrID nameId);

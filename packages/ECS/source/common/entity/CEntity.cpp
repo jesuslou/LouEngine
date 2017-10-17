@@ -106,6 +106,27 @@ bool CEntity::HasChild(CHandle child) const
 	return std::find(m_children.begin(), m_children.end(), child) != m_children.end();
 }
 
+CHandle CEntity::GetChildByName(const std::string& name)
+{
+	for (CEntity* child : m_children)
+	{
+		if (child && child->GetName() == name)
+		{
+			return child;
+		}
+	}
+	return CHandle();
+}
+
+CHandle CEntity::GetChildByIndex(std::size_t index)
+{
+	if (index >= 0 && index < m_children.size())
+	{
+		return m_children[index];
+	}
+	return CHandle();
+}
+
 CHandle CEntity::AddComponent(CStrID nameId)
 {
 	CComponent* component = m_componentFactoryManager.AddComponent(nameId, m_components);
