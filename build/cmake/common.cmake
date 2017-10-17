@@ -136,6 +136,8 @@ function(generate_tests name)
 		if(ide_group)
 			set_target_properties ("${project_name}" PROPERTIES FOLDER "${ide_group}/tests")
 		endif()
+		
+		target_compile_definitions("${name}" PUBLIC -DTESTS_ENABLED)
 	endif()
 endfunction(generate_tests)
 

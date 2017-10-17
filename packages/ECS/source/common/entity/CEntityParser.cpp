@@ -67,7 +67,12 @@ CHandle CEntityParser::ParseSceneFromJson(const char* const jsonStr)
 	{
 		if (rootEntity["type"].asString() == "entity")
 		{
-			result = ParseEntity(rootEntity, nullptr);
+			CEntity* entity = ParseEntity(rootEntity, nullptr);
+			if (entity)
+			{
+				entity->Init();
+				entity->CheckFirstActivation();
+			}
 		}
 		else if (rootEntity["type"].asString() == "prefab")
 		{
@@ -82,6 +87,8 @@ CHandle CEntityParser::ParseEntity(Json::Value& entityData, CEntity* parent)
 {
 	CEntity* entity = m_entityManager.GetNewElement();
 	entity->SetName(entityData["name"].asCString());
+	bool initiallyActive = !entityData["initiallyActive"].empty() ? entityData["initiallyActive"].asBool() : true;
+	entity->SetIsInitiallyActive(initiallyActive);
 	
 	ParseTags(entityData["tags"], entity);
 	ParseComponents(entityData["components"], entity);

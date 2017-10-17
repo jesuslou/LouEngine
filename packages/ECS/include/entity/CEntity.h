@@ -30,6 +30,7 @@
 #include <tags/CTagsManager.h>
 
 #include <vector>
+#include <functional>
 
 class CComponent;
 class CComponentFactoryManager;
@@ -182,12 +183,20 @@ public:
 	void SetName(const char* const name) { m_name = name; }
 	const std::string& GetName() const { return m_name; }
 
+	bool GetIsInitiallyActive() const { return m_initiallyActive; }
+	void SetIsInitiallyActive(bool initiallyActive) { m_initiallyActive = initiallyActive; }
+	void CheckFirstActivation();
+
 private:
 	CEntity();
 	~CEntity();
 
 	void ActivateFromParent();
-	void DeactivateFromParent();
+	void ActivateInternal();
+	void CheckFirstActivationInternal();
+
+	void PerformActionToAllChildren(std::function<void(CEntity*)> function);
+	void PerformActionToAllComponents(std::function<void(CComponent*)> function);
 
 	template<typename... Args>
 	void GetChildrenWithTagsRecursiveInternal(std::vector<CHandle>& children, Args... args)
@@ -236,4 +245,5 @@ private:
 	int m_numDeactivations;
 	bool m_initialized;
 	bool m_destroyed;
+	bool m_initiallyActive;
 };

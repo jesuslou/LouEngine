@@ -267,7 +267,7 @@ TEST_F(CEntityComponentTest, activate_entity_activates_components)
 	EXPECT_NE(nullptr, entity);
 	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_NE(nullptr, component);
-
+	entity->Init();
 	EXPECT_FALSE(entity->IsActive());
 	EXPECT_FALSE(component->IsActive());
 	entity->Activate();
@@ -281,6 +281,8 @@ TEST_F(CEntityComponentTest, deactivate_entity_deactivates_components)
 	EXPECT_NE(nullptr, entity);
 	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_NE(nullptr, component);
+
+	entity->Init();
 
 	EXPECT_FALSE(entity->IsActive());
 	EXPECT_FALSE(component->IsActive());

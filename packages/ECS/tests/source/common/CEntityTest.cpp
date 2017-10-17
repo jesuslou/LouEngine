@@ -30,6 +30,11 @@
 
 #include <gtest/gtest.h>
 
+namespace EntityTestInternal
+{
+	const int N_LOOP_ITERATIONS = 5;
+}
+
 class CEntityTest : public ::testing::Test
 {
 public:
@@ -70,18 +75,6 @@ TEST_F(CEntityTest, entity_created_uninitalized_and_deactivated)
 	EXPECT_NE(nullptr, entity);
 
 	EXPECT_FALSE(entity->IsInitialized());
-	EXPECT_FALSE(entity->IsActive());
-}
-
-TEST_F(CEntityTest, entity_not_activated_on_initialization)
-{
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-
-	EXPECT_FALSE(entity->IsInitialized());
-	EXPECT_FALSE(entity->IsActive());
-	entity->Init();
-	EXPECT_TRUE(entity->IsInitialized());
 	EXPECT_FALSE(entity->IsActive());
 }
 
@@ -338,4 +331,482 @@ TEST_F(CEntityTest, entity_delete_removes_itself_from_its_parent)
 
 	EXPECT_EQ(0, parentEntity->GetChildrenCount());
 	EXPECT_FALSE(parentEntity->HasChild(child));
+}
+
+TEST_F(CEntityTest, entity_not_activated_on_initialization)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+
+	EXPECT_FALSE(entity->IsInitialized());
+	EXPECT_FALSE(entity->IsActive());
+	entity->Init();
+	EXPECT_TRUE(entity->IsInitialized());
+	EXPECT_FALSE(entity->IsActive());
+}
+
+TEST_F(CEntityTest, entity_CheckFirstActivation_with_initiallyActive_true)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	entity->SetIsInitiallyActive(true);
+	entity->Init();
+	entity->CheckFirstActivation();
+	EXPECT_TRUE(entity->IsActive());
+}
+
+TEST_F(CEntityTest, entity_CheckFirstActivation_with_initiallyActive_false)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	entity->SetIsInitiallyActive(false);
+	entity->Init();
+	entity->CheckFirstActivation();
+	EXPECT_FALSE(entity->IsActive());
+}
+
+TEST_F(CEntityTest, entity_CheckFirstActivation_not_working_without_init_called_first)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	entity->SetIsInitiallyActive(true);
+	entity->CheckFirstActivation();
+	EXPECT_FALSE(entity->IsActive());
+}
+
+TEST_F(CEntityTest, entity_activate)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	entity->SetIsInitiallyActive(false);
+	entity->CheckFirstActivation();
+	entity->Init();
+	EXPECT_FALSE(entity->IsActive());
+	entity->Activate();
+	EXPECT_TRUE(entity->IsActive());
+}
+
+TEST_F(CEntityTest, entity_deactivate)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	entity->Init();
+	entity->SetIsInitiallyActive(true);
+	entity->CheckFirstActivation();
+	EXPECT_TRUE(entity->IsActive());
+	entity->Deactivate();
+	EXPECT_FALSE(entity->IsActive());
+}
+
+TEST_F(CEntityTest, entity_init_initalizes_children)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+
+	EXPECT_FALSE(entity->IsInitialized());
+	EXPECT_FALSE(child1->IsInitialized());
+	EXPECT_FALSE(child11->IsInitialized());
+
+	entity->Init();
+
+	EXPECT_TRUE(entity->IsInitialized());
+	EXPECT_TRUE(child1->IsInitialized());
+	EXPECT_TRUE(child11->IsInitialized());
+}
+
+TEST_F(CEntityTest, entity_activate_activates_children)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+
+	entity->Activate();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(child1->IsActive());
+	EXPECT_TRUE(child11->IsActive());
+}
+
+TEST_F(CEntityTest, entity_activate_deactivates_children)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+
+	entity->Activate();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(child1->IsActive());
+	EXPECT_TRUE(child11->IsActive());
+
+	entity->Deactivate();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+}
+
+TEST_F(CEntityTest, entity_intial_activate_true_activates_children)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+
+	entity->SetIsInitiallyActive(true);
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+
+	entity->CheckFirstActivation();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(child1->IsActive());
+	EXPECT_TRUE(child11->IsActive());
+}
+
+TEST_F(CEntityTest, entity_initialllyActive_false_dont_activates_children)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+
+	entity->SetIsInitiallyActive(false);
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+
+	entity->CheckFirstActivation();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+}
+
+TEST_F(CEntityTest, entity_child_initialllyActive_false_breaks_activation_chain)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	CEntity* child111 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child111);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+	child11->AddChild(child111);
+
+	entity->SetIsInitiallyActive(true);
+	child1->SetIsInitiallyActive(false);
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	entity->CheckFirstActivation();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+}
+
+TEST_F(CEntityTest, parent_activate_doesnt_activate_inactive_child)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	CEntity* child111 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child111);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+	child11->AddChild(child111);
+
+	entity->SetIsInitiallyActive(true);
+	child1->SetIsInitiallyActive(false);
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	entity->CheckFirstActivation();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	for (int i = 0; i < EntityTestInternal::N_LOOP_ITERATIONS; ++i)
+	{
+		entity->Activate();
+
+		EXPECT_TRUE(entity->IsActive());
+		EXPECT_FALSE(child1->IsActive());
+		EXPECT_FALSE(child11->IsActive());
+		EXPECT_FALSE(child111->IsActive());
+	}
+}
+
+TEST_F(CEntityTest, child_activate_after_being_deactivated_activate_children)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	CEntity* child111 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child111);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+	child11->AddChild(child111);
+
+	entity->SetIsInitiallyActive(true);
+	child1->SetIsInitiallyActive(false);
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	entity->CheckFirstActivation();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	child1->Activate();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(child1->IsActive());
+	EXPECT_TRUE(child11->IsActive());
+	EXPECT_TRUE(child111->IsActive());
+}
+
+TEST_F(CEntityTest, child_activate_after_being_deactivated_activate_children_but_no_parent)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	CEntity* child111 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child111);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+	child11->AddChild(child111);
+
+	entity->SetIsInitiallyActive(true);
+	child1->SetIsInitiallyActive(false);
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	entity->CheckFirstActivation();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	child11->Activate();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_TRUE(child11->IsActive());
+	EXPECT_TRUE(child111->IsActive());
+}
+
+TEST_F(CEntityTest, deactivating_deactivated_entity_deactivates_its_children)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	CEntity* child111 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child111);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+	child11->AddChild(child111);
+
+	entity->SetIsInitiallyActive(true);
+	child1->SetIsInitiallyActive(false);
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	entity->CheckFirstActivation();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	child11->Activate();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_TRUE(child11->IsActive());
+	EXPECT_TRUE(child111->IsActive());
+
+	child1->Deactivate();
+
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+}
+
+TEST_F(CEntityTest, accumulated_deactivation_on_initialization)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	CEntity* child111 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child111);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+	child11->AddChild(child111);
+
+	entity->SetIsInitiallyActive(true);
+	child1->SetIsInitiallyActive(false);
+	child11->SetIsInitiallyActive(false);
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	entity->CheckFirstActivation();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	for (int i = 0; i < EntityTestInternal::N_LOOP_ITERATIONS; ++i)
+	{
+		child1->Activate();
+
+		EXPECT_TRUE(entity->IsActive());
+		EXPECT_TRUE(child1->IsActive());
+		EXPECT_FALSE(child11->IsActive());
+		EXPECT_FALSE(child111->IsActive());
+	}
+}
+
+TEST_F(CEntityTest, accumulated_deactivation_on_initialization_two_levels)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CEntity* child1 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child1);
+	CEntity* child11 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child11);
+	CEntity* child111 = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, child111);
+	entity->AddChild(child1);
+	child1->AddChild(child11);
+	child11->AddChild(child111);
+
+	entity->SetIsInitiallyActive(true);
+	child1->SetIsInitiallyActive(false);
+	child11->SetIsInitiallyActive(false);
+	child111->SetIsInitiallyActive(false);
+	entity->Init();
+
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	entity->CheckFirstActivation();
+
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(child1->IsActive());
+	EXPECT_FALSE(child11->IsActive());
+	EXPECT_FALSE(child111->IsActive());
+
+	for (int i = 0; i < EntityTestInternal::N_LOOP_ITERATIONS; ++i)
+	{
+		child1->Activate();
+
+		EXPECT_TRUE(entity->IsActive());
+		EXPECT_TRUE(child1->IsActive());
+		EXPECT_FALSE(child11->IsActive());
+		EXPECT_FALSE(child111->IsActive());
+	}
+
+	for (int i = 0; i < EntityTestInternal::N_LOOP_ITERATIONS; ++i)
+	{
+		child11->Activate();
+
+		EXPECT_TRUE(entity->IsActive());
+		EXPECT_TRUE(child1->IsActive());
+		EXPECT_TRUE(child11->IsActive());
+		EXPECT_FALSE(child111->IsActive());
+	}
 }
