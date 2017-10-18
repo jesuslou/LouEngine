@@ -52,13 +52,20 @@ public:
 	void Deactivate() override;
 
 	bool IsInitialized() const { return m_initialized; }
-	bool IsActive() const { return m_isActive; }
+	bool IsActive() const { return m_numDeactivations == 0; }
 	bool IsDestroyed() const { return m_destroyed; }
 
 	virtual void ParseAtts(const Json::Value& atts) {}
 
+	bool GetIsInitiallyActive() const { return m_initiallyActive; }
+	void SetIsInitiallyActive(bool initiallyActive) { m_initiallyActive = initiallyActive; }
+	void CheckFirstActivation();
+	void ActivateFromParent();
+
 protected:
 	CComponent();
+
+	void CheckFirstActivationInternal();
 
 	virtual void DoInit() {}
 	virtual void DoUpdate(float dt) {}
@@ -68,7 +75,8 @@ protected:
 
 	CHandle m_owner;
 
-	bool m_isActive;
+	int m_numDeactivations;
 	bool m_initialized;
 	bool m_destroyed;
+	bool m_initiallyActive;
 };

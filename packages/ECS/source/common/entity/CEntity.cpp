@@ -162,8 +162,20 @@ void CEntity::Init()
 {
 	if (!m_initialized)
 	{
-		PerformActionToAllComponents([](CComponent* component) { component->Init(); });
-		PerformActionToAllChildren([](CEntity* child) { child->Init(); });
+		for (CComponent* component : m_components)
+		{
+			if (component)
+			{
+				component->Init();
+			}
+		}
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				child->Init();
+			}
+		}
 
 		m_initialized = true;
 	}
@@ -173,10 +185,22 @@ void CEntity::Destroy()
 {
 	if (!m_destroyed)
 	{
-		PerformActionToAllComponents([this](CComponent* component) { m_componentFactoryManager.DestroyComponent(&component); });
+		for (CComponent* component : m_components)
+		{
+			if (component)
+			{
+				m_componentFactoryManager.DestroyComponent(&component);
+			}
+		}
 
 		CEntityManager* entityManager = CSystems::GetSystem<CEntityManager>();
-		PerformActionToAllChildren([entityManager](CEntity* child) { entityManager->DestroyEntity(&child); });
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				entityManager->DestroyEntity(&child);
+			}
+		}
 
 		m_destroyed = true;
 	}
@@ -197,12 +221,22 @@ void CEntity::Deactivate()
 	{
 		if (m_numDeactivations == 0)
 		{
-			PerformActionToAllComponents([](CComponent* component) { component->Deactivate(); });
+			for (CComponent* component : m_components)
+			{
+				if (component)
+				{
+					component->Deactivate();
+				}
+			}
+			++m_numDeactivations;
 		}
-
-		PerformActionToAllChildren([](CEntity* child) { child->Deactivate(); });
-
-		++m_numDeactivations;
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				child->Deactivate();
+			}
+		}
 	}
 }
 
@@ -220,22 +254,50 @@ void CEntity::ActivateFromParent()
 
 void CEntity::ActivateInternal()
 {
-	PerformActionToAllComponents([](CComponent* component) { component->Activate(); });
-	PerformActionToAllChildren([](CEntity* child) { child->ActivateFromParent(); });
+	for (CComponent* component : m_components)
+	{
+		if (component)
+		{
+			component->ActivateFromParent();
+		}
+	}
+	for (CEntity* child : m_children)
+	{
+		if (child)
+		{
+			child->ActivateFromParent();
+		}
+	}
 }
 
 void CEntity::CheckFirstActivation()
 {
 	if (m_initialized)
 	{
-		PerformActionToAllChildren([](CEntity* child) { child->CheckFirstActivationInternal(); });
+		for (CEntity* child : m_children)
+		{
+			if (child)
+			{
+				child->CheckFirstActivationInternal();
+			}
+		}
+
+		for (CComponent* component : m_components)
+		{
+			if (component)
+			{
+				component->CheckFirstActivation();
+			}
+		}
 
 		if (GetIsInitiallyActive())
 		{
+			m_numDeactivations = 1;
 			ActivateFromParent();
 		}
 		else
 		{
+			m_numDeactivations = 0;
 			Deactivate();
 		}
 	}
@@ -250,28 +312,20 @@ void CEntity::CheckFirstActivationInternal()
 			++m_numDeactivations;
 		}
 
-		PerformActionToAllChildren([](CEntity* child) { child->CheckFirstActivationInternal(); });
-	}
-}
-
-void CEntity::PerformActionToAllChildren(std::function<void(CEntity*)> function)
-{
-	for (CEntity* child : m_children)
-	{
-		if (child)
+		for (CComponent* component : m_components)
 		{
-			function(child);
+			if (component)
+			{
+				component->CheckFirstActivation();
+			}
 		}
-	}
-}
 
-void CEntity::PerformActionToAllComponents(std::function<void(CComponent*)> function)
-{
-	for (CComponent* component : m_components)
-	{
-		if (component)
+		for (CEntity* child : m_children)
 		{
-			function(component);
+			if (child)
+			{
+				child->CheckFirstActivationInternal();
+			}
 		}
 	}
 }

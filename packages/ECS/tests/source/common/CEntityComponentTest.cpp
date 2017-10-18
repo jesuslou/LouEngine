@@ -33,28 +33,13 @@
 
 namespace EntityComponentTestInternal
 {
+	const int LOOP_COUNT = 5;
+
 	class CCompFoo : public CComponent
 	{};
 
 	class CCompBar : public CComponent
 	{};
-
-	class CCompActivationTest : public CComponent
-	{
-	public:
-		CCompActivationTest() : m_foo(0) {}
-		void DoActivate() override
-		{
-			++m_foo;
-		}
-
-		void DoDeactivate() override
-		{
-			--m_foo;
-		}
-
-		int m_foo;
-	};
 }
 
 class CEntityComponentTest : public ::testing::Test
@@ -68,15 +53,51 @@ public:
 		m_gameSystems.SetSystem<CComponentFactoryManager>(m_componentFactoryManager);
 		m_gameSystems.SetSystem<CEntityManager>(m_entityManager);
 
-		ADD_COMPONENT_FACTORY("foo", EntityComponentTestInternal::CCompFoo, 1);
+		ADD_COMPONENT_FACTORY("foo", EntityComponentTestInternal::CCompFoo, 10);
 		ADD_COMPONENT_FACTORY("bar", EntityComponentTestInternal::CCompBar, 1);
-		ADD_COMPONENT_FACTORY("activationTest", EntityComponentTestInternal::CCompActivationTest, 1);
 	}
 
 	~CEntityComponentTest()
 	{
 		m_gameSystems.DestroySystem<CEntityManager>();
 		m_gameSystems.DestroySystem<CComponentFactoryManager>();
+	}
+
+	std::tuple<CEntity*, CEntity*, CComponent*, CComponent*> GetEntityWithChildren()
+	{
+		CEntity* entity = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity);
+		CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, component);
+		CEntity* entity1 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity1);
+		CComponent* component1 = entity1->AddComponent<EntityComponentTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, component1);
+
+		entity->AddChild(entity1);
+
+		return std::make_tuple(entity, entity1, component, component1);
+	}
+
+	std::tuple<CEntity*, CEntity*, CEntity*, CComponent*, CComponent*, CComponent*> GetEntityWithChildrenRecursive()
+	{
+		CEntity* entity = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity);
+		CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, component);
+		CEntity* entity1 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity1);
+		CComponent* component1 = entity1->AddComponent<EntityComponentTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, component1);
+		CEntity* entity11 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity11);
+		CComponent* component11 = entity11->AddComponent<EntityComponentTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, component11);
+
+		entity->AddChild(entity1);
+		entity1->AddChild(entity11);
+
+		return std::make_tuple(entity, entity1, entity11, component, component1, component11);
 	}
 
 	CGameSystems m_gameSystems;
@@ -186,9 +207,9 @@ TEST_F(CEntityComponentTest, check_cant_add_component_twice)
 {
 	CEntity* entity = m_entityManager->GetNewElement();
 	EXPECT_NE(nullptr, entity);
-	CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompBar>();
 	EXPECT_TRUE(static_cast<bool>(handle));
-	handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	handle = entity->AddComponent<EntityComponentTestInternal::CCompBar>();
 	EXPECT_FALSE(static_cast<bool>(handle));
 }
 
@@ -275,6 +296,36 @@ TEST_F(CEntityComponentTest, activate_entity_activates_components)
 	EXPECT_TRUE(component->IsActive());
 }
 
+TEST_F(CEntityComponentTest, entity_activate_activates_components_children)
+{
+	CEntity* entity, *entity1 = nullptr;
+	CComponent* component, *component1 = nullptr;
+	std::tie(entity, entity1, component, component1) = GetEntityWithChildren();
+
+	entity->Init();
+	EXPECT_FALSE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
+	entity->Activate();
+	EXPECT_TRUE(component->IsActive());
+	EXPECT_TRUE(component1->IsActive());
+}
+
+TEST_F(CEntityComponentTest, entity_activate_activates_components_children_recursive)
+{
+	CEntity* entity, *entity1, *entity11 = nullptr;
+	CComponent* component, *component1, *component11 = nullptr;
+	std::tie(entity, entity1, entity11, component, component1, component11) = GetEntityWithChildrenRecursive();
+
+	entity->Init();
+	EXPECT_FALSE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
+	EXPECT_FALSE(component11->IsActive());
+	entity->Activate();
+	EXPECT_TRUE(component->IsActive());
+	EXPECT_TRUE(component1->IsActive());
+	EXPECT_TRUE(component11->IsActive());
+}
+
 TEST_F(CEntityComponentTest, deactivate_entity_deactivates_components)
 {
 	CEntity* entity = m_entityManager->GetNewElement();
@@ -295,36 +346,332 @@ TEST_F(CEntityComponentTest, deactivate_entity_deactivates_components)
 	EXPECT_FALSE(component->IsActive());
 }
 
-TEST_F(CEntityComponentTest, check_doActivate_method_only_called_once)
+TEST_F(CEntityComponentTest, deactivate_entity_deactivates_components_children)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	EntityComponentTestInternal::CCompActivationTest* component = entity->AddComponent<EntityComponentTestInternal::CCompActivationTest>();
-	EXPECT_NE(nullptr, component);
+	CEntity* entity, *entity1 = nullptr;
+	CComponent* component, *component1 = nullptr;
+	std::tie(entity, entity1, component, component1) = GetEntityWithChildren();
 
 	entity->Init();
 
-	EXPECT_EQ(0, component->m_foo);
+	EXPECT_FALSE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
 	entity->Activate();
-	EXPECT_EQ(1, component->m_foo);
-	entity->Activate();
-	EXPECT_EQ(1, component->m_foo);
+	EXPECT_TRUE(component->IsActive());
+	EXPECT_TRUE(component1->IsActive());
+
+	entity->Deactivate();
+	EXPECT_FALSE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
 }
 
-TEST_F(CEntityComponentTest, check_doDectivate_method_only_called_once)
+TEST_F(CEntityComponentTest, deactivate_entity_deactivates_components_children_recursive)
+{
+	CEntity* entity, *entity1, *entity11 = nullptr;
+	CComponent* component, *component1, *component11 = nullptr;
+	std::tie(entity, entity1, entity11, component, component1, component11) = GetEntityWithChildrenRecursive();
+
+	entity->Init();
+
+	EXPECT_FALSE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
+	EXPECT_FALSE(component11->IsActive());
+	entity->Activate();
+	EXPECT_TRUE(component->IsActive());
+	EXPECT_TRUE(component1->IsActive());
+	EXPECT_TRUE(component11->IsActive());
+
+	entity->Deactivate();
+	EXPECT_FALSE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
+	EXPECT_FALSE(component11->IsActive());
+}
+
+TEST_F(CEntityComponentTest, entity_and_component_initiallyActive)
 {
 	CEntity* entity = m_entityManager->GetNewElement();
 	EXPECT_NE(nullptr, entity);
-	EntityComponentTestInternal::CCompActivationTest* component = entity->AddComponent<EntityComponentTestInternal::CCompActivationTest>();
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 	EXPECT_NE(nullptr, component);
 
 	entity->Init();
 
-	EXPECT_EQ(0, component->m_foo);
+	entity->SetIsInitiallyActive(true);
+	component->SetIsInitiallyActive(true);
+	entity->CheckFirstActivation();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(component->IsActive());
+}
+
+TEST_F(CEntityComponentTest, entity_and_component_initiallyActive_children)
+{
+	CEntity* entity, *entity1 = nullptr;
+	CComponent* component, *component1 = nullptr;
+	std::tie(entity, entity1, component, component1) = GetEntityWithChildren();
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(true);
+	entity1->SetIsInitiallyActive(true);
+	component->SetIsInitiallyActive(true);
+	component1->SetIsInitiallyActive(true);
+	entity->CheckFirstActivation();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(entity1->IsActive());
+	EXPECT_TRUE(component->IsActive());
+	EXPECT_TRUE(component1->IsActive());
+}
+
+TEST_F(CEntityComponentTest, entity_and_component_initiallyActive_children_recursive)
+{
+	CEntity* entity, *entity1, *entity11 = nullptr;
+	CComponent* component, *component1, *component11 = nullptr;
+	std::tie(entity, entity1, entity11, component, component1, component11) = GetEntityWithChildrenRecursive();
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(true);
+	entity1->SetIsInitiallyActive(true);
+	entity11->SetIsInitiallyActive(true);
+	component->SetIsInitiallyActive(true);
+	component1->SetIsInitiallyActive(true);
+	component11->SetIsInitiallyActive(true);
+	entity->CheckFirstActivation();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(entity1->IsActive());
+	EXPECT_TRUE(entity11->IsActive());
+	EXPECT_TRUE(component->IsActive());
+	EXPECT_TRUE(component1->IsActive());
+	EXPECT_TRUE(component11->IsActive());
+}
+
+TEST_F(CEntityComponentTest, entity_active_and_component_deactivated_initiallyActive)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(true);
+	component->SetIsInitiallyActive(false);
+	entity->CheckFirstActivation();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+}
+
+TEST_F(CEntityComponentTest, entity_active_and_component_deactivated_initiallyActive_children)
+{
+	CEntity* entity, *entity1 = nullptr;
+	CComponent* component, *component1 = nullptr;
+	std::tie(entity, entity1, component, component1) = GetEntityWithChildren();
+
+	entity->Init();
+
+	component->SetIsInitiallyActive(false);
+	component1->SetIsInitiallyActive(false);
+	entity->CheckFirstActivation();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(entity1->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
+
+	for (int i = 0; i < EntityComponentTestInternal::LOOP_COUNT; ++i)
+	{
+		entity->Activate();
+		EXPECT_FALSE(component->IsActive());
+		EXPECT_FALSE(component1->IsActive());
+	}
+	for (int i = 0; i < EntityComponentTestInternal::LOOP_COUNT; ++i)
+	{
+		entity1->Activate();
+		EXPECT_FALSE(component->IsActive());
+		EXPECT_FALSE(component1->IsActive());
+	}
+}
+
+TEST_F(CEntityComponentTest, entity_active_and_component_deactivated_initiallyActive_children_recursive)
+{
+	CEntity* entity, *entity1, *entity11 = nullptr;
+	CComponent* component, *component1, *component11 = nullptr;
+	std::tie(entity, entity1, entity11, component, component1, component11) = GetEntityWithChildrenRecursive();
+
+	entity->Init();
+
+	component->SetIsInitiallyActive(false);
+	component1->SetIsInitiallyActive(false);
+	component11->SetIsInitiallyActive(false);
+	entity->CheckFirstActivation();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(entity1->IsActive());
+	EXPECT_TRUE(entity11->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
+	EXPECT_FALSE(component11->IsActive());
+
+	for (int i = 0; i < EntityComponentTestInternal::LOOP_COUNT; ++i)
+	{
+		entity->Activate();
+		EXPECT_FALSE(component->IsActive());
+		EXPECT_FALSE(component1->IsActive());
+		EXPECT_FALSE(component11->IsActive());
+	}
+	for (int i = 0; i < EntityComponentTestInternal::LOOP_COUNT; ++i)
+	{
+		entity1->Activate();
+		EXPECT_FALSE(component->IsActive());
+		EXPECT_FALSE(component1->IsActive());
+		EXPECT_FALSE(component11->IsActive());
+	}
+}
+
+TEST_F(CEntityComponentTest, component_no_active_despite_initiallyActive_if_entity_not_initiallyActive)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(false);
+	component->SetIsInitiallyActive(true);
+	entity->CheckFirstActivation();
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+}
+
+TEST_F(CEntityComponentTest, component_no_active_despite_initiallyActive_if_entity_not_initiallyActive_children)
+{
+	CEntity* entity, *entity1 = nullptr;
+	CComponent* component, *component1 = nullptr;
+	std::tie(entity, entity1, component, component1) = GetEntityWithChildren();
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(false);
+	component->SetIsInitiallyActive(true);
+	component1->SetIsInitiallyActive(true);
+	entity->CheckFirstActivation();
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
 	entity->Activate();
-	EXPECT_EQ(1, component->m_foo);
-	entity->Deactivate();
-	EXPECT_EQ(0, component->m_foo);
-	entity->Deactivate();
-	EXPECT_EQ(0, component->m_foo);
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(component->IsActive());
+	EXPECT_TRUE(component1->IsActive());
+}
+
+TEST_F(CEntityComponentTest, component_no_active_despite_initiallyActive_if_entity_not_initiallyActive_children_recursive)
+{
+	CEntity* entity, *entity1, *entity11 = nullptr;
+	CComponent* component, *component1, *component11 = nullptr;
+	std::tie(entity, entity1, entity11, component, component1, component11) = GetEntityWithChildrenRecursive();
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(true);
+	entity1->SetIsInitiallyActive(false);
+	entity11->SetIsInitiallyActive(false);
+	entity->CheckFirstActivation();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(entity1->IsActive());
+	EXPECT_FALSE(entity11->IsActive());
+	EXPECT_TRUE(component->IsActive());
+	EXPECT_FALSE(component1->IsActive());
+	EXPECT_FALSE(component11->IsActive());
+	for (int i = 0; i < EntityComponentTestInternal::LOOP_COUNT; ++i)
+	{
+		entity1->Activate();
+		EXPECT_TRUE(entity1->IsActive());
+		EXPECT_FALSE(entity11->IsActive());
+		EXPECT_TRUE(component1->IsActive());
+		EXPECT_FALSE(component11->IsActive());
+	}
+	for (int i = 0; i < EntityComponentTestInternal::LOOP_COUNT; ++i)
+	{
+		entity11->Activate();
+		EXPECT_TRUE(entity11->IsActive());
+		EXPECT_TRUE(component11->IsActive());
+	}
+}
+
+TEST_F(CEntityComponentTest, inactive_entity_activates_component_initiallyActive)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(false);
+	component->SetIsInitiallyActive(true);
+	entity->CheckFirstActivation();
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	entity->Activate();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(component->IsActive());
+}
+
+TEST_F(CEntityComponentTest, inactive_entity_dont_activates_inactive_component_initiallyActive)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(false);
+	component->SetIsInitiallyActive(false);
+	entity->CheckFirstActivation();
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	entity->Activate();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+}
+
+TEST_F(CEntityComponentTest, component_inactive_after_activation_if_entity_inactive)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(false);
+	component->SetIsInitiallyActive(false);
+	entity->CheckFirstActivation();
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	component->Activate();
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+}
+
+TEST_F(CEntityComponentTest, component_inactive_after_activation_if_entity_inactive_2)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	entity->Init();
+
+	entity->SetIsInitiallyActive(false);
+	component->SetIsInitiallyActive(false);
+	entity->CheckFirstActivation();
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	component->Activate();
+	EXPECT_FALSE(entity->IsActive());
+	EXPECT_FALSE(component->IsActive());
+	entity->Activate();
+	EXPECT_TRUE(entity->IsActive());
+	EXPECT_TRUE(component->IsActive());
 }

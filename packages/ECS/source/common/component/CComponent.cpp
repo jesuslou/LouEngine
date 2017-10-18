@@ -24,13 +24,15 @@
 
 #include <component/CComponent.h>
 #include <component/CComponentFactoryManager.h>
+#include <entity/CEntity.h>
 #include <systems/CSystems.h>
 
 
 CComponent::CComponent()
-	: m_isActive(false)
+	: m_numDeactivations(1)
 	, m_initialized(false)
 	, m_destroyed(false)
+	, m_initiallyActive(true)
 {
 }
 
@@ -60,7 +62,7 @@ void CComponent::Init()
 
 void CComponent::Update(float dt)
 {
-	if (m_isActive)
+	if (IsActive())
 	{
 		DoUpdate(dt);
 	}
@@ -68,7 +70,7 @@ void CComponent::Update(float dt)
 
 void CComponent::Destroy()
 {
-	if(!m_destroyed)
+	if(m_initialized && !m_destroyed)
 	{
 		DoDestroy();
 		m_destroyed = true;
@@ -77,18 +79,68 @@ void CComponent::Destroy()
 
 void CComponent::Activate()
 {
-	if (!m_isActive)
+	if (m_initialized)
 	{
-		DoActivate();
-		m_isActive = true;
+		CEntity* owner = m_owner;
+		if (m_numDeactivations > 0)
+		{
+			if (!owner || owner->IsActive())
+			{
+				m_numDeactivations = 0;
+				DoActivate();
+			}
+			else
+			{
+				m_numDeactivations = 1;
+			}
+		}
 	}
 }
 
 void CComponent::Deactivate()
 {
-	if (m_isActive)
+	if (m_initialized)
 	{
-		DoDeactivate();
-		m_isActive = false;
+		if (m_numDeactivations == 0)
+		{
+			DoDeactivate();
+			++m_numDeactivations;
+		}
+	}
+}
+
+void CComponent::ActivateFromParent()
+{
+	if (m_numDeactivations > 0)
+	{
+		--m_numDeactivations;
+		if (m_numDeactivations == 0)
+		{
+			DoActivate();
+		}
+	}
+}
+
+void CComponent::CheckFirstActivation()
+{
+	if (m_initialized)
+	{
+		if (GetIsInitiallyActive())
+		{
+			CheckFirstActivationInternal();
+		}
+		else
+		{
+			++m_numDeactivations;
+		}
+	}
+}
+
+void CComponent::CheckFirstActivationInternal()
+{
+	CEntity* owner = m_owner;
+	if ((!owner || owner->IsActive()) && m_numDeactivations > 0)
+	{
+		--m_numDeactivations;
 	}
 }
