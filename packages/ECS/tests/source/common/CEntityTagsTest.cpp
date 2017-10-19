@@ -413,3 +413,29 @@ TEST_F(CEntityTagsTest, get_entity_children_with_any_tag_recursive)
 	child11Found = std::find(childrenWithTags.begin(), childrenWithTags.end(), CHandle(child11)) != childrenWithTags.end();
 	EXPECT_TRUE(child11Found);
 }
+
+TEST_F(CEntityTagsTest, entity_clone_tags)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	bool success = entity->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
+	EXPECT_TRUE(success);
+
+	success = entity->HasTags(EntityTagsTestInternal::TAG1);
+	EXPECT_TRUE(success);
+	success = entity->HasTags(EntityTagsTestInternal::TAG2);
+	EXPECT_TRUE(success);
+
+	CEntity* clone = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, clone);
+	success = clone->HasTags(EntityTagsTestInternal::TAG1);
+	EXPECT_FALSE(success);
+	success = clone->HasTags(EntityTagsTestInternal::TAG2);
+	EXPECT_FALSE(success);
+
+	clone->CloneFrom(entity);
+	success = clone->HasTags(EntityTagsTestInternal::TAG1);
+	EXPECT_TRUE(success);
+	success = clone->HasTags(EntityTagsTestInternal::TAG2);
+	EXPECT_TRUE(success);
+}

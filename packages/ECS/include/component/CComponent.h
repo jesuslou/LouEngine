@@ -45,6 +45,16 @@ public:
 	operator CHandle();
 	const CComponent* operator=(const CHandle& rhs);
 
+	const CComponent& operator=(const CComponent& rhs)
+	{
+		m_owner = CHandle();
+		m_numDeactivations = 1;
+		m_initialized = false;
+		m_destroyed = false;
+		m_initiallyActive = true;
+		return *this;
+	}
+
 	void SetOwner(CHandle parent) { m_owner = parent; }
 	CHandle GetOwner() const { return m_owner; }
 

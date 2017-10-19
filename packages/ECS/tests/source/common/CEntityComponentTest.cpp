@@ -36,7 +36,17 @@ namespace EntityComponentTestInternal
 	const int LOOP_COUNT = 5;
 
 	class CCompFoo : public CComponent
-	{};
+	{
+	public:
+		CCompFoo() : m_x(0) {}
+
+		const CCompFoo& operator=(const CCompFoo& rhs)
+		{
+			m_x = rhs.m_x;
+			return *this;
+		}
+		int m_x;
+	};
 
 	class CCompBar : public CComponent
 	{};
@@ -674,4 +684,23 @@ TEST_F(CEntityComponentTest, component_inactive_after_activation_if_entity_inact
 	entity->Activate();
 	EXPECT_TRUE(entity->IsActive());
 	EXPECT_TRUE(component->IsActive());
+}
+
+TEST_F(CEntityComponentTest, clone_entity_clone_component)
+{
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	EntityComponentTestInternal::CCompFoo* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, component);
+
+	static constexpr int VALUE = 13;
+
+	component->m_x = VALUE;
+
+	CEntity* clone = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, clone);
+	clone->CloneFrom(entity);
+	EntityComponentTestInternal::CCompFoo* componentClone = clone->GetComponent<EntityComponentTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, componentClone);
+	EXPECT_EQ(VALUE, componentClone->m_x);
 }

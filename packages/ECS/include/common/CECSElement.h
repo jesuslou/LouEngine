@@ -31,6 +31,11 @@ public:
 		: m_version(0)
 	{}
 
+	const CECSElement& operator=(const CECSElement& rhs)
+	{
+		return *this;
+	}
+
 	virtual void Init() {}
 	virtual void Update(float dt) {}
 	virtual void Destroy() {}
