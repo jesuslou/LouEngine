@@ -53,6 +53,49 @@ public:
 		m_gameSystems.DestroySystem<CComponentFactoryManager>();
 	}
 
+	std::tuple<CEntity*, CEntity*, CEntity*> GetEntityWithChildren()
+	{
+		CEntity* entity = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity);
+		CEntity* child1 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, child1);
+		CEntity* child11 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, child11);
+		entity->AddChild(child1);
+		child1->AddChild(child11);
+
+		return std::make_tuple(entity, child1, child11);
+	}
+
+	std::tuple<CEntity*, CEntity*, CEntity*, CEntity*> GetEntityWithChildren2()
+	{
+		CEntity* entity = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity);
+		CEntity* child1 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, child1);
+		CEntity* child11 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, child11);
+		CEntity* child111 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, child111);
+		entity->AddChild(child1);
+		child1->AddChild(child11);
+		child11->AddChild(child111);
+
+		return std::make_tuple(entity, child1, child11, child111);
+	}
+
+	std::tuple<CEntity*, CEntity*> GetEntityWithChildrenRecursive()
+	{
+		CEntity* entity = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity);
+		CEntity* entity1 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity1);
+
+		entity->AddChild(entity1);
+
+		return std::make_tuple(entity, entity1);
+	}
+
 	CGameSystems m_gameSystems;
 	CEntityManager *m_entityManager;
 	CComponentFactoryManager *m_componentFactoryManager;
@@ -420,14 +463,8 @@ TEST_F(CEntityTest, entity_deactivate_not_accumulative)
 
 TEST_F(CEntityTest, entity_init_initalizes_children)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
+	CEntity* entity, *child1, *child11 = nullptr;
+	std::tie(entity, child1, child11) = GetEntityWithChildren();
 
 	EXPECT_FALSE(entity->IsInitialized());
 	EXPECT_FALSE(child1->IsInitialized());
@@ -442,14 +479,8 @@ TEST_F(CEntityTest, entity_init_initalizes_children)
 
 TEST_F(CEntityTest, entity_activate_activates_children)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
+	CEntity* entity, *child1, *child11 = nullptr;
+	std::tie(entity, child1, child11) = GetEntityWithChildren();
 
 	entity->Init();
 
@@ -466,14 +497,8 @@ TEST_F(CEntityTest, entity_activate_activates_children)
 
 TEST_F(CEntityTest, entity_activate_deactivates_children)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
+	CEntity* entity, *child1, *child11 = nullptr;
+	std::tie(entity, child1, child11) = GetEntityWithChildren();
 
 	entity->Init();
 
@@ -496,14 +521,8 @@ TEST_F(CEntityTest, entity_activate_deactivates_children)
 
 TEST_F(CEntityTest, entity_intial_activate_true_activates_children)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
+	CEntity* entity, *child1, *child11 = nullptr;
+	std::tie(entity, child1, child11) = GetEntityWithChildren();
 
 	entity->SetIsInitiallyActive(true);
 	entity->Init();
@@ -521,14 +540,8 @@ TEST_F(CEntityTest, entity_intial_activate_true_activates_children)
 
 TEST_F(CEntityTest, entity_initialllyActive_false_dont_activates_children)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
+	CEntity* entity, *child1, *child11 = nullptr;
+	std::tie(entity, child1, child11) = GetEntityWithChildren();
 
 	entity->SetIsInitiallyActive(false);
 	entity->Init();
@@ -546,17 +559,8 @@ TEST_F(CEntityTest, entity_initialllyActive_false_dont_activates_children)
 
 TEST_F(CEntityTest, entity_child_initialllyActive_false_breaks_activation_chain)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	CEntity* child111 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child111);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
-	child11->AddChild(child111);
+	CEntity* entity, *child1, *child11, *child111 = nullptr;
+	std::tie(entity, child1, child11, child111) = GetEntityWithChildren2();
 
 	entity->SetIsInitiallyActive(true);
 	child1->SetIsInitiallyActive(false);
@@ -577,17 +581,8 @@ TEST_F(CEntityTest, entity_child_initialllyActive_false_breaks_activation_chain)
 
 TEST_F(CEntityTest, parent_activate_doesnt_activate_inactive_child)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	CEntity* child111 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child111);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
-	child11->AddChild(child111);
+	CEntity* entity, *child1, *child11, *child111 = nullptr;
+	std::tie(entity, child1, child11, child111) = GetEntityWithChildren2();
 
 	entity->SetIsInitiallyActive(true);
 	child1->SetIsInitiallyActive(false);
@@ -618,17 +613,8 @@ TEST_F(CEntityTest, parent_activate_doesnt_activate_inactive_child)
 
 TEST_F(CEntityTest, child_activate_after_being_deactivated_activate_children)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	CEntity* child111 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child111);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
-	child11->AddChild(child111);
+	CEntity* entity, *child1, *child11, *child111 = nullptr;
+	std::tie(entity, child1, child11, child111) = GetEntityWithChildren2();
 
 	entity->SetIsInitiallyActive(true);
 	child1->SetIsInitiallyActive(false);
@@ -656,17 +642,8 @@ TEST_F(CEntityTest, child_activate_after_being_deactivated_activate_children)
 
 TEST_F(CEntityTest, child_activate_after_being_deactivated_activate_children_but_no_parent)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	CEntity* child111 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child111);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
-	child11->AddChild(child111);
+	CEntity* entity, *child1, *child11, *child111 = nullptr;
+	std::tie(entity, child1, child11, child111) = GetEntityWithChildren2();
 
 	entity->SetIsInitiallyActive(true);
 	child1->SetIsInitiallyActive(false);
@@ -694,17 +671,8 @@ TEST_F(CEntityTest, child_activate_after_being_deactivated_activate_children_but
 
 TEST_F(CEntityTest, deactivating_deactivated_entity_deactivates_its_children)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	CEntity* child111 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child111);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
-	child11->AddChild(child111);
+	CEntity* entity, *child1, *child11, *child111 = nullptr;
+	std::tie(entity, child1, child11, child111) = GetEntityWithChildren2();
 
 	entity->SetIsInitiallyActive(true);
 	child1->SetIsInitiallyActive(false);
@@ -738,17 +706,8 @@ TEST_F(CEntityTest, deactivating_deactivated_entity_deactivates_its_children)
 
 TEST_F(CEntityTest, deactivating_deactivated_entity_deactivates_its_children_cascade)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	CEntity* child111 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child111);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
-	child11->AddChild(child111);
+	CEntity* entity, *child1, *child11, *child111 = nullptr;
+	std::tie(entity, child1, child11, child111) = GetEntityWithChildren2();
 
 	entity->SetIsInitiallyActive(true);
 	child1->SetIsInitiallyActive(false);
@@ -791,17 +750,8 @@ TEST_F(CEntityTest, deactivating_deactivated_entity_deactivates_its_children_cas
 
 TEST_F(CEntityTest, deactivating_deactivated_entity_deactivates_its_children_cascade_2)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	CEntity* child111 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child111);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
-	child11->AddChild(child111);
+	CEntity* entity, *child1, *child11, *child111 = nullptr;
+	std::tie(entity, child1, child11, child111) = GetEntityWithChildren2();
 
 	entity->SetIsInitiallyActive(true);
 	child1->SetIsInitiallyActive(false);
@@ -854,17 +804,8 @@ TEST_F(CEntityTest, deactivating_deactivated_entity_deactivates_its_children_cas
 
 TEST_F(CEntityTest, accumulated_deactivation_on_initialization)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	CEntity* child111 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child111);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
-	child11->AddChild(child111);
+	CEntity* entity, *child1, *child11, *child111 = nullptr;
+	std::tie(entity, child1, child11, child111) = GetEntityWithChildren2();
 
 	entity->SetIsInitiallyActive(true);
 	child1->SetIsInitiallyActive(false);
@@ -896,17 +837,8 @@ TEST_F(CEntityTest, accumulated_deactivation_on_initialization)
 
 TEST_F(CEntityTest, accumulated_deactivation_on_initialization_two_levels)
 {
-	CEntity* entity = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, entity);
-	CEntity* child1 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child1);
-	CEntity* child11 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child11);
-	CEntity* child111 = m_entityManager->GetNewElement();
-	EXPECT_NE(nullptr, child111);
-	entity->AddChild(child1);
-	child1->AddChild(child11);
-	child11->AddChild(child111);
+	CEntity* entity, *child1, *child11, *child111 = nullptr;
+	std::tie(entity, child1, child11, child111) = GetEntityWithChildren2();
 
 	entity->SetIsInitiallyActive(true);
 	child1->SetIsInitiallyActive(false);

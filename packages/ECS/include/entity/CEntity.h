@@ -195,9 +195,6 @@ private:
 	void ActivateInternal();
 	void CheckFirstActivationInternal();
 
-	void PerformActionToAllChildren(std::function<void(CEntity*)> function);
-	void PerformActionToAllComponents(std::function<void(CComponent*)> function);
-
 	template<typename... Args>
 	void GetChildrenWithTagsRecursiveInternal(std::vector<CHandle>& children, Args... args)
 	{
