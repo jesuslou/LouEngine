@@ -53,7 +53,7 @@ public:
 
 	void Read(void* where, std::size_t nBytes) override;
 	bool IsValid() const override;
-	bool IsOwner() const;
+	bool IsParent() const;
 
 	std::size_t Seek(std::size_t offset, ESeekType from) override;
 	std::size_t Tell() const override { return m_currentPosition - m_base; }

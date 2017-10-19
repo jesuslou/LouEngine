@@ -241,7 +241,7 @@ TEST_F(CEntityComponentTest, check_component_invalid_after_deleting_entity)
 	EXPECT_EQ(nullptr, component);
 }
 
-TEST_F(CEntityComponentTest, check_component_owner)
+TEST_F(CEntityComponentTest, check_component_parent)
 {
 	CEntity* entity = m_entityManager->GetNewElement();
 	EXPECT_NE(nullptr, entity);

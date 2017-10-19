@@ -59,41 +59,41 @@ protected:
 	CMemoryDataProvider::u8* m_buffer;
 };
 
-TEST_F(CMemoryDataProviderTest, test_memory_data_provider_no_memory_ownership)
+TEST_F(CMemoryDataProviderTest, test_memory_data_provider_no_memory_parentship)
 {
 	CMemoryDataProvider m_sut(m_buffer, MemoryDataProviderTestInternal::BUFFER_SIZE);
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 	std::size_t size = m_sut.GetSize();
 	ASSERT_EQ(size, MemoryDataProviderTestInternal::BUFFER_SIZE);
 	std::size_t remainingBytes = m_sut.GetRemainingBytes();
 	ASSERT_EQ(remainingBytes, MemoryDataProviderTestInternal::BUFFER_SIZE);
 	m_sut.Destroy();
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 	ASSERT_NE(m_buffer, nullptr);
 }
 
-TEST_F(CMemoryDataProviderTest, test_memory_data_provider_memory_ownership)
+TEST_F(CMemoryDataProviderTest, test_memory_data_provider_memory_parentship)
 {
 	CMemoryDataProvider m_sut(MemoryDataProviderTestInternal::BUFFER_SIZE);
-	ASSERT_TRUE(m_sut.IsOwner());
+	ASSERT_TRUE(m_sut.IsParent());
 	std::size_t size = m_sut.GetSize();
 	ASSERT_EQ(size, MemoryDataProviderTestInternal::BUFFER_SIZE);
 	std::size_t remainingBytes = m_sut.GetRemainingBytes();
 	ASSERT_EQ(remainingBytes, MemoryDataProviderTestInternal::BUFFER_SIZE);
 	m_sut.Destroy();
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 }
 
 TEST_F(CMemoryDataProviderTest, test_memory_data_provider_load_file)
 {
 	CMemoryDataProvider m_sut(MemoryDataProviderTestInternal::FILE_NAME);
-	ASSERT_TRUE(m_sut.IsOwner());
+	ASSERT_TRUE(m_sut.IsParent());
 	std::size_t size = m_sut.GetSize();
 	ASSERT_EQ(size, sizeof(SutDataType) * 2);
 	std::size_t remainingBytes = m_sut.GetRemainingBytes();
 	ASSERT_EQ(remainingBytes, sizeof(SutDataType) + sizeof(MemoryDataProviderTestInternal::SECOND_VALUE));
 	m_sut.Destroy();
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 }
 
 TEST_F(CMemoryDataProviderTest, test_memory_data_provider_read)
@@ -180,7 +180,7 @@ TEST_F(CMemoryDataProviderTest, test_file_data_provider_assign_POD)
 	ASSERT_EQ(remainingBytes, MemoryDataProviderTestInternal::BUFFER_SIZE - sizeof(SutDataType));
 	m_sut.Destroy();
 	ASSERT_FALSE(m_sut.IsValid());
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 
 	m_sut.Load(MemoryDataProviderTestInternal::FILE_NAME);
 	value = m_sut.AssignPOD<int>();
@@ -197,7 +197,7 @@ TEST_F(CMemoryDataProviderTest, test_file_data_provider_assign_POD_array)
 	ASSERT_EQ(remainingBytes, 0);
 	m_sut.Destroy();
 	ASSERT_FALSE(m_sut.IsValid());
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 
 	m_sut.Load(MemoryDataProviderTestInternal::FILE_NAME);
 	values = m_sut.AssignPODArray<int>(2);

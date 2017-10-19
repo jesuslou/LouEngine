@@ -54,10 +54,10 @@ protected:
 	CMemoryDataProvider::u8* m_buffer;
 };
 
-TEST_F(CMemoryDataSaverTest, test_memory_data_saver_no_memory_ownership)
+TEST_F(CMemoryDataSaverTest, test_memory_data_saver_no_memory_parentship)
 {
 	CMemoryDataSaver m_sut(m_buffer, MemoryDataProviderTestInternal::BUFFER_SIZE);
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 	std::size_t capacity = m_sut.GetCapacity();
 	ASSERT_EQ(capacity, MemoryDataProviderTestInternal::BUFFER_SIZE);
 	std::size_t size = m_sut.GetSize();
@@ -65,14 +65,14 @@ TEST_F(CMemoryDataSaverTest, test_memory_data_saver_no_memory_ownership)
 	std::size_t remainingBytes = m_sut.GetRemainingBytes();
 	ASSERT_EQ(remainingBytes, MemoryDataProviderTestInternal::BUFFER_SIZE);
 	m_sut.Destroy();
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 	ASSERT_NE(m_buffer, nullptr);
 }
 
-TEST_F(CMemoryDataSaverTest, test_memory_data_saver_memory_ownership)
+TEST_F(CMemoryDataSaverTest, test_memory_data_saver_memory_parentship)
 {
 	CMemoryDataSaver m_sut(MemoryDataProviderTestInternal::BUFFER_SIZE);
-	ASSERT_TRUE(m_sut.IsOwner());
+	ASSERT_TRUE(m_sut.IsParent());
 	std::size_t capacity = m_sut.GetCapacity();
 	ASSERT_EQ(capacity, MemoryDataProviderTestInternal::BUFFER_SIZE);
 	std::size_t size = m_sut.GetSize();
@@ -80,7 +80,7 @@ TEST_F(CMemoryDataSaverTest, test_memory_data_saver_memory_ownership)
 	std::size_t remainingBytes = m_sut.GetRemainingBytes();
 	ASSERT_EQ(remainingBytes, MemoryDataProviderTestInternal::BUFFER_SIZE);
 	m_sut.Destroy();
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 }
 
 TEST_F(CMemoryDataSaverTest, test_memory_data_saver_write_POD)
@@ -122,7 +122,7 @@ TEST_F(CMemoryDataSaverTest, test_memory_data_saver_consume_POD)
 	ASSERT_EQ(remainingBytes, MemoryDataProviderTestInternal::BUFFER_SIZE - sizeof(SutDataType));
 	m_sut.Destroy();
 	ASSERT_FALSE(m_sut.IsValid());
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 }
 
 TEST_F(CMemoryDataSaverTest, test_memory_data_saver_consume_array)
@@ -133,5 +133,5 @@ TEST_F(CMemoryDataSaverTest, test_memory_data_saver_consume_array)
 	ASSERT_EQ(remainingBytes, 0);
 	m_sut.Destroy();
 	ASSERT_FALSE(m_sut.IsValid());
-	ASSERT_FALSE(m_sut.IsOwner());
+	ASSERT_FALSE(m_sut.IsParent());
 }

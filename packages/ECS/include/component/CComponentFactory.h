@@ -65,6 +65,7 @@ public:
 			*newComponent = *(static_cast<T*>(component));
 			return newComponent;
 		}
+		return nullptr;
 	}
 
 	CComponent* GetByIdxAndVersion(int index, int version) override

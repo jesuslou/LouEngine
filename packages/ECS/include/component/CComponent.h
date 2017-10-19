@@ -45,7 +45,7 @@ public:
 	operator CHandle();
 	const CComponent* operator=(const CHandle& rhs);
 
-	void SetOwner(CHandle owner) { m_owner = owner; }
+	void SetOwner(CHandle parent) { m_owner = parent; }
 	CHandle GetOwner() const { return m_owner; }
 
 	void Activate() override;

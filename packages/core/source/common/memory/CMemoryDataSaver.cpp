@@ -30,7 +30,7 @@ CMemoryDataSaver::CMemoryDataSaver()
 	: m_base(nullptr)
 	, m_top(nullptr)
 	, m_reservedBytes(0)
-	, m_isOwnerOfBase(false)
+	, m_isParentOfBase(false)
 {
 }
 
@@ -46,7 +46,7 @@ CMemoryDataSaver::CMemoryDataSaver(unsigned char *buffer, std::size_t bufferSize
 	: m_base(buffer)
 	, m_top(buffer)
 	, m_reservedBytes(bufferSize)
-	, m_isOwnerOfBase(false)
+	, m_isParentOfBase(false)
 {
 }
 
@@ -57,7 +57,7 @@ CMemoryDataSaver::~CMemoryDataSaver()
 
 void CMemoryDataSaver::operator= (const CMemoryDataSaver &ds)
 {
-	if (m_isOwnerOfBase)
+	if (m_isParentOfBase)
 	{
 		assert(m_base);
 		assert(m_reservedBytes >= ds.m_reservedBytes);
@@ -66,24 +66,24 @@ void CMemoryDataSaver::operator= (const CMemoryDataSaver &ds)
 	}
 	else
 	{
-		assert((!ds.m_isOwnerOfBase && !m_isOwnerOfBase) && "Can't operator copy of CMemoryDataSaver..., destructor class, free owned buffer!\n");
+		assert((!ds.m_isParentOfBase && !m_isParentOfBase) && "Can't operator copy of CMemoryDataSaver..., destructor class, free owned buffer!\n");
 		m_base = ds.m_base;
 		m_top = ds.m_top;
 		m_reservedBytes = ds.m_reservedBytes;
-		m_isOwnerOfBase = ds.m_isOwnerOfBase;
+		m_isParentOfBase = ds.m_isParentOfBase;
 	}
 }
 
 void CMemoryDataSaver::Destroy()
 {
-	if (m_base && m_isOwnerOfBase)
+	if (m_base && m_isParentOfBase)
 	{
 		free(m_base);
 	}
 	m_base = nullptr;
 	m_top = nullptr;
 	m_reservedBytes = 0;
-	m_isOwnerOfBase = false;
+	m_isParentOfBase = false;
 }
 
 void CMemoryDataSaver::Rewind(size_t initial_size/* = 0*/)
@@ -94,7 +94,7 @@ void CMemoryDataSaver::Rewind(size_t initial_size/* = 0*/)
 void CMemoryDataSaver::Alloc(size_t requiredBytes, std::size_t initialSize)
 {
 	Destroy();
-	m_isOwnerOfBase = true;
+	m_isParentOfBase = true;
 	m_reservedBytes = requiredBytes;
 	m_base = (u8 *) malloc(m_reservedBytes);
 	m_top = m_base + initialSize;

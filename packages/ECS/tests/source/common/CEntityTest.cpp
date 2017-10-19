@@ -878,3 +878,35 @@ TEST_F(CEntityTest, accumulated_deactivation_on_initialization_two_levels)
 		EXPECT_FALSE(child111->IsActive());
 	}
 }
+
+TEST_F(CEntityTest, clone_entity)
+{
+	CEntity* entity, *child1, *child11 = nullptr;
+	std::tie(entity, child1, child11) = GetEntityWithChildren();
+
+	entity->SetIsInitiallyActive(false);
+
+	CEntity* clonedEntity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, clonedEntity);
+	clonedEntity->CloneFrom(entity);
+	EXPECT_EQ(entity->GetName(), clonedEntity->GetName());
+	EXPECT_FALSE(static_cast<bool>(clonedEntity->GetParent()));
+	EXPECT_EQ(1, clonedEntity->GetChildrenCount());
+	EXPECT_TRUE(clonedEntity->GetIsInitiallyActive());
+	EXPECT_FALSE(clonedEntity->IsInitialized());
+	EXPECT_FALSE(clonedEntity->IsActive());
+	EXPECT_FALSE(clonedEntity->IsDestroyed());
+}
+
+TEST_F(CEntityTest, clone_entity_from_child_dont_inherit_parent)
+{
+	CEntity* entity, *child1, *child11 = nullptr;
+	std::tie(entity, child1, child11) = GetEntityWithChildren();
+
+	CEntity* clonedEntity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, clonedEntity);
+	clonedEntity->CloneFrom(child1);
+	EXPECT_EQ(entity->GetName(), child1->GetName());
+	EXPECT_FALSE(static_cast<bool>(clonedEntity->GetParent()));
+	EXPECT_EQ(1, clonedEntity->GetChildrenCount());
+}

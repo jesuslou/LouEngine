@@ -45,7 +45,7 @@ public:
 
 	void Write(const void *data, std::size_t data_bytes) override;
 	bool IsValid() const override { return m_base != nullptr; }
-	bool IsOwner() const { return m_isOwnerOfBase; }
+	bool IsParent() const { return m_isParentOfBase; }
 
 	unsigned char *GetBuffer() { return m_base; }
 	const unsigned char *GetBuffer() const { return m_base; }
@@ -93,5 +93,5 @@ private:
 	u8 *m_base;
 	u8 *m_top;
 	std::size_t m_reservedBytes;
-	bool m_isOwnerOfBase;
+	bool m_isParentOfBase;
 };

@@ -72,10 +72,10 @@ CMemoryDataProvider::CMemoryDataProvider(const CMemoryDataProvider &mdp)
 
 void CMemoryDataProvider::operator =(const CMemoryDataProvider &dp)
 {
-	// Check sender and receiver is not owner of some buffer, as it's not clear who takes ownership of those
+	// Check sender and receiver is not parent of some buffer, as it's not clear who takes parentship of those
 	// buffers. So it's disallowed.
-	assert(!dp.m_allocatedMemory);			// Confirm the original is not owner
-	assert(!m_allocatedMemory);				// Confirm I'm not owner
+	assert(!dp.m_allocatedMemory);			// Confirm the original is not parent
+	assert(!m_allocatedMemory);				// Confirm I'm not parent
 	m_allocatedMemory = dp.m_allocatedMemory;
 	m_base = dp.m_base;
 	m_nBytes = dp.m_nBytes;
@@ -151,7 +151,7 @@ bool CMemoryDataProvider::IsValid() const
 	return (m_base != nullptr && GetSize() > 0);
 }
 
-bool CMemoryDataProvider::IsOwner() const
+bool CMemoryDataProvider::IsParent() const
 {
 	return m_allocatedMemory != nullptr;
 }
