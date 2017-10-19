@@ -180,12 +180,14 @@ public:
 	bool IsActive() const { return m_numDeactivations == 0; }
 	bool IsDestroyed() const { return m_destroyed; }
 
-	void SetName(const char* const name) { m_name = name; }
+	void SetName(const std::string& name) { m_name = name; }
 	const std::string& GetName() const { return m_name; }
 
 	bool GetIsInitiallyActive() const { return m_initiallyActive; }
 	void SetIsInitiallyActive(bool initiallyActive) { m_initiallyActive = initiallyActive; }
 	void CheckFirstActivation();
+
+	void CloneFrom(CEntity* entity);
 
 private:
 	CEntity();

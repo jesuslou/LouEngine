@@ -50,6 +50,11 @@ public:
   template <unsigned Len>
   CStrID & operator=( const char (&str)[Len] );
 
+  operator unsigned()
+  {
+	  return id;
+  }
+
   // Construct/assign from a char pointer
   // (wrapper disambiguates against compile-time version,
   // but forces you to use the explicit ctor when passed as argument)

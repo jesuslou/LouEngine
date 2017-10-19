@@ -31,6 +31,7 @@ class IComponentFactory
 {
 public:
 	virtual CComponent* CreateComponent() = 0;
+	virtual CComponent* CloneComponent(CComponent* component) = 0;
 	virtual CComponent* GetByIdxAndVersion(int index, int version) = 0;
 	virtual bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle) = 0;
 	virtual int GetComponentPosition(CComponent* component) = 0;
@@ -54,6 +55,16 @@ public:
 	CComponent* CreateComponent() override
 	{
 		return GetNewElement();
+	}
+
+	CComponent* CloneComponent(CComponent* component) override
+	{
+		T* newComponent = static_cast<T*>(CreateComponent());
+		if (newComponent)
+		{
+			*newComponent = *(static_cast<T*>(component));
+			return newComponent;
+		}
 	}
 
 	CComponent* GetByIdxAndVersion(int index, int version) override

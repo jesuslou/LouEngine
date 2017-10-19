@@ -31,6 +31,7 @@
 #include <graphics/CRenderer.h>
 #include <systems/CSystems.h>
 #include <entity/CEntityManager.h>
+#include <entity/CPrefabManager.h>
 #include <component/CComponentFactoryManager.h>
 #include <tags/CTagsManager.h>
 
@@ -141,6 +142,7 @@ void CApplication::Destroy()
 	m_keyboard->Destroy();
 	CSystems::DestroySystem<Input::IKeyboard>();
 
+	CSystems::DestroySystem<CPrefabManager>();
 	CSystems::DestroySystem<CEntityManager>();
 	CSystems::DestroySystem<CComponentFactoryManager>();
 	CSystems::DestroySystem<CTagsManager>();
@@ -150,7 +152,8 @@ void CApplication::Destroy()
 void CApplication::RegisterComponents()
 {
 	m_gameSystems.SetSystem<CEntityManager>(new CEntityManager());
-
+	m_gameSystems.SetSystem<CPrefabManager>(new CPrefabManager());
+	
 	m_componentFactoryManager = new CComponentFactoryManager();
 	m_gameSystems.SetSystem<CComponentFactoryManager>(m_componentFactoryManager);
 	m_gameSystems.SetSystem<CTagsManager>(new CTagsManager());

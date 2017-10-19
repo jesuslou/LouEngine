@@ -26,6 +26,8 @@
 
 #include <component/CComponentFactoryManager.h>
 
+#include <cassert>
+
 CComponent* CComponentFactoryManager::CreateComponent(CStrID componentNameId)
 {
 	IComponentFactory* factory = GetFactoryByName(componentNameId);
@@ -34,6 +36,25 @@ CComponent* CComponentFactoryManager::CreateComponent(CStrID componentNameId)
 		return factory->CreateComponent();
 	}
 	return nullptr;
+}
+
+CComponent* CComponentFactoryManager::CloneComponent(CComponent* component, int componentIdx)
+{
+	IComponentFactory* factory = GetFactoryByIndex(componentIdx);
+	if (factory)
+	{
+		return factory->CloneComponent(component);
+	}
+	return nullptr;
+}
+
+void CComponentFactoryManager::CloneComponents(std::vector<CComponent*>& src, std::vector<CComponent*>& dst)
+{
+	assert(src.size() == dst.size());
+	for (std::size_t i = 0; i < src.size(); ++i)
+	{
+		dst[i] = CloneComponent(src[i], i);
+	}
 }
 
 CComponent* CComponentFactoryManager::AddComponent(CStrID componentNameId, std::vector<CComponent*>& components)

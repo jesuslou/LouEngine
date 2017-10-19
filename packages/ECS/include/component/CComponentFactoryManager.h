@@ -108,6 +108,8 @@ public:
 	}
 
 	CComponent* CreateComponent(CStrID componentNameId);
+	CComponent* CloneComponent(CComponent* component, int componentIdx);
+	void CloneComponents(std::vector<CComponent*>& src, std::vector<CComponent*>& dst);
 	CComponent* AddComponent(CStrID componentNameId, std::vector<CComponent*>& components);
 	CComponent* Get(std::size_t componentTypeIdx, int index, int version);
 	CHandle SetHandleInfoFromComponent(CComponent* component);

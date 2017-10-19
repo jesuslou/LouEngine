@@ -27,6 +27,8 @@
 #include <systems/CSystems.h>
 #include <component/CComponentFactoryManager.h>
 
+#include <cassert>
+
 CEntity::CEntity()
 	: m_componentFactoryManager(*CSystems::GetSystem<CComponentFactoryManager>())
 	, m_tagsManager(*CSystems::GetSystem<CTagsManager>())
@@ -76,7 +78,7 @@ void CEntity::SetParent(CEntity* newParent)
 
 bool CEntity::AddChild(CHandle newChild)
 {
-	if (!HasChild(newChild))
+	if (newChild && !HasChild(newChild))
 	{
 		CEntity* entity = newChild;
 		entity->SetParent(this);
@@ -325,6 +327,42 @@ void CEntity::CheckFirstActivationInternal()
 			if (child)
 			{
 				child->CheckFirstActivationInternal();
+			}
+		}
+	}
+}
+
+void CEntity::CloneFrom(CEntity* entity)
+{
+	if (entity)
+	{
+		SetParent(nullptr);
+		SetName(entity->GetName());
+
+		m_tags = entity->m_tags;
+
+		m_numDeactivations = 1;
+		m_initialized = false;
+		m_destroyed = false;
+		m_initiallyActive = true;
+
+		m_componentFactoryManager.CloneComponents(entity->m_components, m_components);
+
+		CEntityManager* entityManager = CSystems::GetSystem<CEntityManager>();
+		for (CEntity *child : entity->m_children)
+		{
+			if (child)
+			{
+				CEntity* newChild = entityManager->GetNewElement();
+				if (newChild)
+				{
+					newChild->CloneFrom(child);
+					AddChild(newChild);
+				}
+				else
+				{
+					assert(false || "CEntityManager doesn't have enough free entities to perform a full copy");
+				}
 			}
 		}
 	}
