@@ -67,7 +67,8 @@ CHandle CEntityParser::ParseSceneFromJson(const char* const jsonStr)
 	{
 		if (rootEntity["type"].asString() == "entity")
 		{
-			CEntity* entity = ParseEntity(rootEntity, nullptr);
+			result = ParseEntity(rootEntity, nullptr);
+			CEntity* entity = result;
 			if (entity)
 			{
 				entity->Init();
@@ -130,6 +131,8 @@ bool CEntityParser::ParseComponents(Json::Value& components, CEntity* entity)
 			CComponent* component = entity->AddComponent(CStrID(componentJson["type"].asCString()));
 			if (component)
 			{
+				bool initiallyActive = !componentJson["initiallyActive"].empty() ? componentJson["initiallyActive"].asBool() : true;
+				component->SetIsInitiallyActive(initiallyActive);
 				component->ParseAtts(componentJson);
 			}
 			else
