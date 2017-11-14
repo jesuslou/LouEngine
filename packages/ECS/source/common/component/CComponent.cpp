@@ -36,6 +36,15 @@ CComponent::CComponent()
 {
 }
 
+CComponent::~CComponent()
+{
+	for (auto& pair : m_messages)
+	{
+		delete pair.second;
+	}
+	m_messages.clear();
+}
+
 CComponent::operator CHandle()
 {
 	return CSystems::GetSystem<CComponentFactoryManager>()->SetHandleInfoFromComponent(this);

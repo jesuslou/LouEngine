@@ -26,6 +26,9 @@
 
 #include <handle/CHandle.h>
 #include <common/CECSElement.h>
+#include <messages/CMsgHandler.h>
+
+#include <unordered_map>
 
 namespace Json
 {
@@ -36,7 +39,7 @@ class CComponent : public CECSElement
 {
 	template<class CComponent> friend class CFactory;
 public:
-	virtual ~CComponent() {}
+	virtual ~CComponent();
 
 	void Init() override;
 	void Update(float dt) override;
@@ -58,6 +61,19 @@ public:
 	void SetOwner(CHandle parent) { m_owner = parent; }
 	CHandle GetOwner() const { return m_owner; }
 
+	virtual void RegisterMessages() {}
+
+	template<typename T>
+	void SendMessage(const T& message)
+	{
+		static const long long hash = CTypeHasher::Hash<T>();
+		auto& registeredMsg = m_messages.find(hash);
+		if (registeredMsg != m_messages.end())
+		{
+			(*registeredMsg).second->Execute(this, message);
+		}
+	}
+
 	void Activate() override;
 	void Deactivate() override;
 
@@ -76,14 +92,22 @@ protected:
 	CComponent();
 
 	void CheckFirstActivationInternal();
-
+	
 	virtual void DoInit() {}
 	virtual void DoUpdate(float dt) {}
 	virtual void DoDestroy() {}
 	virtual void DoActivate() {}
 	virtual void DoDeactivate() {}
 
+	template<typename C, typename T>
+	void RegisterMessage(void(C::*function)(const T& param))
+	{
+		m_messages[CTypeHasher::Hash<T>()] = new CMsgHandler<C, T>(function);
+	}
+
 	CHandle m_owner;
+
+	std::unordered_map<long long, CMsgHandlerBase*> m_messages;
 
 	int m_numDeactivations;
 	bool m_initialized;
