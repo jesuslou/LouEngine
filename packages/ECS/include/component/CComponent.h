@@ -66,11 +66,14 @@ public:
 	template<typename T>
 	void SendMessage(const T& message)
 	{
-		static const long long hash = CTypeHasher::Hash<T>();
-		auto& registeredMsg = m_messages.find(hash);
-		if (registeredMsg != m_messages.end())
+		if (IsActive() && !m_destroyed)
 		{
-			(*registeredMsg).second->Execute(this, message);
+			static const long long hash = CTypeHasher::Hash<T>();
+			auto& registeredMsg = m_messages.find(hash);
+			if (registeredMsg != m_messages.end())
+			{
+				(*registeredMsg).second->Execute(this, message);
+			}
 		}
 	}
 
