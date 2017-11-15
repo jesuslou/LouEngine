@@ -170,6 +170,18 @@ public:
 		return children;
 	}
 
+	template<typename T>
+	void SendMessage(const T& message)
+	{
+		for (CComponent* component : m_components)
+		{
+			if (component)
+			{
+				component->SendMessage(message);
+			}
+		}
+	}
+
 	void Init() override;
 	void Destroy() override;
 

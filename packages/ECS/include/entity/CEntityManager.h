@@ -33,6 +33,18 @@ class CEntityManager : public CFactory<CEntity>
 public:
 	CEntityManager();
 	~CEntityManager() override {}
+	
+	template<typename T>
+	void BroadcastMessage(const T& message)
+	{
+		for (SEntry& entry : m_entries)
+		{
+			if (entry.m_used)
+			{
+				entry.m_data->SendMessage(message);
+			}
+		}
+	}
 
 	bool DestroyEntity(CEntity** entity);
 	bool DestroyEntity(CHandle handle);
