@@ -22,8 +22,9 @@
 //
 ////////////////////////////////////////////////////////////
 
-#include <entity/CEntityManager.h>
 #include <entity/CEntityParser.h>
+#include <entity/CEntityManager.h>
+#include <entity/CPrefabManager.h>
 #include <component/CComponent.h>
 #include <memory/CMemoryDataProvider.h>
 #include <systems/CSystems.h>
@@ -34,6 +35,7 @@
 
 CEntityParser::CEntityParser()
 	: m_entityManager(*CSystems::GetSystem<CEntityManager>())
+	, m_prefabManager(*CSystems::GetSystem<CPrefabManager>())
 {
 }
 
@@ -86,11 +88,30 @@ CHandle CEntityParser::ParseSceneFromJson(const char* const jsonStr)
 
 CHandle CEntityParser::ParseEntity(Json::Value& entityData, CEntity* parent)
 {
-	CEntity* entity = m_entityManager.GetNewElement();
-	entity->SetName(entityData["name"].asCString());
+	CEntity* entity = nullptr;
+	if (!entityData["prefab"].empty())
+	{
+		entity = m_prefabManager.ClonePrefab(CStrID(entityData["prefab"].asCString()));
+	}
+	else
+	{
+		entity = m_entityManager.GetNewElement();
+	}
+
+	if (!entity)
+	{
+		// ERROR
+		return CHandle();
+	}
+
+	if (!entityData["name"].empty())
+	{
+		entity->SetName(entityData["name"].asCString());
+	}
+
 	bool initiallyActive = !entityData["initiallyActive"].empty() ? entityData["initiallyActive"].asBool() : true;
 	entity->SetIsInitiallyActive(initiallyActive);
-	
+
 	ParseTags(entityData["tags"], entity);
 	ParseComponents(entityData["components"], entity);
 	ParseChildren(entityData["children"], entity);
@@ -104,7 +125,12 @@ CHandle CEntityParser::ParseEntity(Json::Value& entityData, CEntity* parent)
 
 CHandle CEntityParser::ParsePrefab(Json::Value& entityData)
 {
-	return CHandle();
+	CEntity* prefab = ParseEntity(entityData, nullptr);
+	if (prefab)
+	{
+		m_prefabManager.RegisterPrefab(CStrID(entityData["name"].asCString()), prefab);
+	}
+	return prefab;
 }
 
 bool CEntityParser::ParseTags(Json::Value& tags, CEntity* entity)
@@ -128,7 +154,12 @@ bool CEntityParser::ParseComponents(Json::Value& components, CEntity* entity)
 		for (size_t i = 0; i < components.size(); ++i)
 		{
 			Json::Value& componentJson = components[i];
-			CComponent* component = entity->AddComponent(CStrID(componentJson["type"].asCString()));
+			CStrID componentId = CStrID(componentJson["type"].asCString());
+			CComponent* component = entity->GetComponent(componentId);
+			if (!component)
+			{
+				component = entity->AddComponent(componentId);
+			}
 			if (component)
 			{
 				bool initiallyActive = !componentJson["initiallyActive"].empty() ? componentJson["initiallyActive"].asBool() : true;
@@ -137,6 +168,7 @@ bool CEntityParser::ParseComponents(Json::Value& components, CEntity* entity)
 			}
 			else
 			{
+				// ERROR
 				return false;
 			}
 		}

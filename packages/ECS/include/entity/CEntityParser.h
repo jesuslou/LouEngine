@@ -29,6 +29,7 @@
 
 class CEntity;
 class CEntityManager;
+class CPrefabManager;
 
 namespace Json
 {
@@ -52,4 +53,5 @@ private:
 	bool ParseChildren(Json::Value& children, CEntity* entity);
 
 	CEntityManager& m_entityManager;
+	CPrefabManager& m_prefabManager;
 };
