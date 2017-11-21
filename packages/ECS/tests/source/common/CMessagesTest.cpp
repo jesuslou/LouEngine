@@ -24,6 +24,7 @@
 
 #include <component/CComponent.h>
 #include <component/CComponentFactoryManager.h>
+#include <entity/CEntityManager.h>
 #include <handle/CHandle.h>
 #include <systems/CSystems.h>
 
@@ -46,28 +47,60 @@ namespace MessagesTestInternal
 {
 	const int LOOP_COUNT = 5;
 
+	struct STestMessage
+	{
+		STestMessage(int dummy) : m_dummy(dummy) {}
+		int m_dummy;
+	};
+
+	struct STestMessage2
+	{
+	};
+
 	class CCompFoo : public CComponent
 	{
 	public:
 		CCompFoo()
-			: m_initCount(0)
-			, m_updateCount(0)
-			, m_destroyCount(0)
-			, m_activateCount(0)
-			, m_deactivateCount(0)
+			: m_foo(0)
 		{}
 
-		void DoInit() override { ++m_initCount; }
-		void DoUpdate(float /*dt*/) override { ++m_updateCount; }
-		void DoDestroy() override { ++m_destroyCount; }
-		void DoActivate() override { ++m_activateCount; }
-		void DoDeactivate() override { ++m_deactivateCount; }
+		void RegisterMessages() override
+		{
+			RegisterMessage(&CCompFoo::OnTestMessage);
+		}
 
-		int m_initCount;
-		int m_updateCount;
-		int m_destroyCount;
-		int m_activateCount;
-		int m_deactivateCount;
+		void OnTestMessage(const STestMessage& message)
+		{
+			m_foo = message.m_dummy;
+		}
+
+		int m_foo;
+	};
+
+	class CCompBar : public CComponent
+	{
+	public:
+		CCompBar()
+			: m_bar(0)
+		{}
+
+		void RegisterMessages() override
+		{
+			RegisterMessage(&CCompBar::OnTestMessage);
+			RegisterMessage(&CCompBar::OnTestMessage2);
+		}
+
+		void OnTestMessage(const STestMessage& message)
+		{
+			m_bar = message.m_dummy * 2;
+		}
+
+		void OnTestMessage2(const STestMessage2& /*message*/)
+		{
+			m_bar = 1337;
+		}
+
+		int m_bar;
 	};
 }
 
@@ -76,257 +109,59 @@ class CMessagesTest : public ::testing::Test
 public:
 	CMessagesTest()
 		: m_componentFactoryManager(new CComponentFactoryManager)
+		, m_entityManager(new CEntityManager)
 	{
 		CSystems::SetGameSystems(&m_gameSystems);
 		m_gameSystems.SetSystem<CComponentFactoryManager>(m_componentFactoryManager);
+		m_gameSystems.SetSystem<CEntityManager>(m_entityManager);
 
-		ADD_COMPONENT_FACTORY("foo", MessagesTestInternal::CCompFoo, 1);
+		ADD_COMPONENT_FACTORY("foo", MessagesTestInternal::CCompFoo, 2);
+		ADD_COMPONENT_FACTORY("bar", MessagesTestInternal::CCompBar, 2);
 	}
 
 	~CMessagesTest()
 	{
+		m_gameSystems.DestroySystem<CEntityManager>();
 		m_gameSystems.DestroySystem<CComponentFactoryManager>();
 	}
 
 	CGameSystems m_gameSystems;
 	CComponentFactoryManager *m_componentFactoryManager;
+	CEntityManager *m_entityManager;
 };
 
-TEST_F(CMessagesTest, component_not_initalized_on_creation)
+TEST_F(CMessagesTest, component_receives_registered_sendMessage)
 {
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
+	MessagesTestInternal::CCompFoo* compFoo = static_cast<MessagesTestInternal::CCompFoo*>(
 		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
+	EXPECT_NE(nullptr, compFoo);
 
-	EXPECT_FALSE(component->IsInitialized());
-	EXPECT_FALSE(component->IsDestroyed());
-	EXPECT_FALSE(component->IsActive());
-
-	EXPECT_EQ(0, component->m_initCount);
-	EXPECT_EQ(0, component->m_destroyCount);
-	EXPECT_EQ(0, component->m_updateCount);
-	EXPECT_EQ(0, component->m_activateCount);
-	EXPECT_EQ(0, component->m_deactivateCount);
+	compFoo->Init();
+	compFoo->Activate();
+	EXPECT_EQ(0, compFoo->m_foo);
+	MessagesTestInternal::STestMessage message(10);
+	compFoo->SendMessage(message);
+	EXPECT_EQ(10, compFoo->m_foo);
 }
 
-TEST_F(CMessagesTest, component_call_doInit)
+TEST_F(CMessagesTest, component_ignores_unregistered_sendMessage)
 {
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
+	MessagesTestInternal::CCompFoo* compFoo = static_cast<MessagesTestInternal::CCompFoo*>(
 		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
+	EXPECT_NE(nullptr, compFoo);
 
-	EXPECT_FALSE(component->IsInitialized());
-
-	component->Init();
-	EXPECT_TRUE(component->IsInitialized());
-	EXPECT_EQ(1, component->m_initCount);
+	compFoo->Init();
+	compFoo->Activate();
+	EXPECT_EQ(0, compFoo->m_foo);
+	MessagesTestInternal::STestMessage2 message;
+	compFoo->SendMessage(message);
+	EXPECT_EQ(0, compFoo->m_foo);
 }
 
-TEST_F(CMessagesTest, component_init_called_only_once)
+TEST_F(CMessagesTest, entity_with_component_receives_message)
 {
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-
-	for (int i = 0; i < MessagesTestInternal::LOOP_COUNT; ++i)
-	{
-		component->Init();
-		EXPECT_TRUE(component->IsInitialized());
-		EXPECT_EQ(1, component->m_initCount);
-	}
-}
-
-TEST_F(CMessagesTest, component_call_doActivate)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	component->Init();
-
-	EXPECT_FALSE(component->IsActive());
-	component->Activate();
-	EXPECT_TRUE(component->IsActive());
-	EXPECT_EQ(1, component->m_activateCount);
-}
-
-TEST_F(CMessagesTest, component_doActivate_called_only_once)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	component->Init();
-
-	for (int i = 0; i < MessagesTestInternal::LOOP_COUNT; ++i)
-	{
-		component->Activate();
-		EXPECT_TRUE(component->IsActive());
-		EXPECT_EQ(1, component->m_activateCount);
-	}
-}
-
-TEST_F(CMessagesTest, component_dont_activate_itself_if_uninitialized)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-
-	EXPECT_FALSE(component->IsActive());
-	component->Activate();
-	EXPECT_FALSE(component->IsActive());
-	EXPECT_EQ(0, component->m_activateCount);
-}
-
-TEST_F(CMessagesTest, component_call_doDeactivate)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	component->Init();
-
-	EXPECT_FALSE(component->IsActive());
-	component->Activate();
-	EXPECT_TRUE(component->IsActive());
-
-	component->Deactivate();
-	EXPECT_FALSE(component->IsActive());
-	EXPECT_EQ(1, component->m_deactivateCount);
-}
-
-TEST_F(CMessagesTest, component_doDectivate_called_only_once)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-	component->Init();
-
-	component->Activate();
-
-	for (int i = 0; i < MessagesTestInternal::LOOP_COUNT; ++i)
-	{
-		component->Deactivate();
-		EXPECT_FALSE(component->IsActive());
-		EXPECT_EQ(1, component->m_deactivateCount);
-	}
-}
-
-TEST_F(CMessagesTest, component_initially_disabled_dont_call_doDeactivate)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-	component->Init();
-
-	for (int i = 0; i < MessagesTestInternal::LOOP_COUNT; ++i)
-	{
-		component->Deactivate();
-		EXPECT_FALSE(component->IsActive());
-		EXPECT_EQ(0, component->m_deactivateCount);
-	}
-}
-
-TEST_F(CMessagesTest, component_dont_deactivate_itself_if_uninitialized)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-
-	EXPECT_FALSE(component->IsActive());
-	component->Activate();
-	EXPECT_FALSE(component->IsActive());
-
-	component->Deactivate();
-	EXPECT_EQ(0, component->m_deactivateCount);
-}
-
-TEST_F(CMessagesTest, component_call_doDestroy)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-
-	component->Init();
-	component->Destroy();
-	EXPECT_TRUE(component->IsDestroyed());
-	EXPECT_EQ(1, component->m_destroyCount);
-}
-
-TEST_F(CMessagesTest, component_call_doDestroy_called_only_once)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-
-	component->Init();
-	
-	for (int i = 0; i < MessagesTestInternal::LOOP_COUNT; ++i)
-	{
-		component->Destroy();
-		EXPECT_TRUE(component->IsDestroyed());
-		EXPECT_EQ(1, component->m_destroyCount);
-	}
-}
-
-TEST_F(CMessagesTest, component_dont_destroy_itself_if_uninitialized)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-
-	component->Destroy();
-	EXPECT_FALSE(component->IsDestroyed());
-	EXPECT_EQ(0, component->m_destroyCount);
-}
-
-TEST_F(CMessagesTest, component_call_doUpdate)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-
-	component->Init();
-	component->Activate();
-
-	for (int i = 1; i < MessagesTestInternal::LOOP_COUNT; ++i)
-	{
-		component->Update(0.f);
-		EXPECT_EQ(i, component->m_updateCount);
-	}
-}
-
-TEST_F(CMessagesTest, component_dont_update_if_inactive)
-{
-	MessagesTestInternal::CCompFoo* component = static_cast<MessagesTestInternal::CCompFoo*>(
-		m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
-	EXPECT_NE(nullptr, component);
-
-	EXPECT_FALSE(component->IsInitialized());
-
-	component->Init();
-
-	for (int i = 1; i < MessagesTestInternal::LOOP_COUNT; ++i)
-	{
-		component->Update(0.f);
-		EXPECT_EQ(0, component->m_updateCount);
-	}
+	CEntity* entity = m_entityManager->GetNewElement();
+	EXPECT_NE(nullptr, entity);
+	MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+	EXPECT_NE(nullptr, compFoo);
 }

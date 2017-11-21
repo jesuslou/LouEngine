@@ -66,7 +66,7 @@ public:
 	template<typename T>
 	void SendMessage(const T& message)
 	{
-		if (IsActive() && !m_destroyed)
+		if (m_initialized && IsActive() && !m_destroyed)
 		{
 			static const long long hash = CTypeHasher::Hash<T>();
 			auto& registeredMsg = m_messages.find(hash);

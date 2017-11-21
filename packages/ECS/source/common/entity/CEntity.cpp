@@ -168,13 +168,6 @@ void CEntity::Init()
 		{
 			if (component)
 			{
-				component->RegisterMessages();
-			}
-		}
-		for (CComponent* component : m_components)
-		{
-			if (component)
-			{
 				component->Init();
 			}
 		}

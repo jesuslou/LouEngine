@@ -64,6 +64,7 @@ void CComponent::Init()
 {
 	if (!m_initialized)
 	{
+		RegisterMessages();
 		DoInit();
 		m_initialized = true;
 	}
